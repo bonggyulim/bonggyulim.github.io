@@ -30,6 +30,7 @@ exclude:
   - _site_verify8
   - _site_verify9
   - _site_verify10
+  - _site_verify11
   - node_modules
 
 comments:
@@ -43,8 +44,6 @@ collections:
     output: true
   projects:
     output: true
-  tags:
-    output: true
 
 defaults:
   - scope:
@@ -52,17 +51,7 @@ defaults:
     values:
       layout: default
   - scope:
-      type: posts
-    values:
-      layout: post
-      permalink: /blog/:title/
-  - scope:
       type: projects
     values:
       layout: project
       permalink: /projects/:slug/
-  - scope:
-      type: tags
-    values:
-      layout: tag
-      permalink: /tags/:title/
