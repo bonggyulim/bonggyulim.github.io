@@ -1,32 +1,37 @@
 ---
-title: Projects
-description: A curated selection of service, deep learning, and machine learning projects.
+title: 프로젝트
+description: 주요 프로젝트와 구현 내용을 정리했습니다.
 permalink: /projects/
 visible: true
 ---
 
-{% assign featured_order = "industrial-ai-platform|ppe-guard|celeba-conditional-face-generation|smartwatch-activity-classification" | split: "|" %}
+{% assign featured_order = "industrial-ai-platform|ppe-inspection-system|celeba-conditional-face-generation|smartwatch-activity-classification" | split: "|" %}
 
 <div class="hyde content home">
-  <div class="row">
+  <div class="projects-grid">
     {% for slug in featured_order %}
       {% assign project = site.projects | where: "slug", slug | first %}
       {% if project and project.published != false %}
-    <div class="col-lg-6 col-sm-12">
-      <a class="hyde home-project-card" href="{{ site.baseurl }}{{ project.url }}">
-        {% if project.image and project.image != 'placeholder.png' %}
-        <div class="hyde post-thumbnail-wrapper">
-          <div class="hyde post-thumbnail" style="background-image: url('{{ site.baseurl }}/assets/images/projects/{{ project.image }}');"></div>
+    <a class="hyde home-project-card project-card" href="{{ site.baseurl }}{{ project.url }}">
+      <div class="hyde project-card-media">
+        <img
+          class="hyde project-card-image"
+          src="{{ site.baseurl }}/assets/images/projects/{{ project.image }}"
+          alt="{{ project.title }} 미리보기"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="hyde project-card-placeholder{% if project.image %} is-hidden{% endif %}">대표 이미지 준비 예정</div>
+      </div>
+      <div class="hyde home-project-copy">
+        <h3>{{ project.title }}</h3>
+        <p>{{ project.description }}</p>
+        <div class="hyde tech-tags">
+          {% for item in project.tech limit: 4 %}
+          <span class="hyde tech-tag">{{ item }}</span>
+          {% endfor %}
         </div>
-        {% else %}
-        <div class="hyde media-placeholder compact">Image placeholder</div>
-        {% endif %}
-        <div class="hyde home-project-copy">
-          <h3>{{ project.title }}</h3>
-          <p>{{ project.description }}</p>
-        </div>
-      </a>
-    </div>
+      </div>
+    </a>
       {% endif %}
     {% endfor %}
   </div>

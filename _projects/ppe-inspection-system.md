@@ -1,56 +1,43 @@
 ---
-title: PPE Guard
-slug: ppe-guard
-description: On-premise AI inspection system for checking worker PPE compliance and storing operational results.
-image: placeholder.png
+title: PPE Guard 안전장비 탐지 시스템
+slug: ppe-inspection-system
+type: service
+description: 영상·웹캠 입력을 기반으로 작업자 안전장비 착용 여부를 탐지하고 결과를 저장·조회하는 산업안전 AI 시스템입니다.
+image: ppe-guard-preview.png
 date: 2026-05-15
+tech:
+  - Flask
+  - Python
+  - OpenCV
+  - Docker
+  - MariaDB
+demo_url:
+github_url:
+overview: 작업자 보호구 착용 여부를 검사하고 결과를 저장·조회할 수 있도록 구성한 사내망 배포형 산업안전 AI 시스템입니다. 고객사 내부 환경에서 운영 가능한 설치형 구조를 목표로 구성했습니다.
+role:
+  - 백엔드 구조 설계
+  - AI 판정 연동
+  - 고객사 DB 연계 구조 설계
+  - 환경 변수 및 배포 구조 정리
+key_features:
+  - 웹캠 및 영상 입력 기반 검사 처리
+  - AI 판정 결과 저장 및 조회 기능
+  - 백엔드를 통한 DB 접근 제어
+  - 사내망 배포를 고려한 Docker 실행 구조
+architecture_summary: 프론트엔드 요청을 Flask API가 수신하고, AI 판정과 결과 저장을 백엔드가 통제하는 구조로 구성해 보안성과 운영 통제성을 확보했습니다.
+decisions:
+  - 프론트엔드가 고객사 DB에 직접 접근하지 않고 백엔드 API를 통하도록 설계했습니다.
+  - 내부망 환경을 고려해 설치형 Docker 실행 구조를 기본 배포 방식으로 선택했습니다.
+  - AI 판정 결과 저장 구조를 분리해 조회와 감사 이력을 관리하기 쉽게 만들었습니다.
+  - 환경별 설정을 `.env`로 분리해 운영 변경 시 코드 수정 범위를 줄였습니다.
+troubleshooting:
+  - 고객사 DB 연동 방식 차이를 백엔드 매핑 계층으로 흡수했습니다.
+  - 웹캠 입력과 파일 입력의 처리 흐름 차이를 공통 판정 파이프라인으로 맞췄습니다.
+  - 환경변수 누락으로 인한 배포 오류를 설정 템플릿 정리로 줄였습니다.
+  - 결과 저장 시 필드 정합성 문제를 저장 스키마 고정으로 해결했습니다.
+achievements:
+  - 웹캠과 영상 입력 기반 PPE 판정 흐름을 구현했습니다.
+  - 판정 결과 저장과 조회 기능을 운영 가능한 형태로 정리했습니다.
+  - 고객사 내부망 배포를 고려한 설치형 구조를 마련했습니다.
+  - 백엔드를 통한 DB 접근 제어 구조를 적용했습니다.
 ---
-
-## Overview
-
-PPE Guard is an internal AI inspection system that checks whether workers are wearing required protective equipment and stores the inspection results for later review.
-
-## Role
-
-I designed the backend structure, connected the AI inference flow, defined the customer DB integration approach, and organized the Docker runtime and environment-based configuration.
-
-## Tech Stack
-
-- Flask
-- Python
-- Docker
-- Customer DB
-- OpenCV
-
-## Key Features
-
-- Webcam and video-based inspection input
-- AI inference result storage and retrieval
-- Backend-mediated DB access control
-- `.env`-based environment configuration
-- On-premise deployment model
-
-## Architecture
-
-The frontend sends requests to a Flask API, and the backend controls both AI inference and result persistence for better security and operations.
-
-<div class="hyde media-placeholder">Architecture image placeholder</div>
-
-## Demo
-
-<div class="hyde media-placeholder">Demo video placeholder</div>
-
-<!--
-<video controls width="100%">
-  <source src="{{ site.baseurl }}/assets/videos/ppe-guard-demo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
--->
-
-## Result
-
-The system adopted a backend-centered DB access model that fits internal deployment environments where security and operational control are important.
-
-## What I Learned
-
-I learned that practical internal systems require strong attention to access control, configuration isolation, and deployment constraints in addition to model accuracy.

@@ -2,29 +2,16 @@
   <div class="hyde container">
     <div class="hyde footer">
       <div class="hyde footer-left">
-        <ul class="hyde footer-menu links">
-          {% assign pages = site.pages | sort: 'url' %}
-          {% for p in pages %}
-            {% if p.visible == true %}
-          <li>
-            <a href="{{ site.baseurl }}{{ p.url }}">{{ p.title }}</a>
-          </li>
-            {% endif %}
-          {% endfor %}
-        </ul>
         <p class="text">&copy; {{ site.time | date: '%Y' }} {{ site.title }}</p>
       </div>
       <div class="hyde footer-right">
-        <ul class="hyde footer-menu social">
-          <li>
-            <a href="https://github.com/{{ site.github }}"><i class="fab fa-github"></i></a>
-          </li>
-          <li>
-            <a href="mailto:{{ site.email }}"><i class="fas fa-envelope"></i></a>
-          </li>
-        </ul>
-        <p class="text">
-          Original template <a href="https://github.com/ChemistryX/hyde"><i class="fas fa-meteor"></i> Hyde</a>
+        <p class="text footer-links">
+          <a href="https://github.com/{{ site.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <span>/</span>
+          <a href="mailto:{{ site.email }}">Email</a>
+        </p>
+        <p class="text footer-template">
+          Original template: <a href="https://github.com/ChemistryX/hyde">Hyde</a>
         </p>
       </div>
     </div>

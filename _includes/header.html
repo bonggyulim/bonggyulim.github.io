@@ -1,4 +1,4 @@
-<div class="hyde jumbotron">
+<div class="hyde jumbotron{% if page.layout == 'project' %} project-hero{% endif %}">
   <div class="hyde container">
     <h1>{% if page.layout == "tag" %}<span class="hyde symbol">#</span>{% endif %}{{ page.title }}</h1>
     {% if page.layout == "post" %}
@@ -13,13 +13,20 @@
         <div class="hyde separator">|</div>
         <span class="hyde post-date">{{ page.date | date: '%Y.%m.%d' }}</span>
       </div>
-      <a class="hyde post-back" href="{{ site.baseurl }}/blog/"><i class="fas fa-chevron-left"></i> Back to list</a>
+      <a class="hyde post-back" href="{{ site.baseurl }}/blog/"><i class="fas fa-chevron-left"></i> 목록으로 돌아가기</a>
     </div>
     {% else %}
     <h2>{{ page.description }}</h2>
+      {% if page.layout == "project" and page.tech %}
+    <div class="hyde project-hero-tags">
+        {% for item in page.tech %}
+      <span class="hyde tech-tag">{{ item }}</span>
+        {% endfor %}
+    </div>
+      {% endif %}
       {% if page.layout == "tag" or page.layout == "project" %}
     <div class="hyde post-desc reverse">
-      <a class="hyde post-back" href="{{ site.baseurl }}/{{ page.url | split: '/' | shift | first }}/"><i class="fas fa-chevron-left"></i> Back to list</a>
+      <a class="hyde post-back" href="{% if page.layout == 'project' %}{{ site.baseurl }}/projects/{% else %}{{ site.baseurl }}/{{ page.url | split: '/' | shift | first }}/{% endif %}"><i class="fas fa-chevron-left"></i> {% if page.layout == 'project' %}프로젝트 목록으로{% else %}목록으로 돌아가기{% endif %}</a>
     </div>
       {% endif %}
     {% endif %}

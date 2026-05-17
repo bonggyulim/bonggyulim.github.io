@@ -55,20 +55,19 @@ bundle exec jekyll serve
 브라우저에서 확인:
 
 - `http://127.0.0.1:4000/`
-- `http://127.0.0.1:4000/about/`
 - `http://127.0.0.1:4000/projects/`
 
 ## Notes
 
 - Windows에서는 RubyInstaller 사용을 권장합니다.
-- 포트 `4000`이 이미 사용 중이면 다른 프로세스를 종료하거나 포트를 변경해서 실행합니다.
+- 포트 `4000`이 이미 사용 중이면 다른 프로세스를 종료하거나 포트를 변경해 실행합니다.
 - 자동 재생성이 과하게 반복되면 `_config.yml`의 `exclude` 설정을 확인하거나 `bundle exec jekyll serve --no-watch`로 실행할 수 있습니다.
 
 ## Structure
 
-- Home
-- About
-- Projects
+- Home: 소개, 핵심 역량, 기술 스택
+- Projects: 프로젝트 목록
+- Project Detail: 프로젝트 상세 설명
 
 ## Deployment
 

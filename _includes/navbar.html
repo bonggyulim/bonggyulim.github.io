@@ -1,37 +1,31 @@
 <header class="hyde header {% if page.url == "/" %}main{% endif %}">
   <nav class="hyde navbar-parent {% if page.url == "/" %}main{% endif %}">
-    {% assign pages = site.pages | sort: 'url' %}
-    {% assign current_url = page.url | append: "/" | replace: "//", "/" %}
     <div class="hyde mobile-nav-wrapper">
       <div class="hyde container">
         <ul class="hyde mobile-nav">
           <div class="hyde mobile-nav-row">
-            <a class="hyde mobile-nav-item logo" href="{{ site.baseurl }}/"><i class="fas fa-meteor"></i> {{ site.title }}</a>
+            <a class="hyde mobile-nav-item logo" href="{{ site.baseurl }}/"><i class="fas fa-meteor"></i> {{ site.title | upcase }}</a>
             <a class="hyde mobile-nav-item close-btn"><i class="fas fa-times"></i></a>
           </div>
-          {% for p in pages %}
-            {% if p.visible == true %}
-          <a class="hyde mobile-nav-item{% if current_url == p.url %} active{% endif %}" href="{{ site.baseurl }}{{ p.url }}">{{ p.title }}</a>
-            {% endif %}
-          {% endfor %}
+          <a class="hyde mobile-nav-item{% if page.url == '/projects/' %} active{% endif %}" href="{{ site.baseurl }}/projects/">프로젝트</a>
+          <a class="hyde mobile-nav-item" href="https://github.com/{{ site.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
         </ul>
       </div>
     </div>
     <div class="hyde container">
       <ul class="hyde navbar">
         <li class="hyde nav-item">
-          <a class="hyde nav-logo" href="{{ site.baseurl }}/"><i class="fas fa-meteor"></i> {{ site.title }}</a>
+          <a class="hyde nav-logo" href="{{ site.baseurl }}/"><i class="fas fa-meteor"></i> {{ site.title | upcase }}</a>
         </li>
         <li class="hyde nav-toggler">
           <a class="hyde nav-toggle-btn"><i class="fas fa-bars"></i></a>
         </li>
-        {% for p in pages %}
-          {% if p.visible == true %}
-        <li class="hyde nav-item{% if current_url == p.url %} active{% endif %}">
-          <a href="{{ site.baseurl }}{{ p.url }}">{{ p.title }}</a>
+        <li class="hyde nav-item{% if page.url == '/projects/' %} active{% endif %}">
+          <a href="{{ site.baseurl }}/projects/">프로젝트</a>
         </li>
-          {% endif %}
-        {% endfor %}
+        <li class="hyde nav-item">
+          <a href="https://github.com/{{ site.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </li>
       </ul>
     </div>
   </nav>

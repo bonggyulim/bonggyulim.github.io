@@ -2,11 +2,141 @@
 layout: default
 ---
 
-<div class="hyde content project-detail">
-  {% if page.image and page.image != "placeholder.png" %}
-  <img src="{{ site.baseurl }}/assets/images/projects/{{ page.image }}" alt="{{ page.title }}" />
+<div class="hyde content project-container">
+  <section class="hyde project-preview project-section">
+    <div class="hyde project-preview-media">
+      {% if page.image %}
+      <img
+        src="{{ site.baseurl }}/assets/images/projects/{{ page.image }}"
+        alt="{{ page.title }} 미리보기"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      {% endif %}
+      <div class="hyde project-preview-placeholder{% if page.image %} is-hidden{% endif %}">대표 이미지 준비 예정</div>
+    </div>
+    {% if page.demo_url or page.github_url %}
+    <div class="hyde project-link-row">
+      {% if page.demo_url %}
+      <a class="hyde btn btn-primary project-link-btn" href="{{ page.demo_url }}" target="_blank" rel="noopener noreferrer">시연 영상 보기</a>
+      {% endif %}
+      {% if page.github_url %}
+      <a class="hyde btn btn-default project-link-btn" href="{{ page.github_url }}" target="_blank" rel="noopener noreferrer">GitHub 보기</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="hyde project-section">
+    <h2>개요</h2>
+    <p>{{ page.overview }}</p>
+  </section>
+
+  <section class="hyde project-summary-grid project-section">
+    <article class="hyde project-summary-card">
+      <h2>담당 역할</h2>
+      <ul>
+        {% for item in page.role %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </article>
+    <article class="hyde project-summary-card">
+      <h2>{% if page.type == "experiment" %}실험 구성{% else %}핵심 구현{% endif %}</h2>
+      <ul>
+        {% if page.type == "experiment" %}
+          {% for item in page.experiment_summary %}
+        <li>{{ item }}</li>
+          {% endfor %}
+        {% else %}
+          {% for item in page.key_features %}
+        <li>{{ item }}</li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </article>
+    <article class="hyde project-summary-card">
+      <h2>기술 스택</h2>
+      <p>{{ page.tech | join: ", " }}</p>
+    </article>
+  </section>
+
+  {% if page.type == "service" %}
+  <section class="hyde project-section">
+    <h2>시스템 구조</h2>
+    <p>{{ page.architecture_summary }}</p>
+    <div class="hyde architecture-placeholder">구조 이미지 준비 예정</div>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>기술 의사결정</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.decisions %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>트러블슈팅</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.troubleshooting %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>성과</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.achievements %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
   {% else %}
-  <div class="hyde media-placeholder hero">Image placeholder</div>
+  <section class="hyde project-section">
+    <h2>실험 설계</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.experiment_design %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>평가 지표</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.metrics %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>주요 결과</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.major_results %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>트러블슈팅</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.troubleshooting %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="hyde project-section">
+    <h2>개선 방향</h2>
+    <ul class="hyde project-section-list">
+      {% for item in page.improvements %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
   {% endif %}
-  {{ content }}
 </div>
