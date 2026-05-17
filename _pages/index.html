@@ -1,13 +1,62 @@
 ---
-description: Hyde와 함께 자신만의 블로그 / 포트폴리오를 만들어보세요
+title: Home
+description: I build AI-powered services by connecting product requirements with working backend systems, data flows, and deployment environments.
 permalink: /
 visible: false
 ---
 
 <div class="hyde jumbotron main">
   <div class="hyde container">
-    <h1>{{ site.description }}</h1>
+    <h1>AI &amp; Backend Developer</h1>
     <h2 class="hyde main-desc">{{ page.description }}</h2>
-    <a href="{{ site.baseurl }}/about" class="hyde btn btn-light">start exploring</a>
+    <div class="hyde home-actions">
+      <a href="{{ site.baseurl }}/projects/" class="hyde btn btn-light">View Projects</a>
+      <a href="{{ site.baseurl }}/about/" class="hyde btn btn-default home-secondary">About Me</a>
+    </div>
+  </div>
+</div>
+
+<div class="hyde container">
+  <div class="hyde content home">
+    <section class="hyde home-section">
+      <div class="row">
+        <div class="col-md-3 col-sm-6">
+          <div class="hyde tag home-keyword">AI Application</div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="hyde tag home-keyword">Backend API</div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="hyde tag home-keyword">Deep Learning</div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="hyde tag home-keyword">Machine Learning</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hyde home-section">
+      <div class="hyde section-heading">
+        <h2>Featured Projects</h2>
+        <a href="{{ site.baseurl }}/projects/">See all projects</a>
+      </div>
+      {% assign featured_order = "industrial-ai-platform|ppe-guard|celeba-conditional-face-generation|smartwatch-activity-classification" | split: "|" %}
+      <div class="row">
+        {% for slug in featured_order %}
+          {% assign project = site.projects | where: "slug", slug | first %}
+          {% if project and project.published != false %}
+        <div class="col-lg-6 col-sm-12">
+          <a class="hyde home-project-card" href="{{ site.baseurl }}{{ project.url }}">
+            <div class="hyde media-placeholder compact">Project preview</div>
+            <div class="hyde home-project-copy">
+              <h3>{{ project.title }}</h3>
+              <p>{{ project.description }}</p>
+            </div>
+          </a>
+        </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
   </div>
 </div>

@@ -1,19 +1,32 @@
-title: Hyde
+title: Bonggyu Lim
 description: >-
-  Build your own portfolio <br>
-  with Hyde.
-url: "https://chemistryx.github.io"
-baseurl: "/hyde"
-github: ChemistryX
-email: changeme@chemistryx.me
-google_analytics: "UA_TOKEN"
+  AI & Backend Developer Portfolio <br>
+  Industrial AI, RAG, LLM, Backend, Deployment
+url: "https://bonggyulim.github.io"
+baseurl: ""
+github: bonggyulim
+email: bonggyulim0728@gmail.com
+google_analytics: ""
 
-exclude: [README.md, Gemfile, Gemfile.lock]
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - Gemfile.lock.old
+  - vendor
+  - .bundle
+  - .bundle-user
+  - .jekyll-cache
+  - .sass-cache
+  - _site
+  - _site_preview
+  - node_modules
 
 comments:
-  enabled: true
-  repo: "REPO_COMMENTS_PATH"
+  enabled: false
+  repo: ""
   issue-term: pathname
+  theme: github-light
 
 collections:
   pages:
@@ -32,14 +45,14 @@ defaults:
       type: posts
     values:
       layout: post
-      permalink: /blog/:title
+      permalink: /blog/:title/
   - scope:
       type: projects
     values:
       layout: project
-      permalink: /projects/:title
+      permalink: /projects/:slug/
   - scope:
       type: tags
     values:
       layout: tag
-      permalink: /tags/:title
+      permalink: /tags/:title/

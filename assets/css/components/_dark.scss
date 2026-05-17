@@ -105,6 +105,29 @@
         }
     }
 
+    .hyde.home-project-card {
+        background-color: $dark200 !important;
+        border-color: $dark300 !important;
+    }
+
+    .hyde.home-project-copy {
+        h3, p {
+            color: $gray450 !important;
+        }
+    }
+
+    .hyde.home-keyword {
+        background-color: $dark200 !important;
+        border-color: $dark300 !important;
+        color: $gray450 !important;
+    }
+
+    .hyde.media-placeholder {
+        background: linear-gradient(135deg, rgba($dark200, 0.95), rgba($dark300, 0.95)) !important;
+        border-color: $dark300 !important;
+        color: $gray450 !important;
+    }
+
     hr {
         background-color: $dark200 !important;
     }

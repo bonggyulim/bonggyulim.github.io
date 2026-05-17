@@ -1,33 +1,33 @@
 ---
 title: Projects
-description: 지금까지 작업했던 프로젝트를 모아놓은 곳입니다.
-permalink: projects
+description: A curated selection of service, deep learning, and machine learning projects.
+permalink: /projects/
 visible: true
 ---
 
-<div class="hyde posts">
-  {% assign sorted = site.projects | sort: 'date' | reverse %} {% for project in sorted %}
-  <div class="hyde post{% unless forloop.last %} divider{% endunless %}">
-    <a href="{{ site.baseurl }}{{ project.url }}">
-      <div class="hyde post-thumbnail-wrapper">
-        {% if project.image %}
-        <div class="hyde post-thumbnail" style="background-image: url('{{ site.baseurl }}/assets/images/projects/{{ project.image }}');"></div>
-        {% elsif project.youtube %}
-        <div
-          class="hyde post-thumbnail"
-          style="background-image: url('{{ project.youtube | prepend: 'https://img.youtube.com/vi/' }}/maxresdefault.jpg')"
-        ></div>
+{% assign featured_order = "industrial-ai-platform|ppe-guard|celeba-conditional-face-generation|smartwatch-activity-classification" | split: "|" %}
+
+<div class="hyde content home">
+  <div class="row">
+    {% for slug in featured_order %}
+      {% assign project = site.projects | where: "slug", slug | first %}
+      {% if project and project.published != false %}
+    <div class="col-lg-6 col-sm-12">
+      <a class="hyde home-project-card" href="{{ site.baseurl }}{{ project.url }}">
+        {% if project.image and project.image != 'placeholder.png' %}
+        <div class="hyde post-thumbnail-wrapper">
+          <div class="hyde post-thumbnail" style="background-image: url('{{ site.baseurl }}/assets/images/projects/{{ project.image }}');"></div>
+        </div>
         {% else %}
-        <div class="hyde post-thumbnail"></div>
+        <div class="hyde media-placeholder compact">Image placeholder</div>
         {% endif %}
-      </div>
-    </a>
-    <a href="{{ site.baseurl }}{{ project.url }}">
-      <h2 class="hyde post-title">{{ project.title }}</h2>
-    </a>
-    <div class="hyde post-trail">
-      <span class="hyde post-date">{{ project.date | date: '%Y년 %-m월 %-d일' }}</span>
+        <div class="hyde home-project-copy">
+          <h3>{{ project.title }}</h3>
+          <p>{{ project.description }}</p>
+        </div>
+      </a>
     </div>
+      {% endif %}
+    {% endfor %}
   </div>
-  {% else %} {% include empty.html %} {% endfor %}
 </div>
