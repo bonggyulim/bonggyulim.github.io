@@ -10,7 +10,6 @@ export default function Header() {
         </NavLink>
         <nav className="main-nav">
           <NavLink to="/">Home</NavLink>
-          <NavLink to="/projects">Projects</NavLink>
           <a href="https://github.com/bonggyulim" target="_blank" rel="noreferrer">
             GitHub
           </a>

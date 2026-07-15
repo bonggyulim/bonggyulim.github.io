@@ -20,13 +20,17 @@ function LinkChip({ href, children }) {
 
 export default function ProjectCard({ project, variant = "compact" }) {
   const isCompact = variant === "compact";
-  const tags = isCompact ? project.tags.slice(0, 4) : project.tags.slice(0, 6);
+  const detailPath = project.detailPath ?? `/projects/${project.slug}`;
+  const tags = project.tags;
+  const highlights = project.highlights.slice(0, 4);
+  const compactSummary = project.homeSummary ?? project.summary;
+  const imageFit = isCompact ? project.imageFit ?? "cover" : "cover";
 
   return (
     <article className={isCompact ? "home-project-card" : "projects-page-card"}>
-      <Link className="project-card-link" to={`/projects/${project.slug}`}>
+      <Link className="project-card-link" to={detailPath}>
         {project.image ? (
-          <figure className={`project-image ${isCompact ? "is-home" : "is-projects"}`}>
+          <figure className={`project-image ${isCompact ? "is-home" : "is-projects"} is-${imageFit}`}>
             <img src={project.image} alt={`${project.title} 대표 이미지`} />
           </figure>
         ) : null}
@@ -39,43 +43,42 @@ export default function ProjectCard({ project, variant = "compact" }) {
             </span>
           </div>
 
-          <p className={isCompact ? "project-summary compact" : "project-summary expanded"}>{project.summary}</p>
+          <p className={isCompact ? "project-summary compact" : "project-summary expanded"}>
+            {isCompact ? compactSummary : project.summary}
+          </p>
 
           {!isCompact ? (
-            <ul className="project-highlight-list">
-              {project.highlights.slice(0, 3).map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
+            <>
+              <ul className="project-highlight-list">
+                {highlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
 
-          <div className="tag-list">
-            {tags.map((tag) => (
-              <span key={tag} className="tag-pill">
-                {tag}
-              </span>
-            ))}
-          </div>
+              <div className="tag-list">
+                {tags.map((tag) => (
+                  <span key={tag} className="tag-pill">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       </Link>
 
-      {!isCompact ? (
-        <div className="projects-card-footer">
+      <div className={isCompact ? "home-card-footer" : "projects-card-footer"}>
+        {isCompact ? null : (
           <div className="card-link-row">
             <LinkChip href={project.githubUrl}>GitHub</LinkChip>
             <LinkChip href={project.pptUrl}>PPT</LinkChip>
           </div>
-          <Link className="detail-inline-link" to={`/projects/${project.slug}`}>
-            상세 보기
-          </Link>
-        </div>
-      ) : (
-        <div className="home-card-footer">
-          <Link className="detail-inline-link" to={`/projects/${project.slug}`}>
-            자세히 보기
-          </Link>
-        </div>
-      )}
+        )}
+
+        <Link className="detail-inline-link" to={detailPath}>
+          상세 보기 {isCompact ? "→" : ""}
+        </Link>
+      </div>
     </article>
   );
 }
