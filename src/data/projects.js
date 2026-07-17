@@ -73,13 +73,13 @@ export const projects = [
     description: "드론 RGB·열화상 이미지를 분석해 이상 후보와 유지보수 우선순위를 제공하는 태양광 관리 플랫폼입니다.",
     image: "/assets/projects/pv-insight-thumbnail.png",
     imageFit: "cover",
-    videoUrl: "/assets/projects/pv-insight.mp4",
+    videoUrl: "/assets/projects/pv-insight-v2.mp4",
     videoPoster: "/assets/projects/pv-insight-thumbnail.png",
     architectureImage: "/assets/projects/pv-insight-architecture.png",
     tags: ["Java", "Spring Boot", "JPA", "Flyway", "FastAPI", "Python", "PostgreSQL", "AWS S3", "AWS SQS", "Docker", "K3s", "Traefik", "Jenkins", "ONNX Runtime"],
     serviceUrl: "https://app.pv-insight.com/",
     githubUrl: "https://github.com/solar-ai-dev/pv-fusion",
-    pptUrl: "https://drive.google.com/file/d/10HTasD1Iz1Kjm4Pe2rDkboW1L9ToyKo6/view?usp=sharing",
+    pptUrl: "https://drive.google.com/file/d/1aGiUSR2hrWWxOQss0XEdZAJtKm6wi4x0/view?usp=sharing",
     demoUrl: "",
     highlights: [
       "RGB·Thermal 이미지의 독립 단건 분석 구조",
@@ -116,10 +116,10 @@ export const projects = [
         title: "문제 해결 경험",
         type: "problem_solution",
         card: {
-          title: "중복 분석과 Job 상태 불일치 방지",
+          title: "SQS 재전달에 대응한 멱등 처리",
           problem: "SQS 메시지가 재전달되면 동일 이미지가 중복 분석되고 Job 상태와 결과가 어긋날 수 있었다.",
-          solution: "imageId 기준 중복 Job 차단과 조건부 상태 전환을 적용하고 결과 저장을 하나의 트랜잭션으로 처리했다.",
-          result: "중복 분석과 결과 데이터의 상태 불일치를 방지했다."
+          solution: "imageId 기준 Job 제약, 조건부 상태 전환과 트랜잭션 저장을 적용했다.",
+          result: "중복 메시지에도 결과가 한 번만 반영되도록 애플리케이션 수준의 멱등성을 확보했다."
         }
       }
     ]
