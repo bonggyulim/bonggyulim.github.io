@@ -2,8 +2,6 @@ import { Link, useParams } from "react-router-dom";
 import ProjectActionDock from "../components/ProjectActionDock";
 import { getProjectBySlug } from "../data/projects";
 
-const coreSectionTitles = new Set(["내 기여", "설계 및 구현 범위", "핵심 구현"]);
-
 function CoreBlock({ section }) {
   return (
     <article className="detail-core-card">
@@ -14,6 +12,26 @@ function CoreBlock({ section }) {
         ))}
       </ul>
     </article>
+  );
+}
+
+function ContributionSection({ section }) {
+  return (
+    <section className="detail-section">
+      <h2>{section.title}</h2>
+      <div className="detail-core-grid detail-contribution-grid">
+        {section.cards.map((card) => (
+          <article key={card.title} className="detail-core-card detail-contribution-card">
+            <h3>{card.title}</h3>
+            <ul className="detail-card-list">
+              {card.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -28,34 +46,58 @@ function ArchitectureSection({ project, section }) {
           </div>
         ) : null}
         <p className="detail-architecture-copy">{section.description}</p>
+        {section.scopeGroups ? (
+          <div className="detail-scope-grid">
+            {section.scopeGroups.map((group) => (
+              <article key={group.title} className="detail-scope-card">
+                <h3>{group.title}</h3>
+                <ul className="detail-card-list">
+                  {group.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
+function ProblemSolutionCard({ card }) {
+  return (
+    <article className="detail-problem-card">
+      <h3>{card.title}</h3>
+      <div className="detail-problem-grid">
+        <div>
+          <strong>문제</strong>
+          <p>{card.problem}</p>
+        </div>
+        <div>
+          <strong>해결</strong>
+          <p>{card.solution}</p>
+        </div>
+        <div>
+          <strong>결과</strong>
+          <p>{card.result}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function ProblemSolutionSection({ section }) {
-  const { card } = section;
+  const cards = section.cards ?? [section.card];
 
   return (
     <section className="detail-section">
       <h2>{section.title}</h2>
-      <article className="detail-problem-card">
-        <h3>{card.title}</h3>
-        <div className="detail-problem-grid">
-          <div>
-            <strong>문제</strong>
-            <p>{card.problem}</p>
-          </div>
-          <div>
-            <strong>해결</strong>
-            <p>{card.solution}</p>
-          </div>
-          <div>
-            <strong>결과</strong>
-            <p>{card.result}</p>
-          </div>
-        </div>
-      </article>
+      <div className={cards.length > 1 ? "detail-problem-stack" : ""}>
+        {cards.map((card) => (
+          <ProblemSolutionCard key={card.title} card={card} />
+        ))}
+      </div>
     </section>
   );
 }
@@ -77,6 +119,49 @@ function MetricSection({ section }) {
   );
 }
 
+function EvidenceSection({ section }) {
+  return (
+    <section className="detail-section">
+      <h2>{section.title}</h2>
+      <div className="detail-evidence-block">
+        <p>{section.description}</p>
+        <div className="detail-evidence-grid">
+          {section.links.map((link) => (
+            <a key={link.label} className="detail-evidence-link" href={link.url} target="_blank" rel="noopener noreferrer">
+              {link.label}
+              <span aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function renderSection(project, section) {
+  if (section.type === "contribution_cards") {
+    return <ContributionSection key={section.title} section={section} />;
+  }
+
+  if (section.type === "architecture") {
+    return <ArchitectureSection key={section.title} project={project} section={section} />;
+  }
+
+  if (section.type === "problem_solution") {
+    return <ProblemSolutionSection key={section.title} section={section} />;
+  }
+
+  if (section.type === "metric_grid") {
+    return <MetricSection key={section.title} section={section} />;
+  }
+
+  if (section.type === "evidence") {
+    return <EvidenceSection key={section.title} section={section} />;
+  }
+
+  return null;
+}
+
 export default function ProjectDetail() {
   const { slug } = useParams();
   const project = getProjectBySlug(slug);
@@ -95,10 +180,8 @@ export default function ProjectDetail() {
     );
   }
 
-  const coreSections = project.sections.filter((section) => coreSectionTitles.has(section.title));
-  const architectureSection = project.sections.find((section) => section.type === "architecture");
-  const problemSection = project.sections.find((section) => section.type === "problem_solution");
-  const metricSection = project.sections.find((section) => section.type === "metric_grid");
+  const listSections = project.sections.filter((section) => section.type === "list");
+  const customSections = project.sections.filter((section) => section.type !== "list");
 
   return (
     <main className="page-shell page-content project-detail-page">
@@ -111,6 +194,14 @@ export default function ProjectDetail() {
           </span>
         </div>
         <p className="detail-summary">{project.description}</p>
+        {project.meta ? (
+          <div className="detail-meta-list">
+            {project.meta.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
+        ) : null}
+        {project.roleScope ? <p className="detail-role-scope">{project.roleScope}</p> : null}
         <div className="tag-list">
           {project.tags.map((tag) => (
             <span key={tag} className="tag-pill">
@@ -135,18 +226,18 @@ export default function ProjectDetail() {
         </figure>
       ) : null}
 
-      <section className="detail-section">
-        <h2>프로젝트 핵심</h2>
-        <div className="detail-core-grid">
-          {coreSections.map((section) => (
-            <CoreBlock key={section.title} section={section} />
-          ))}
-        </div>
-      </section>
+      {listSections.length > 0 ? (
+        <section className="detail-section">
+          <h2>프로젝트 핵심</h2>
+          <div className="detail-core-grid">
+            {listSections.map((section) => (
+              <CoreBlock key={section.title} section={section} />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-      {architectureSection ? <ArchitectureSection project={project} section={architectureSection} /> : null}
-      {problemSection ? <ProblemSolutionSection section={problemSection} /> : null}
-      {metricSection ? <MetricSection section={metricSection} /> : null}
+      {customSections.map((section) => renderSection(project, section))}
       <ProjectActionDock project={project} />
     </main>
   );

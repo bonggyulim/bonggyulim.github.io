@@ -42,13 +42,9 @@ const stackGroups = [
     title: "Infra / DevOps",
     items: ["Docker", "Linux", "Nginx", "AWS", "Amazon S3", "Amazon SQS", "K3s", "Jenkins", "GitHub Actions"]
   },
-  {
-    title: "Collaboration / Knowledge",
-    items: ["GitHub", "Jira", "Slack", "Notion", "Obsidian"]
-  }
 ];
 
-const featuredProjectSlugs = ["industrial-ai-platform", "pv-insight", "promptops-wiki-agent"];
+const featuredProjectSlugs = ["industrial-ai-platform", "pv-insight"];
 
 export default function Home() {
   const featuredProjects = featuredProjectSlugs
