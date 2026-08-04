@@ -48,7 +48,7 @@ export default function ProjectActionDock({ project }) {
 
   return (
     <nav
-      className="project-action-dock"
+      className="project-action-dock floating-project-links"
       style={{ "--action-count": actions.length }}
       aria-label={`${project.title} 프로젝트 링크`}
     >

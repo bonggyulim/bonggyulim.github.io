@@ -1,17 +1,24 @@
+const industrialRepo = "https://github.com/human-team1/industrial-ai-platform";
+const pvRepo = "https://github.com/solar-ai-dev/pv-fusion";
+
 export const projects = [
   {
     slug: "industrial-ai-platform",
-    title: "Industrial-AI",
+    title: "Industrial AI Platform",
     detailPath: "/projects/industrial-ai-platform",
     status: "completed",
     statusLabel: "완료",
-    summary:
-      "제조 이미지 이상탐지와 모델·메모리뱅크 운영, 문서 검색·질의응답을 결합한 산업 AI 플랫폼 프로젝트입니다.",
-    homeSummary:
-      "제조 이미지 이상탐지와 문서 기반 운영 가이드를 제공하는 산업 AI 플랫폼",
+    summary: "제조 이미지 이상 탐지와 모델·Memory Bank 운영, 문서 기반 RAG를 결합한 설비 점검 지원 플랫폼",
+    homeSummary: "제조 이미지 이상 탐지, 모델·Memory Bank 운영과 문서 RAG를 결합한 설비 점검 지원 플랫폼",
     description:
-      "제조 이미지 이상탐지와 모델·메모리뱅크 운영, 문서 검색·질의응답을 결합한 산업 AI 플랫폼입니다.",
-    meta: ["2026.04.17 ~ 2026.05.15", "7인 팀 프로젝트", "PM·프로젝트 리드"],
+      "제조 이미지 이상 탐지와 모델·Memory Bank 운영, 문서 기반 RAG를 결합한 설비 점검 지원 플랫폼입니다. 검사 결과와 이상 위치를 확인하고, 설비 문서를 검색해 점검·대응 정보를 조회할 수 있습니다.",
+    meta: [
+      "2026.04.17 ~ 2026.05.15",
+      "7인 팀 프로젝트",
+      "PM · 시스템·AI 구조 설계 · 백엔드·AI 서버·프론트엔드 구현 · 관리자 모니터링 · 실험 전략 수립 · 자체 호스팅 배포"
+    ],
+    roleScope:
+      "PM · 시스템·AI 구조 설계 · 백엔드·AI 서버·프론트엔드 구현 · 관리자 모니터링 · 실험 전략 수립 · 자체 호스팅 배포",
     image: "/assets/projects/industrial-thumbnail.png",
     imageFit: "cover",
     videoUrl: "/assets/projects/industrial-ai.mp4",
@@ -32,98 +39,105 @@ export const projects = [
       "Anomalib",
       "Nginx"
     ],
-    githubUrl: "https://github.com/human-team1/industrial-ai-platform",
+    githubUrl: industrialRepo,
     pptUrl: "https://drive.google.com/file/d/14WMw24gUADrO7AW1iBptb_xJ_hcLLzXH/view?usp=drive_link",
     demoUrl: "",
     highlights: [
-      "Spring Backend와 FastAPI AI Server 책임 분리",
-      "정상 이미지 기반 메모리뱅크 생성 및 추론 적용",
-      "검사 결과·문서·모델 버전 통합 관리",
-      "이상탐지 결과 기반 운영 가이드 제공"
+      "Spring·FastAPI 비동기 검사와 AI 추론 흐름 구현",
+      "모델 버전·아티팩트·Memory Bank 운영 기능 구현",
+      "문서 인덱싱 Job과 RAG 저장 상태 연동",
+      "Docker·Nginx·GitHub Actions 기반 자체 호스팅 배포"
     ],
     sections: [
       {
-        title: "내 역할과 기여",
+        id: "role",
+        title: "내 역할과 핵심 기여",
         type: "contribution_cards",
+        groupLabels: {
+          build: "서비스 구현·설계",
+          operate: "운영·배포"
+        },
         cards: [
           {
-            title: "서비스·시스템 설계",
+            id: "implementation",
+            group: "build",
+            category: "IMPLEMENTATION",
+            title: "핵심 기능 구현",
             items: [
-              "요구사항·MVP·사용자 흐름 정의",
-              "시스템 아키텍처·ERD·API 설계",
-              "Spring Backend와 FastAPI AI Server 책임 분리",
-              "기능 연동 기준 수립 및 일정 조율"
+              "이미지 업로드부터 AI 검사·결과 저장·이상 위치 시각화까지 검사 흐름 구현",
+              "모델·버전·배포 상태와 품목별 Memory Bank 생성·적용·비활성화 구현",
+              "문서 CRUD·버전 관리부터 인덱싱·벡터 저장·검색 반영까지 구현",
+              "FastAPI 이미지 추론과 문서 검색·RAG·LLM 호출을 Spring에 연동",
+              "검사·모델·문서·대시보드·관리자 화면 설계·React 구현"
             ]
           },
           {
-            title: "백엔드·관리자 기능",
+            id: "design",
+            group: "build",
+            category: "DESIGN",
+            title: "설계·의사결정",
             items: [
-              "검사 결과·문서·모델 버전 관리",
-              "카테고리별 메모리뱅크 생성·삭제·비활성화",
-              "로그 수집 및 관리자 페이지 구현",
-              "Spring Backend와 AI Server 연동"
+              "PM으로 요구사항·MVP·설계 기준을 정하고 공동 설계문서 검토·통합",
+              "Spring·FastAPI·DB·캐시·스토리지·벡터 DB의 책임과 데이터 흐름 설계",
+              "검사·모델·문서·관리자 API·DB와 Spring–FastAPI 연동 규격 설계",
+              "이상 탐지·문서 검색·RAG·LLM을 검사·결과 확인·점검 안내 흐름에 배치",
+              "정확도·속도·GPU 메모리를 기준으로 공통 Backbone·품목별 Memory Bank 운영 구조 설계"
             ]
           },
           {
-            title: "AI·RAG 설계 및 구현",
+            id: "operations",
+            group: "operate",
+            category: "ADMIN & MONITORING",
+            title: "관리자 기능·시스템 모니터링",
             items: [
-              "FastAPI 기반 이상탐지 추론 서버 구현",
-              "정상 이미지 기반 메모리뱅크 생성 서버 구현",
-              "정확도·추론 속도·GPU 메모리 평가 기준 설계",
-              "RAG·LLM 프롬프트 실험 및 LangGraph 흐름 설계"
+              "관리자 계정의 가입 승인·거절, 계정 상태·역할 변경 구현",
+              "AI 서버·DB·저장소·캐시 연결 상태와 헬스체크 조회 구현",
+              "서버 CPU·메모리 등 자원 상태와 사용량 추이 모니터링 구현",
+              "운영 로그·요청 ID·모델 버전으로 검사·문서·AI 처리 장애와 결과 추적"
             ]
           },
           {
-            title: "인프라·배포",
+            id: "deploy",
+            group: "operate",
+            category: "DEPLOY",
+            title: "CI/CD·자체 호스팅 배포",
             items: [
-              "MariaDB·Redis·MinIO·ChromaDB Docker 구성",
-              "GitHub Actions CI/CD 구축",
-              "개인 GPU 서버 기반 자체 호스팅",
-              "포트포워딩·Nginx HTTPS 외부 접속 환경 구축"
+              "Docker Compose·Nginx로 운영 환경과 단일 HTTPS 진입점 구성",
+              "외부 80·443만 개방하고 AI 서버·DB·캐시·스토리지를 내부망으로 격리",
+              "GitHub Actions Self-hosted Runner로 빌드·설정 검증·서비스 재기동 자동화",
+              "DDNS·포트포워딩·방화벽·TLS·도메인 연결로 외부 서비스 배포"
+            ]
+          },
+          {
+            id: "experiment",
+            group: "operate",
+            category: "EXPERIMENT",
+            title: "실험 전략 수립",
+            items: [
+              "정확도·위치 탐지·추론 시간·GPU 메모리 기반 모델 평가 기준 수립",
+              "후보 비교, 속도형·성능형 최적화, Teacher–Student 경량화 전략 수립",
+              "검색 방식·프롬프트·LLM 비교를 위한 RAG 실험 기준 정의"
             ]
           }
         ]
       },
       {
-        title: "시스템 아키텍처",
-        type: "architecture",
-        description:
-          "React에서 사용자 요청과 결과 조회를 처리하고, Spring Backend가 인증·검색·이력·모델 및 메모리뱅크 관리 기능을 담당합니다. FastAPI AI Server는 이상탐지 추론, 메모리뱅크 생성, 문서 검색과 RAG 질의응답을 처리합니다.",
-      },
-      {
-        title: "문제 해결 경험",
+        id: "troubleshooting",
+        title: "핵심 문제 해결",
         type: "problem_solution",
-        cards: [
-          {
-            title: "실험 환경과 서버 추론 결과 차이 개선",
-            problem:
-              "동일한 모델인데 Colab 실험과 FastAPI 서버에서 추론 결과가 다르게 나타났습니다.",
-            solution:
-              "Anomalib의 입력 처리와 전처리·추론·후처리 과정을 비교하고, 서버에 누락된 설정을 반영했습니다.",
-            result:
-              "실험 결과가 실제 서버 환경에서도 일관되게 재현되도록 개선했습니다."
-          },
-          {
-            title: "신규 품목 적용을 위한 메모리뱅크 구조",
-            problem:
-              "새로운 품목이 추가될 때마다 모델 전체를 재학습하면 적용 시간과 운영 부담이 증가할 수 있었습니다.",
-            solution:
-              "공통 백본 모델과 카테고리별 메모리뱅크를 분리하고, 정상 이미지로 메모리뱅크를 생성할 수 있도록 구현했습니다.",
-            result:
-              "모델 전체를 다시 학습하지 않고 신규 품목을 이상탐지에 적용할 수 있는 구조를 마련했습니다."
-          },
-          {
-            title: "자체 호스팅 배포 환경 안정화",
-            problem:
-              "인증서 경로 차이로 Nginx 컨테이너가 반복 재시작되는 문제가 발생했습니다.",
-            solution:
-              "인증서 디렉터리와 bind mount 경로를 통일하고 환경별 경로 설정을 정리했습니다.",
-            result:
-              "컨테이너 기동 오류를 해결하고 HTTPS 기반 외부 접속 환경을 안정화했습니다."
-          }
-        ]
+        card: {
+          id: "serving-result-consistency",
+          title: "실험 환경과 FastAPI 추론 결과의 불일치 해결",
+          problem: "같은 이미지와 모델을 사용했지만 실험 환경과 FastAPI 서버의 판정 결과가 다르게 나타났습니다.",
+          decision: "",
+          implementation: [
+            "실험·서버의 입력 규격·전처리·Memory Bank·판정 기준 비교",
+            "Spring 전달 모델 버전·파일·설정과 FastAPI 로딩 경로 점검",
+            "실제 모델·추론 설정을 결과에서 확인하도록 연동 규격 정리"
+          ],
+          result: "동일한 모델·입력·전처리·판정 설정을 적용해 결과 재현성을 높였습니다."
+        }
       }
-  
     ]
   },
   {
@@ -132,95 +146,141 @@ export const projects = [
     detailPath: "/projects/pv-insight",
     status: "completed",
     statusLabel: "완료",
-    summary: "드론 RGB·열화상 이미지에서 이상 후보를 선별하고 유지보수 우선순위를 제공하는 태양광 관리 플랫폼입니다.",
-    homeSummary: "드론 RGB·열화상 기반 이상 탐지와 유지보수 우선순위 관리 플랫폼",
-    description: "드론 RGB·열화상 이미지에서 이상 후보를 선별하고 유지보수 우선순위를 제공하는 태양광 관리 플랫폼입니다.",
-    meta: ["2026.05.26 ~ 2026.07.05", "2인 팀 프로젝트", "백엔드·AI·프론트·배포 담당"],
+    summary: "드론 RGB·Thermal 이미지를 구역 단위로 분석해 태양광 설비의 이상 후보와 조치 유형을 관리하는 점검 플랫폼",
+    homeSummary: "드론 RGB·Thermal 이미지로 태양광 설비의 이상 후보와 후속 조치를 관리하는 점검 플랫폼",
+    description:
+      "드론 RGB·Thermal 이미지를 구역 단위로 분석해 태양광 설비의 이상 후보와 조치 유형을 관리하는 점검 플랫폼입니다. 발전소별 점검 결과와 반복 이상 이력을 확인하고 후속 조치를 관리할 수 있습니다.",
+    meta: [
+      "2026.05.26 ~ 2026.07.05",
+      "2인 팀 프로젝트",
+      "사용자·발전소·프론트엔드 구현 · 분석 처리 안정화 · Thermal 모델 실험·적용 · AWS·K3s 운영 배포"
+    ],
+    roleScope:
+      "사용자·발전소·프론트엔드 구현 · 분석 처리 안정화 · Thermal 모델 실험·적용 · AWS·K3s 운영 배포",
     image: "/assets/projects/pv-insight-thumbnail.png",
     imageFit: "cover",
     videoUrl: "/assets/projects/pv-insight-v2.mp4",
     videoPoster: "/assets/projects/pv-insight-thumbnail.png",
     architectureImage: "/assets/projects/pv-insight-architecture.png",
-    tags: ["Java", "Spring Boot", "JPA", "Flyway", "PostgreSQL", "Python", "FastAPI", "AWS S3", "AWS SQS", "Docker", "K3s", "Traefik", "Jenkins", "ONNX Runtime"],
+    tags: [
+      "Java",
+      "Spring Boot",
+      "JPA",
+      "Flyway",
+      "PostgreSQL",
+      "Python",
+      "FastAPI",
+      "AWS S3",
+      "AWS SQS",
+      "Docker",
+      "K3s",
+      "Traefik",
+      "Jenkins",
+      "ONNX Runtime"
+    ],
     serviceUrl: "https://app.pv-insight.com/",
-    githubUrl: "https://github.com/solar-ai-dev/pv-fusion",
+    githubUrl: pvRepo,
     pptUrl: "https://drive.google.com/file/d/1aGiUSR2hrWWxOQss0XEdZAJtKm6wi4x0/view?usp=sharing",
     demoUrl: "",
     highlights: [
-      "RGB·Thermal 이미지의 독립 단건 분석 구조",
-      "SQS 기반 비동기 분석 및 Job 상태 관리",
-      "EC2·K3s 기반 서비스 컴포넌트 분리 배포"
+      "Google OAuth2와 세션 기반 사용자 승인·권한 구현",
+      "발전소별 담당 데이터 접근 범위 검증",
+      "SQS at-least-once 전제의 분석 Job 상태 안정화",
+      "Thermal 모델 실험과 AWS·K3s 운영 배포 수행"
     ],
     sections: [
-        {
-          title: "내 역할과 기여",
-          type: "contribution_cards",
-          cards: [
-            {
-              title: "서비스·백엔드",
-              items: [
-                "사용자 인증·인가 기능 구현",
-                "분석 Job 생성·상태 관리",
-                "SQS 기반 비동기 분석 흐름 구현"
-              ]
-            },
-            {
-              title: "Thermal 모델·추론",
-              items: [
-                "Thermal 데이터 검수·전처리",
-                "모델 실험 기준과 학습 방향 설계",
-                "Thermal 모델 학습·평가 수행",
-                "FastAPI·ONNX 기반 추론 서버 구현"
-              ]
-            },
-            {
-              title: "프론트엔드·대시보드",
-              items: [
-                "사용자 화면과 대시보드 구현",
-                "RGB·Thermal 결과 조회 화면 구현",
-                "백엔드 API 연동"
-              ]
-            },
-            {
-              title: "인프라·배포",
-              items: [
-                "Jenkins CI/CD 파이프라인 구축",
-                "K3s 기반 서비스 워크로드 구성",
-                "Traefik과 AWS 서비스 연동"
-              ]
-            }
-          ]
+      {
+        id: "role",
+        title: "내 역할과 핵심 기여",
+        type: "contribution_cards",
+        groupLabels: {
+          build: "서비스 구현·설계",
+          operate: "안정성·배포"
         },
-        {
-          title: "시스템 아키텍처",
-          type: "architecture",
-          description:
-            "Frontend에서 사용자 인증, 분석 요청과 결과 조회를 처리합니다. Spring Boot Backend는 사용자·분석 Job·결과 데이터를 관리하고, 분석 요청을 SQS를 통해 FastAPI AI Worker에 전달합니다. 원본과 결과 파일은 S3, 서비스 데이터와 Job 상태는 PostgreSQL에 저장합니다."
-        },
-        {
-          title: "문제 해결 경험",
-          type: "problem_solution",
-          cards: [
-            {
-              title: "SQS 재수신에 대응한 멱등 처리",
-              problem:
-                "SQS 메시지가 재수신되면 동일 이미지가 중복 분석되고 Job 상태와 결과가 어긋날 수 있었습니다.",
-              solution:
-                "imageId 기준으로 중복 Job 생성을 차단하고, QUEUED 상태의 Job만 RUNNING으로 전환했습니다. 결과 저장과 상태 변경은 하나의 트랜잭션으로 처리했습니다.",
-              result:
-                "동일 메시지가 다시 전달돼도 결과가 한 번만 반영되도록 애플리케이션 멱등성을 확보했습니다."
-            },
-            {
-              title: "Thermal 데이터 품질 검수와 실험 구성",
-              problem:
-                "외부 Thermal 데이터의 화질과 이상 유형이 일정하지 않아 그대로 학습하면 실험 결과의 신뢰도가 낮아질 수 있었습니다.",
-              solution:
-                "이미지를 수동 검수하고 학습에 사용할 데이터 기준을 정리했습니다. 데이터 특성과 서비스 조건을 기준으로 전처리·학습·평가 방향을 설계했습니다.",
-              result:
-                "품질이 낮거나 목적에 맞지 않는 데이터를 제외하고, 서비스 적용 가능성을 판단할 수 있는 실험 구성을 마련했습니다."
-            }
-          ]
+        cards: [
+          {
+            id: "implementation",
+            group: "build",
+            category: "IMPLEMENTATION",
+            title: "핵심 기능 구현",
+            items: [
+              "Google OAuth2 신규 사용자 등록과 관리자 승인·거절·역할 변경 구현",
+              "발전소·구역·설비 관리와 사용자별 데이터 접근 권한 구현",
+              "점검·이미지·분석 결과 조회와 데이터·S3 파일 삭제 흐름 구현·보완",
+              "대시보드·발전소·점검·분석 결과·관리자 화면 설계·React 구현",
+              "운영 로그 기록과 사용자 작업·주요 변경 이력 조회 구현"
+            ]
+          },
+          {
+            id: "design",
+            group: "build",
+            category: "DESIGN",
+            title: "설계·의사결정",
+            items: [
+              "사용자·권한·발전소·구역·설비 도메인과 접근 정책 설계",
+              "Spring·AI Worker·RDS·S3·SQS의 책임과 분석 데이터 흐름 설계",
+              "운영 AWS와 로컬 PostgreSQL·MinIO·LocalStack 실행 환경 분리",
+              "분석 작업 중복·상태 변경·실패·재처리와 결과·파일 저장 정책 설계",
+              "월 100달러 내외 비용과 CPU 추론을 기준으로 단일 EC2·K3s 운영 구조 설계"
+            ]
+          },
+          {
+            id: "operations",
+            group: "operate",
+            category: "RELIABILITY",
+            title: "비동기 분석·데이터 일관성",
+            items: [
+              "DB 제약과 진행 작업 조회로 이미지당 분석 작업을 1개로 제한",
+              "작업 상태·실패 유형별 SQS 재처리·복구 기준 관리",
+              "분석 결과·결함·작업 상태를 한 트랜잭션으로 저장",
+              "DB 삭제 후 S3 파일을 제거하고 작업·이미지·요청 ID로 실패 위치 추적",
+              "사용자·권한·발전소·분석 작업 핵심 로직 단위 테스트 작성"
+            ]
+          },
+          {
+            id: "deploy",
+            group: "operate",
+            category: "DEPLOY",
+            title: "AWS·K3s 운영 배포",
+            items: [
+              "단일 EC2 K3s에 Frontend·Backend·AI Worker를 분리 배치하고 Traefik으로 라우팅",
+              "Jenkins에서 서비스별 검증 후 Docker 빌드·ECR 저장·K3s 배포 자동화",
+              "RDS·S3·SQS 연동과 ConfigMap·Secret·IAM·Flyway로 설정·권한·DB 변경 관리",
+              "외부 80·443만 개방하고 도메인·HTTPS·CloudWatch 구성 후 AI 분석까지 배포 검증"
+            ]
+          },
+          {
+            id: "experiment",
+            group: "operate",
+            category: "EXPERIMENT",
+            title: "Thermal 모델·배포 적용",
+            items: [
+              "드론뷰 Thermal 데이터 품질 검수와 부적합 데이터 제외 후 학습 데이터 구성",
+              "이상 유형별 모델 학습·평가로 F1 87.52~93.41, mAP@0.5 83.46~94.39 기록",
+              "Confidence 0.55·IoU 0.45 선정 후 ONNX Runtime CPU 검증·AI Worker 적용"
+            ]
+          }
+        ]
+      },
+      {
+        id: "troubleshooting",
+        title: "핵심 문제 해결",
+        type: "problem_solution",
+        card: {
+          id: "sqs-job-state-consistency",
+          title: "SQS 중복 전달과 분석 작업 상태 관리",
+          problem:
+            "SQS 재전달과 동시 요청으로 같은 이미지의 분석 작업이 중복되거나 완료 작업이 다시 처리될 수 있었습니다.",
+          decision: "",
+          implementation: [
+            "이미지당 진행 중인 분석 작업을 1개로 제한",
+            "DB 제약과 진행 작업 조회로 중복 생성 방지",
+            "작업 상태 순서와 실패 유형별 재처리 기준 관리",
+            "분석 결과·결함·작업 상태를 한 트랜잭션으로 저장"
+          ],
+          result: "중복 전달과 동시 요청에서도 분석 작업과 처리 상태의 일관성을 유지했습니다."
         }
+      }
     ]
   }
 ];

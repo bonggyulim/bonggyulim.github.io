@@ -4,47 +4,69 @@ import { projects } from "../data/projects";
 
 const capabilities = [
   {
-    title: "AI 서비스 아키텍처",
-    description: "AI 모델 결과를 반영하는 API·DB·저장소·Worker 전체 흐름 설계"
+    title: "서비스·시스템 설계",
+    description: "요구사항·MVP·시스템 구조·서버 간 데이터 계약 설계"
   },
   {
-    title: "모델 실험과 서빙",
-    description: "이상 탐지 모델 실험·평가 및 모델 서빙 구조 구현"
+    title: "백엔드·AI 서버 구현",
+    description: "Spring Boot 백엔드·FastAPI AI 서버 구현 및 연동"
   },
   {
-    title: "RAG / LLM Agent",
-    description: "RAG·LLM·LangGraph 기반 Agent 및 검증·승인 구조 구현"
+    title: "비동기 처리·데이터 일관성",
+    description: "상태 전이·트랜잭션·중복 처리·실패 재처리 설계"
   },
   {
-    title: "API·DB·스토리지 연동",
-    description: "FastAPI·Spring Boot 역할 분리와 데이터 저장·조회 구조 설계"
+    title: "에이전트·모델 서빙",
+    description: "LangGraph 승인 워크플로와 자원·비용 기반 모델 서빙"
   },
   {
-    title: "배포·운영 환경",
-    description: "Docker·Nginx·AWS·K3s·Jenkins 기반 실행·배포 환경 구축"
+    title: "CI/CD·운영 배포",
+    description: "Jenkins·GitHub Actions·AWS·K3s CI/CD·배포"
   }
 ];
 
 const stackGroups = [
   {
     title: "Backend",
-    items: ["Java", "Spring Boot", "JPA", "Python", "FastAPI", "Flask"]
+    items: ["Java", "Spring Boot", "JPA", "Python", "FastAPI"]
   },
   {
-    title: "AI / ML",
-    items: ["PyTorch", "TensorFlow", "Scikit-Learn", "YOLO", "Anomalib", "OpenCV", "LLM", "RAG", "GraphRAG", "LangChain", "LangGraph"]
+    title: "AI / Agent",
+    items: [
+      "PyTorch",
+      "TensorFlow",
+      "Scikit-Learn",
+      "YOLO",
+      "Anomalib",
+      "ONNX Runtime",
+      "LLM",
+      "RAG",
+      "LangChain",
+      "LangGraph"
+    ]
   },
   {
     title: "Database / Storage",
-    items: ["MariaDB", "MySQL", "PostgreSQL", "Redis", "ChromaDB", "MinIO", "Firebase"]
+    items: ["MariaDB", "PostgreSQL", "Redis", "ChromaDB", "MinIO", "Flyway"]
   },
   {
     title: "Infra / DevOps",
-    items: ["Docker", "Linux", "Nginx", "AWS", "Amazon S3", "Amazon SQS", "K3s", "Jenkins", "GitHub Actions"]
+    items: [
+      "Docker",
+      "Linux",
+      "Nginx",
+      "AWS",
+      "Amazon S3",
+      "Amazon SQS",
+      "K3s",
+      "Traefik",
+      "Jenkins",
+      "GitHub Actions"
+    ]
   },
 ];
 
-const featuredProjectSlugs = ["industrial-ai-platform", "pv-insight"];
+const featuredProjectSlugs = ["pv-insight", "industrial-ai-platform"];
 
 export default function Home() {
   const featuredProjects = featuredProjectSlugs
@@ -55,8 +77,8 @@ export default function Home() {
     <main>
       <section className="hero-section">
         <div className="page-shell hero-inner">
-          <p className="eyebrow">BACKEND · AI SERVICE · DEVOPS</p>
-          <h1>서비스 구조를 설계하고<br />성능·비용·운영을 함께 고려해<br />AI 서비스를 구현하는 개발자입니다.</h1>
+          <p className="eyebrow">BACKEND · AI SERVICE · AGENT WORKFLOW</p>
+          <h1>서비스 요구사항과 운영 제약을 기준으로<br />AI 서비스를 설계·구현하는<br />백엔드 개발자입니다.</h1>
           <div className="hero-actions">
           </div>
         </div>
@@ -70,13 +92,11 @@ export default function Home() {
           <div className="intro-grid">
             <div className="section-card prose-card">
               <div className="prose-block">
-                <p>백엔드와 AI 모델을 연결해 실제 서비스 형태로 구현하는 AI 서비스 개발자입니다.</p>
+                <p>서비스 요구사항과 MVP를 시스템 구조·데이터 흐름·API로 구체화하고, 백엔드와 AI 서버를 연결해 운영 가능한 서비스로 구현해 왔습니다.</p>
                 <p>
-                  FastAPI, Spring Boot, PostgreSQL, Docker 기반으로 API 서버와 분석 파이프라인을 구축했으며,
-                  YOLO·Anomalib 기반 이상탐지와 RAG·LangGraph 기반 지식 에이전트 프로젝트를 진행했습니다.
+                  Spring Boot와 FastAPI를 기반으로 서비스 API와 AI 추론 서버를 구현했으며, 비동기 작업의 상태 전이·트랜잭션·데이터 일관성·인증과 권한을 고려해 처리 흐름을 설계했습니다.
                 </p>
-                <p>팀 프로젝트에서는 PL/PM 역할로 요구사항 정리, 아키텍처 설계, API/DB 설계, 배포 구조 정리를 담당했습니다.</p>
-                <p>현재는 AI 모델의 실험 결과가 API, DB, Worker, 사용자 기능으로 이어지는 구조를 설계하고 구현하는 데 집중하고 있습니다.</p>
+                <p>AI 기능은 정확도뿐 아니라 추론 시간·메모리 사용량·운영 비용·배포 환경을 기준으로 평가하고, Docker·Nginx 자체 호스팅과 AWS·K3s 환경에서 CI/CD와 배포를 수행했습니다.</p>
               </div>
             </div>
 
