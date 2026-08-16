@@ -69,17 +69,16 @@ export default function ProjectDetail() {
     }));
   const sections = normalizedSections.filter((section) => section.renderInDetail !== false);
   const visibleMeta = (project.meta ?? []).filter((item) => item !== project.roleScope);
-  const isPvInsight = project.slug === "pv-insight";
   const introSectionTypes = new Set(["contribution_cards", "contribution_summary", "architecture_overview"]);
-  const introSections = isPvInsight ? sections.filter((section) => introSectionTypes.has(section.type)) : [];
-  const remainingSections = isPvInsight ? sections.filter((section) => !introSectionTypes.has(section.type)) : sections;
+  const introSections = sections.filter((section) => introSectionTypes.has(section.type));
+  const remainingSections = sections.filter((section) => !introSectionTypes.has(section.type));
   const introContribution = introSections.find(
     (section) => section.type === "contribution_cards" || section.type === "contribution_summary"
   );
   const introArchitecture = introSections.find((section) => section.type === "architecture_overview");
 
   return (
-    <main className={`detail-page project-detail-page ${project.slug === "pv-insight" ? "is-pv-insight" : ""}`.trim()}>
+    <main className={`detail-page project-detail-page is-pv-insight ${project.slug === "industrial-ai-platform" ? "is-industrial" : ""}`.trim()}>
       <div className="detail-main">
         <ProjectDetailHero project={project} metaItems={visibleMeta} />
 
@@ -89,7 +88,7 @@ export default function ProjectDetail() {
           </figure>
         ) : null}
 
-        {isPvInsight && (introContribution || introArchitecture) ? (
+        {introContribution || introArchitecture ? (
           <div className="detail-pv-intro-grid">
             <div className="detail-pv-intro-column detail-pv-intro-contribution">
               {introContribution ? renderSection(introContribution) : null}
@@ -100,7 +99,7 @@ export default function ProjectDetail() {
           </div>
         ) : null}
 
-        {(isPvInsight ? remainingSections : sections).map((section) => renderSection(section))}
+        {remainingSections.map((section) => renderSection(section))}
       </div>
       <ProjectActionDock project={project} />
     </main>

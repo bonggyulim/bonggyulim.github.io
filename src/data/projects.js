@@ -11,14 +11,11 @@ export const projects = [
     summary: "제조 이미지 이상 탐지와 모델·Memory Bank 운영, 문서 기반 RAG를 결합한 설비 점검 지원 플랫폼",
     homeSummary: "제조 이미지 이상 탐지, 모델·Memory Bank 운영과 문서 RAG를 결합한 설비 점검 지원 플랫폼",
     description:
-      "제조 이미지 이상 탐지와 모델·Memory Bank 운영, 문서 기반 RAG를 결합한 설비 점검 지원 플랫폼입니다. 검사 결과와 이상 위치를 확인하고, 설비 문서를 검색해 점검·대응 정보를 조회할 수 있습니다.",
+      "제조 이미지 이상 탐지와 카테고리별 Memory Bank 운영, 설비 문서 RAG 챗봇을 결합한 설비 점검 지원 플랫폼입니다. 정상 이미지 기반 Memory Bank 생성·적용, 검사 결과와 이상 위치 확인, 설비 문서 검색과 출처 기반 점검·대응 정보 조회를 지원합니다.",
     meta: [
       "2026.04.17 ~ 2026.05.15",
-      "7인 팀 프로젝트",
-      "PM · 시스템·AI 구조 설계 · 백엔드·AI 서버·프론트엔드 구현 · 관리자 모니터링 · 실험 전략 수립 · 자체 호스팅 배포"
+      "7인 팀 프로젝트"
     ],
-    roleScope:
-      "PM · 시스템·AI 구조 설계 · 백엔드·AI 서버·프론트엔드 구현 · 관리자 모니터링 · 실험 전략 수립 · 자체 호스팅 배포",
     image: "/assets/projects/industrial-thumbnail.png",
     imageFit: "cover",
     videoUrl: "/assets/projects/industrial-ai.mp4",
@@ -53,70 +50,36 @@ export const projects = [
         id: "role",
         title: "내 역할과 핵심 기여",
         type: "contribution_cards",
-        groupLabels: {
-          build: "서비스 구현·설계",
-          operate: "운영·배포"
-        },
+        layout: "role_rows",
         cards: [
           {
             id: "implementation",
-            group: "build",
-            category: "IMPLEMENTATION",
             title: "핵심 기능 구현",
             items: [
-              "이미지 업로드부터 AI 검사·결과 저장·이상 위치 시각화까지 검사 흐름 구현",
-              "모델·버전·배포 상태와 품목별 Memory Bank 생성·적용·비활성화 구현",
-              "문서 CRUD·버전 관리부터 인덱싱 상태·RAG 반영까지 구현",
-              "FastAPI 이미지 추론과 문서 검색·RAG·LLM 호출을 Spring과 연동",
-              "검사·모델·문서·서버·관리자 화면 설계·React 구현"
+              "검사 도메인 구현",
+              "문서 관리 도메인 구현",
+              "모델·Memory Bank 적용 범위 관리 구현",
+              "FastAPI AI 서빙 연동 및 React 화면 구현"
             ]
           },
           {
             id: "design",
-            group: "build",
-            category: "DESIGN",
             title: "설계·의사결정",
             items: [
-              "PM으로 요구사항·MVP·설계 기준을 정의하고 공동 설계문서 검토·통합",
-              "Spring·FastAPI·DB·캐시·스토리지·벡터 DB의 책임과 데이터 흐름 설계",
-              "검사·모델·문서·관리자 API·DB와 Spring–FastAPI 연동 규격 설계",
-              "이상 탐지·문서 검색·RAG·LLM을 검사 결과 확인과 점검 안내 흐름으로 연결",
-              "정확도·속도·GPU 메모리를 기준으로 공통 Backbone·품목별 Memory Bank 운영 구조 설계"
+              "요구사항·MVP·설계 기준 정의",
+              "서버·저장소 책임과 데이터 흐름 설계",
+              "API·DB·Spring–FastAPI 계약 설계",
+              "Memory Bank 운영 구조·AI 평가 기준 설계"
             ]
           },
           {
-            id: "operations",
-            group: "operate",
-            category: "ADMIN & MONITORING",
-            title: "관리자 기능·시스템 모니터링",
+            id: "operations-deploy",
+            title: "자체호스팅 배포·운영 관리",
             items: [
-              "관리자 계정의 가입 승인·거절, 계정 상태·역할 변경 구현",
-              "AI 서버·DB·저장소·캐시 연결 상태와 헬스체크 조회 구현",
-              "서버 CPU·메모리 등 자원 상태와 사용량 추이 모니터링 구현",
-              "운영 로그·요청 ID·모델 버전으로 검사·문서·AI 처리 장애와 결과 추적"
-            ]
-          },
-          {
-            id: "deploy",
-            group: "operate",
-            category: "DEPLOY",
-            title: "CI/CD·자체 호스팅 배포",
-            items: [
-              "Docker Compose·Nginx로 운영 환경과 단일 HTTPS 진입점 구성",
-              "외부 80·443만 개방하고 AI 서버·DB·캐시·스토리지를 내부망으로 격리",
-              "GitHub Actions Self-hosted Runner로 빌드·설정 검증·서비스 재기동 자동화",
-              "DDNS·포트포워딩·방화벽·TLS·도메인 연결로 외부 서비스 배포"
-            ]
-          },
-          {
-            id: "experiment",
-            group: "operate",
-            category: "EXPERIMENT",
-            title: "실험 전략 수립",
-            items: [
-              "정확도·위치 탐지·추론 시간·GPU 메모리 기반 모델 평가 기준 수립",
-              "후보 비교, 속도·성능·경량화 최적화와 Teacher–Student 경량화 전략 수립",
-              "검색 방식·프롬프트·LLM 비교를 위한 RAG 실험 기준 정의"
+              "Docker Compose·Nginx·HTTPS 운영환경",
+              "GitHub Actions 빌드·배포 자동화",
+              "Health·Resource 상태 조회",
+              "Request ID·Log·비동기 작업 추적"
             ]
           }
         ]
@@ -128,7 +91,7 @@ export const projects = [
         image: "/assets/projects/industrial-architecture.png",
         imageAlt: "Industrial AI Platform 시스템 아키텍처 다이어그램",
         externalUrl: "/assets/projects/industrial-architecture.png",
-        legend: "검사·RAG Spring Boot → FastAPI AI Server　│　데이터 MariaDB · Redis · MinIO · ChromaDB　│　배포 Docker Compose · Nginx",
+        legend: "서비스 Spring Boot ↔ FastAPI　│　데이터·AI MariaDB · Redis · MinIO · ChromaDB · LLM　│　운영 Docker Compose · Nginx · HTTPS",
         renderInDetail: true
       },
       {
@@ -136,16 +99,58 @@ export const projects = [
         title: "문제 해결",
         type: "problem_solution",
         card: {
-          id: "serving-result-consistency",
-          title: "실험 환경과 FastAPI 추론 결과 불일치 해결",
-          problem: "같은 이미지와 모델을 사용했지만 실험 환경과 FastAPI 서버의 판정 결과가 다르게 나타났습니다.",
-          decision: "",
-          implementation: [
-            "실험·서버의 입력 규격·전처리·Memory Bank·판정 기준 비교",
-            "Spring 전달 모델 버전·파일·설정과 FastAPI 로딩 경로 점검",
-            "실제 모델·추론 설정을 결과에서 확인하도록 연동 규격 정리"
-          ],
-          result: "동일한 모델·입력·전처리·판정 설정을 적용해 결과 재현성을 높였습니다."
+          id: "category-scaling-strategy",
+          kind: "industrial_scaling",
+          title: "신규 카테고리 확장을 고려한 탐지 구조·경량화 검증",
+          problem: "신규 카테고리에 대응하면서 카테고리별 재학습을 줄이고, 추론 비용까지 고려한 운영 구조 필요",
+          problemEmphasis: ["신규 카테고리", "카테고리별 재학습", "추론 비용"],
+          decision: "공통 Backbone + 카테고리별 Memory Bank 및 SPEED → PERFORMANCE 2-Stage 운영 기준과 경량화 대안 검증",
+          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "SPEED → PERFORMANCE", "경량화"],
+          backboneFlow: {
+            title: "01. 공통 Backbone + 카테고리별 Memory Bank — 카테고리 대응 구조",
+            image: "/assets/projects/memorybank.svg",
+            imageAlt: "공통 Backbone + 카테고리별 Memory Bank 카테고리 대응 구조 다이어그램",
+            summary: "정상 이미지로 카테고리별 Memory Bank를 구축하고, 검사 시점에는 공통 Backbone으로 추출한 Feature를 비교해 카테고리별 이상 탐지 결과와 Score·Heatmap을 생성"
+          },
+          stageFlow: {
+            title: "02. SPEED → PERFORMANCE 2-Stage 추론 기준",
+            steps: [
+              {
+                type: "box2",
+                primary: "SPEED",
+                secondary: "빠른 1차 판정",
+                note: { model: "WRN50 + PatchCore", reason: "처리 효율·GPU Memory 기준 우선" }
+              },
+              { type: "queue", content: "재검토 큐" },
+              {
+                type: "box2",
+                primary: "PERFORMANCE",
+                secondary: "정밀 재판정",
+                note: { model: "DINOv2 기반", reason: "정확도·위치 성능 기준 우선" }
+              }
+            ],
+            criteria: ["F1-Score", "Latency", "GPU Memory Peak", "PRO"]
+          },
+          lightweightSection: {
+            title: "03. Teacher-Student 경량화 검증",
+            summary: "카테고리·분석량 증가 시 Backbone + Memory Bank 구조의 GPU 메모리·추론 비용 확대 가능성을 고려해 경량 Student 구조 검증",
+            metrics: [
+              { title: "GPU Memory Peak", before: "847.48 MB", after: "87.26 MB", note: "약 90% 감소" },
+              { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p 개선", scale: { min: 0.5, max: 1 } },
+              { title: "F1-Score", before: "0.914", after: "0.959", note: "+4.5%p 개선", scale: { min: 0.5, max: 1 } },
+              { title: "Pixel AUROC", before: "0.985", after: "0.970", note: "-1.5%p 하락", scale: { min: 0.5, max: 1 } },
+              { title: "PRO", before: "0.842", after: "0.708", note: "-13.4%p 하락", scale: { min: 0.5, max: 1 } }
+            ],
+            resultItems: [
+              { text: "신규 카테고리의 Memory Bank 생성·적용·관리까지 이어지는 운영 구조 구축" },
+              {
+                text: "GPU Memory Peak 약 90% 절감, Image AUROC·F1 유지·개선 및 위치 설명력(PRO) Trade-off 확인",
+                emphasisPrimary: ["GPU Memory Peak 약 90% 절감"],
+                emphasisSecondary: ["Image AUROC·F1 유지·개선"]
+              }
+            ]
+          },
+          nextSteps: "축적된 Anomaly Heatmap·검사 결과를 활용한 결함 유형 분류로 확장"
         }
       }
     ]
@@ -288,6 +293,7 @@ export const projects = [
         id: "troubleshooting",
         title: "핵심 문제 해결",
         type: "problem_solution",
+        cardOrder: ["worker-scaling-strategy", "sqs-job-state-consistency", "thermal-model-experiments"],
         card: {
           id: "sqs-job-state-consistency",
           title: "SQS 환경에서 분석 Job 중복 생성·실행 방지",
@@ -359,10 +365,11 @@ if status in {"processed", "skipped"} or terminal:
           {
             id: "worker-scaling-strategy",
             kind: "worker_scaling",
-            title: "운영 예산 기반 서버 구성 및 Worker 확장 전략 검증",
-            basis: "MVP 월 운영 예산 약 $107과 CPU ONNX 추론 조건을 기준으로 서버 구성을 결정했습니다.",
-            validation: "동일 Node의 Worker 증설 효과를 확인한 뒤, 동일한 2 Workers를 두 Node에 분산해 확장 효과를 비교했습니다.",
-            budgetDescription: "AWS Pricing Calculator로 단일 EC2 기반 MVP 운영환경의 월 비용을 먼저 산정하고, 이를 서버 구성의 기준으로 사용했습니다.",
+            title: "동시 분석 요청을 고려한 Worker 확장 전략 검증",
+            basis: "월 약 $107 예산으로 t3.large 단일 Node·CPU Worker 1개 구성",
+            scalingNeed: "분석 Job 누적에 대비해 Worker 처리 용량 확장 방식 검토",
+            comparisonNote: "Worker 복제와 Node 분산을 RGB·Thermal 각 100 Job으로 비교",
+            budgetDescription: "AWS Pricing Calculator로 단일 EC2 기반 MVP 운영환경의 월 비용을 산정",
             costRows: [
               ["EC2 + EBS", "t3.large / gp3 100GB", "$85.04"],
               ["RDS + Storage", "db.t4g.micro / gp3", "$20.87"],
@@ -372,40 +379,32 @@ if status in {"processed", "skipped"} or terminal:
             ],
             totalCost: ["합계", "AWS Pricing Calculator", "$107.31 / month"],
             extraCost: ["별도 반영", "Public IPv4 / EIP", "+$3.65"],
-            experimentSummary: "동일한 RGB·Thermal 각 100 Job을 기준으로 Worker 수와 Node 배치를 변경해 처리량을 비교했습니다.",
             comparisonOne: {
-              title: "동일 Node에서 Worker 증설",
-              scenario: "1 EC2 / 1 Worker → 1 EC2 / 2 Workers",
+              title: "1 EC2 / 1 Worker → 1 EC2 / 2 Workers",
               rgb: ["0.368 → 0.398 jobs/s", "+8.2%"],
               thermal: ["1.247 → 1.528 jobs/s", "+22.5%"],
-              cpuPeak: "RGB 99% · Thermal 96%",
-              conclusion: "Worker 수를 늘렸지만 CPU 경합으로 처리량 증가가 제한됐습니다."
+              conclusion: "Worker 수를 늘렸지만 CPU 경합으로 처리량 증가가 제한 (CPU Peak: ≈99%)"
             },
             comparisonTwo: {
-              title: "동일 2 Workers를 두 Node로 분산",
-              scenario: "1 EC2 / 2 Workers → 2 EC2 / 2 Workers",
+              title: "1 EC2 / 2 Workers → 2 EC2 / 2 Workers",
               rgb: ["0.398 → 0.786 jobs/s", "+97.5%"],
               thermal: ["1.528 → 2.550 jobs/s", "+66.9%"],
-              conclusion: "Worker 수가 같아도 Node를 분산하자 처리량이 크게 증가했습니다."
+              conclusion: "Worker 수가 같아도 Node를 분산하자 처리량이 크게 증가 (CPU Peak≈76%)"
             },
             baselineSummary: "Baseline → 최종 구성: RGB 처리시간 271.40s → 127.19s · -53.1%, Thermal 처리시간 80.19s → 39.21s · -51.1%",
-            decision: "동일 Node에 Worker만 추가하면 CPU 경합으로 확장 효과가 제한됐습니다. 동일한 2 Workers를 두 Node에 분산했을 때 처리량이 크게 증가해, CPU 추론 환경에서는 Node 분산을 우선하는 확장 방식을 기준으로 정했습니다.",
+            decision: "Worker 증설은 CPU 경합으로 효과가 제한됐고, Node 분산에서 처리량이 크게 증가해 이를 우선 확장 방식으로 결정",
             sourceUrl: "https://github.com/solar-ai-dev/pv-fusion/tree/develop/docs/benchmarks/worker-scaling"
           },
           {
             id: "thermal-model-experiments",
             kind: "thermal_experiment",
             title: "Thermal 데이터 정제 개선과 모델 실험",
-            problem: "초기 Thermal 데이터는 약 7,500장에 원본과 증강 이미지가 혼재했고, 원천 데이터셋의 8-Class 라벨은 동일한 Thermal 결함을 Single/Multi 등으로 과도하게 세분화해 실제 서비스에 필요한 결함 판단 단위와 맞지 않았습니다.",
-            problemEmphasis: ["약 7,500장에 원본과 증강 이미지가 혼재", "8-Class 라벨은 동일한 Thermal 결함을 Single/Multi 등으로 과도하게 세분화"],
-            decision: "서비스 입력과 가까운 약 850장 Drone-view를 기준 데이터로 정리하고, Thermal 결함의 의미를 기준으로 8-Class를 HotSpot · Diode_ByPassed · String_Fault의 3-Class로 재정의했습니다. 이후 Stratified 3-Fold로 증강·전처리 후보를 비교하고, 최종 조합은 분리된 test set에서 Threshold를 검증해 추론 조건을 확정했습니다.",
-            decisionEmphasis: ["약 850장 Drone-view", "HotSpot · Diode_ByPassed · String_Fault의 3-Class", "Stratified 3-Fold", "분리된 test set"],
             dataCards: [
-              ["약 7,500장", "Raw + Augmentation 혼재", "Augmentation leakage 위험", ""],
-              ["약 1,250장", "Raw-only 분리", "촬영 고도·거리 등 입력 조건 혼재", ""],
-              ["약 850장", "Drone-view 선별", "공식 실험 기준", "teal"]
+              ["약 7,500장", "Raw + Augmentation 혼재", "", ""],
+              ["약 1,250장", "Raw-only 분리", "", ""],
+              ["약 850장", "Drone-view 선별", "", "teal"]
             ],
-            dataSummary: "데이터 수를 최대한 늘리기보다 실제 서비스 입력 분포와 유사한 Drone-view를 공식 실험 기준으로 선택했습니다.",
+            dataSummary: "증강본 제거 후 실제 서비스 입력과 유사한 Drone-view 중심 데이터로 재구성",
             augmentationStages: [
               {
                 step: "01",
@@ -440,13 +439,11 @@ if status in {"processed", "skipped"} or terminal:
                 delta: "+4.28%p"
               }
             ],
-            augmentationSummary: "각 단계의 Stratified 3-Fold 결과를 확인한 뒤 다음 증강 조건을 추가해 최종 조합을 선택했습니다.",
             classGroups: [
               ["HotSpot", "MultiHotSpot", "SingleHotSpot"],
               ["Diode_ByPassed", "MultiByPassed", "MultiDiode", "SingleByPassed", "SingleDiode"],
               ["String_Fault", "StringOpenCircuit", "StringReversedPolarity"]
             ],
-            classSummary: "원천 데이터셋은 동일한 결함을 Single/Multi 등으로 과도하게 세분화하고 있어 실제 서비스에 필요한 Thermal 결함 판단 단위와 맞지 않았습니다. 이에 결함 유형의 의미를 기준으로 HotSpot · Diode_ByPassed · String_Fault의 3-Class로 Taxonomy를 재정의했습니다.",
             preprocess: [
               ["LAW", "Original Thermal", "전처리 없는 원본", "/assets/projects/LAW.png"],
               ["DUAL_EDGE", "Dual Edge", "Edge 강조", "/assets/projects/DUAL_EDGE.png"],
@@ -455,10 +452,8 @@ if status in {"processed", "skipped"} or terminal:
               ["GUIDED_FILTER_WEAK", "Guided Filter Weak", "Edge 보존 평활화", "/assets/projects/GUIDED_FILTER_WEAK.png"],
               ["LOWCUT_P15", "LOWCUT-P15", "밝기 하단 조정", "/assets/projects/LOWCUT_P15.png"]
             ],
-            preprocessSummary: "노이즈 제거, 경계 보존, 밝기 분포 조정 등 여러 전처리를 비교했지만 최종 조합의 성능 개선으로 이어지지 않아 전처리를 추가하지 않았습니다.",
-            preprocessSummaryEmphasis: ["최종 조합의 성능 개선으로 이어지지 않아 전처리를 추가하지 않았습니다."],
-            finalDecision: "서비스 입력에 맞춰 데이터와 결함 Taxonomy를 정리하고, Stratified 3-Fold로 증강·전처리 후보를 비교했습니다. 최종 조합은 별도 test set에서 Threshold를 검증해 conf 0.55 / IoU 0.45를 선택하고, ONNX로 export해 ONNX Runtime CPU Worker에 적용했습니다.",
-            finalDecisionEmphasis: ["conf 0.55 / IoU 0.45", "ONNX Runtime CPU Worker"]
+            finalDecision: "최종 Test set에서 F1 90.49% · mAP@0.5 90.45%로 목표 성능을 충족하고, Confidence 0.55 · IoU 0.45 운영 기준 확정",
+            finalDecisionEmphasis: ["F1 90.49% · mAP@0.5 90.45%로 목표 성능을 충족", "Confidence 0.55 · IoU 0.45 운영 기준 확정"]
           }
         ]
       }

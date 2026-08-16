@@ -7,8 +7,7 @@ const contributionGroups = [
 
 const sectionEyebrows = {
   contribution_cards: "CONTRIBUTION",
-  contribution_summary: "CONTRIBUTION",
-  problem_solution: "PROBLEM SOLVING"
+  contribution_summary: "CONTRIBUTION"
 };
 
 const syntaxTokenPattern = /(#.*$|'[^']*'|\b(?:CREATE|UNIQUE|INDEX|ON|WHERE|IN|UPDATE|SET|AND|and|in|if|raise|with|as|or)\b|\b(?:save_result|save_defects|mark_succeeded|delete|cursor|commit|_insert_result|_insert_defects|_mark_job_succeeded|delete_message|rowcount)\b|\b(?:StateTransitionError|JobStateTransitionError)\b|\b[A-Za-z_][A-Za-z0-9_]*\b|==|!=|<=|>=|=>|->|[=:+\-*/()[\]{}.,])/g;
@@ -19,7 +18,7 @@ const troubleshootingTabs = {
     title: "SQS 환경에서 분석 Job 중복 생성·실행 방지"
   },
   "worker-scaling-strategy": {
-    title: "운영 예산 기반 서버 구성 및 Worker 확장 전략 검증"
+    title: "동시 분석 요청을 고려한 Worker 확장 전략 검증"
   },
   "thermal-model-experiments": {
     title: "Thermal 데이터 정제 개선과 모델 실험"
@@ -276,6 +275,36 @@ function FieldBlock({ label, children }) {
   );
 }
 
+function ContextRow({ leftLabel, rightLabel, children }) {
+  const [leftContent, rightContent] = children;
+
+  return (
+    <div className="detail-context-row">
+      <div className="detail-context-col">
+        <strong className="detail-context-label">{leftLabel}</strong>
+        {leftContent}
+      </div>
+      <div className="detail-context-col">
+        <strong className="detail-context-label">{rightLabel}</strong>
+        {rightContent}
+      </div>
+    </div>
+  );
+}
+
+function TripleContextRow({ items }) {
+  return (
+    <div className="detail-context-row-triple">
+      {items.map((item) => (
+        <div className="detail-context-col" key={item.label}>
+          <strong className="detail-context-label">{item.label}</strong>
+          <p>{item.content}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ContributionRoleRow({ card }) {
   return (
     <article className="detail-contribution-role-row">
@@ -350,12 +379,13 @@ function WorkerTopologyCard({ topology }) {
   );
 }
 
-function WorkerComparisonCard({ comparison, accent = "neutral", isFeatured = false }) {
+function WorkerComparisonCard({ comparison, accent = "neutral" }) {
   return (
-    <article className={`detail-worker-comparison ${isFeatured ? "is-featured" : ""} is-${accent}`.trim()}>
+    <article className={`detail-worker-comparison is-${accent}`.trim()}>
       <header className="detail-worker-comparison-head">
-        <strong>{comparison.title}</strong>
-        <span>{comparison.scenario}</span>
+        <span className="detail-worker-comparison-head-title">
+          <strong>{comparison.title}</strong>
+        </span>
       </header>
       <div className="detail-worker-comparison-metrics">
         <div>
@@ -374,6 +404,12 @@ function WorkerComparisonCard({ comparison, accent = "neutral", isFeatured = fal
             <span>{comparison.cpuPeak}</span>
           </div>
         ) : null}
+        {comparison.makespan ? (
+          <div>
+            <strong>Makespan</strong>
+            <span>{comparison.makespan}</span>
+          </div>
+        ) : null}
       </div>
       <p className="detail-worker-comparison-conclusion">{comparison.conclusion}</p>
     </article>
@@ -383,48 +419,55 @@ function WorkerComparisonCard({ comparison, accent = "neutral", isFeatured = fal
 function WorkerScalingCard({ card }) {
   return (
     <article className="detail-problem-card detail-worker-card">
-      <h3 className="detail-problem-title">{card.title}</h3>
-      <div className="detail-problem-grid detail-problem-grid-compact">
-        <FieldBlock label="기준"><EmphasizedText text={card.basis} phrases={card.basisEmphasis} /></FieldBlock>
-        <FieldBlock label="검증"><EmphasizedText text={card.validation} phrases={card.validationEmphasis} /></FieldBlock>
-      </div>
+      <TripleContextRow
+        items={[
+          { label: "운영 기준", content: <EmphasizedText text={card.basis} phrases={["$107 예산", "t3.large 단일 Node·CPU Worker 1개"]} /> },
+          { label: "확장 필요성", content: card.scalingNeed },
+          { label: "비교", content: card.comparisonNote }
+        ]}
+      />
       <div className="detail-problem-details detail-worker-details">
-        <section className="detail-worker-section">
-          <h4>1. MVP 운영 예산 산정</h4>
-          <p><EmphasizedText text={card.budgetDescription} /></p>
-          <div className="detail-cost-grid">
-            <div className="detail-cost-table-wrap">
-              <table className="detail-cost-table">
-                <thead><tr><th>항목</th><th>기준</th><th>월 예상 비용</th></tr></thead>
-                <tbody>
-                  {card.costRows.map((row) => <tr key={row[0]}>{row.map((cell) => <td key={cell}>{cell}</td>)}</tr>)}
-                  <tr className="is-total">{card.totalCost.map((cell) => <td key={cell}>{cell}</td>)}</tr>
-                  <tr>{card.extraCost.map((cell) => <td key={cell}>{cell}</td>)}</tr>
-                </tbody>
-              </table>
+        <div className="detail-worker-split">
+          <section className="detail-worker-section detail-worker-cost-section detail-worker-split-cost">
+            <h4>MVP 운영 예산 산정</h4>
+            <div className="detail-cost-grid">
+              <div className="detail-cost-table-wrap">
+                <table className="detail-cost-table">
+                  <thead><tr><th>항목</th><th>기준</th><th>월 예상 비용</th></tr></thead>
+                  <tbody>
+                    {card.costRows.map((row) => <tr key={row[0]}>{row.map((cell) => <td key={cell}>{cell}</td>)}</tr>)}
+                    <tr className="is-total">{card.totalCost.map((cell) => <td key={cell}>{cell}</td>)}</tr>
+                    <tr>{card.extraCost.map((cell) => <td key={cell}>{cell}</td>)}</tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <figure className="detail-cost-image"><img src="/assets/projects/pv-infra-cost.png" alt="AWS Pricing Calculator 운영 비용 산정" /></figure>
-          </div>
-        </section>
+            <p><EmphasizedText text={card.budgetDescription} /></p>
+          </section>
 
-        <section className="detail-worker-section">
-          <h4>2. 실험 조건</h4>
-          <p>{card.experimentSummary}</p>
-        </section>
-
-        <section className="detail-worker-section">
-          <h4>3. Worker 확장 방식 검증</h4>
-          <div className="detail-worker-comparison-grid">
-            <WorkerComparisonCard comparison={card.comparisonOne} accent="amber" />
-            <WorkerComparisonCard comparison={card.comparisonTwo} accent="teal" isFeatured />
+          <div className="detail-worker-split-bridge">
+            <p>월 운영비 기준 · EC2 t3.large 1대 구성</p>
+            <span className="detail-worker-split-bridge-arrow-down" aria-hidden="true"></span>
+            <p>YOLO26s 640 · CPU ONNX 87.2 ± 0.9ms 참고</p>
+            <span className="detail-worker-split-bridge-arrow-down" aria-hidden="true"></span>
+            <p>Job 누적 시 처리 용량을 어떻게 확장할 것인가?</p>
+            <span className="detail-worker-split-bridge-arrow" aria-hidden="true"></span>
           </div>
-          <p className="detail-worker-summary">{card.baselineSummary}</p>
-        </section>
+
+          <section className="detail-worker-section detail-worker-split-verification">
+            <h4>Worker 확장 방식 검증</h4>
+            <div className="detail-worker-comparison-stack">
+              <WorkerComparisonCard comparison={card.comparisonOne} accent="amber" />
+              <WorkerComparisonCard comparison={card.comparisonTwo} accent="teal" />
+            </div>
+          </section>
+        </div>
 
         <section className="detail-worker-decision">
           <h4>결정</h4>
           <p>{card.decision}</p>
         </section>
+
         <a className="detail-worker-source-link" href={card.sourceUrl} target="_blank" rel="noopener noreferrer">실험 원본 보기</a>
       </div>
     </article>
@@ -434,87 +477,264 @@ function WorkerScalingCard({ card }) {
 function ThermalExperimentCard({ card }) {
   return (
     <article className="detail-problem-card detail-thermal-card">
-      <h3 className="detail-problem-title">{card.title}</h3>
-      <div className="detail-problem-grid detail-problem-grid-compact">
-        <FieldBlock label="문제"><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></FieldBlock>
-        <FieldBlock label="실험·결정"><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></FieldBlock>
-      </div>
       <div className="detail-problem-details detail-thermal-details">
         <section className="detail-thermal-section">
-          <h4>01. 서비스 입력 기준 데이터 정리</h4>
-          <div className="detail-thermal-data-grid">
-            {card.dataCards.map(([value, title, note, variant]) => (
-              <div key={value} className={`detail-thermal-data-card ${variant ? `is-${variant}` : ""}`.trim()}>
-                <strong>{value}</strong><span>{title}</span><small>{note}</small>
+          <div className="detail-thermal-merge-grid">
+            <div className="detail-thermal-merge-col">
+              <h4 className="detail-thermal-step-heading">01. 서비스 입력 기준 데이터 정제</h4>
+              <div className="detail-thermal-data-flow">
+                {card.dataCards.map(([value, title, , variant], index) => {
+                  const step = (
+                    <div key={value} className={`detail-thermal-data-step ${variant ? `is-${variant}` : ""}`.trim()}>
+                      <strong>{value}</strong>
+                      <span>{title}</span>
+                    </div>
+                  );
+
+                  return index === 0 ? (
+                    step
+                  ) : (
+                    [
+                      <span key={`arrow-${value}`} className="detail-thermal-data-arrow" aria-hidden="true">→</span>,
+                      step
+                    ]
+                  );
+                })}
               </div>
-            ))}
+              <p>{card.dataSummary}</p>
+            </div>
+
+            <div className="detail-thermal-merge-col">
+              <h4 className="detail-thermal-step-heading">02. 서비스 3-Class 재정의</h4>
+              <div className="detail-thermal-class-grid">
+                {card.classGroups.map((group) => {
+                  const [head, ...rest] = group;
+                  const summary = rest.join(" · ");
+
+                  return (
+                    <div key={head}>
+                      <strong>{head}</strong>
+                      <span>{summary}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="detail-thermal-class-transition"><strong>원천 8-Class</strong><span> → </span><strong className="is-teal">서비스 기준 3-Class</strong></p>
+            </div>
           </div>
-          <p>{card.dataSummary}</p>
         </section>
 
-        <section className="detail-thermal-section">
-          <h4>02. Thermal 결함 Taxonomy 재정의</h4>
-          <p className="detail-thermal-class-transition"><strong>원천 8-Class</strong><span> → </span><strong className="is-teal">서비스 기준 3-Class</strong></p>
-          <div className="detail-thermal-class-grid">
-            {card.classGroups.map((group) => {
-              const [head, ...rest] = group;
-              const summary = rest.join(" · ");
-
-              return (
-                <div key={head}>
-                  <strong>{head}</strong>
-                  <span>{summary}</span>
-                </div>
-              );
-            })}
-          </div>
-          <p>{card.classSummary}</p>
-        </section>
-
-        <section className="detail-thermal-section">
-          <h4>03. Stratified 3-Fold로 증강·전처리 후보 비교</h4>
+        <section className="detail-thermal-section detail-thermal-augment-section">
+          <h4 className="detail-thermal-step-heading">03. Stratified 3-Fold 기반 오버샘플링과 데이터 증강 효과 검증</h4>
           <div className="detail-thermal-stage-grid">
             {card.augmentationStages?.map((stage) => (
               <article key={stage.step} className="detail-thermal-stage-card">
-                <span className="detail-thermal-stage-step">{stage.step}</span>
-                <strong>{stage.title}</strong>
-                <p className="detail-thermal-stage-metric">{stage.metric}</p>
-                <div className="detail-thermal-stage-values">
-                  <span>{stage.before}</span>
-                  <span aria-hidden="true">→</span>
-                  <span>{stage.after}</span>
+                <div className="detail-thermal-bar-row">
+                  <span className="detail-thermal-bar-label">{stage.step === "01" ? "Raw" : "Before"}</span>
+                  <span className="detail-thermal-bar-value">{stage.before}</span>
+                  <span className="detail-thermal-bar-track">
+                    <span className="detail-thermal-bar-fill" style={{ width: `${parseFloat(stage.before)}%` }} />
+                  </span>
                 </div>
-                <strong className="detail-problem-emphasis is-teal">{stage.delta}</strong>
+                <div className="detail-thermal-bar-row">
+                  <span className="detail-thermal-bar-label">{stage.title}</span>
+                  <span className="detail-thermal-bar-value">{stage.after}</span>
+                  <span className="detail-thermal-bar-track">
+                    <span className="detail-thermal-bar-fill is-after" style={{ width: `${parseFloat(stage.after)}%` }} />
+                  </span>
+                </div>
+                <p className="detail-thermal-bar-result">({stage.metric} : <strong className="detail-problem-emphasis is-teal">{stage.delta}</strong>)</p>
               </article>
             ))}
           </div>
-          <p>{card.augmentationSummary}</p>
         </section>
 
         <div className="detail-thermal-compare-grid">
           <section className="detail-thermal-section detail-thermal-preprocess-section">
-            <h4>04. Thermal 전처리 후보 비교</h4>
+            <h4 className="detail-thermal-step-heading">04. Thermal 전처리 후보 비교</h4>
             <div className="detail-thermal-image-grid">
               {card.preprocess.map(([id, title, note, src]) => (
                 <figure key={id}>
                   <img src={src} alt={`${title} 전처리 결과`} />
-                  <figcaption><strong>{title}</strong><span>{note}</span></figcaption>
+                  <figcaption><strong>{title}</strong><span> - {note}</span></figcaption>
                 </figure>
               ))}
             </div>
-            <p><EmphasizedText text={card.preprocessSummary} phrases={card.preprocessSummaryEmphasis} /></p>
           </section>
 
           <section className="detail-thermal-section detail-thermal-threshold-section">
-            <h4>05. 분리된 test set에서 Threshold 검증</h4>
+            <h4 className="detail-thermal-step-heading">05. Test set 기반 Confidence Threshold 검증</h4>
             <figure className="detail-thermal-tradeoff">
               <img src="/assets/projects/thermal_threshold_tradeoff.png" alt="Confidence Threshold Trade-off" />
             </figure>
-            <p className="detail-thermal-threshold-note">최종 Threshold conf = 0.55, IoU = 0.45</p>
+            <p>Precision·Recall·F1 균형을 기준으로 Confidence 0.55 선택 · IoU 0.45 적용</p>
           </section>
         </div>
 
         <section className="detail-worker-decision"><h4>결정</h4><p><EmphasizedText text={card.finalDecision} phrases={card.finalDecisionEmphasis} /></p></section>
+      </div>
+    </article>
+  );
+}
+
+function ScalingFlowStep({ step }) {
+  if (step.type === "box2") {
+    return (
+      <span className="detail-scaling-flow-box detail-scaling-flow-box-split">
+        <span className="detail-scaling-flow-box-header">
+          <strong>{step.primary}</strong>
+          <span>{step.secondary}</span>
+        </span>
+        {step.note ? (
+          <span className="detail-scaling-flow-box-details">
+            <span className="detail-scaling-flow-box-detail">
+              <strong>{step.note.model}</strong>
+              <span>{step.note.reason}</span>
+            </span>
+          </span>
+        ) : null}
+      </span>
+    );
+  }
+
+  if (step.type === "box") {
+    return <span className="detail-scaling-flow-box">{step.content}</span>;
+  }
+
+  if (step.type === "queue") {
+    return <span className="detail-scaling-flow-box detail-scaling-flow-queue-box">{step.content}</span>;
+  }
+
+  return <span className="detail-scaling-flow-text">{step.content}</span>;
+}
+
+function ScalingFlow({ steps }) {
+  return (
+    <div className="detail-scaling-flow">
+      {steps.map((step, index) => (
+        <div key={`${index}-${step.content ?? step.primary}`} className="detail-scaling-flow-item">
+          {index > 0 ? <span className="detail-scaling-flow-arrow" aria-hidden="true">→</span> : null}
+          <ScalingFlowStep step={step} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function parseMetricValue(value) {
+  const match = /[\d.]+/.exec(value);
+  return match ? parseFloat(match[0]) : 0;
+}
+
+function ScalingMetricCard({ metric }) {
+  const beforeNum = parseMetricValue(metric.before);
+  const afterNum = parseMetricValue(metric.after);
+
+  let beforeRatio;
+  let afterRatio;
+  if (metric.scale) {
+    const { min, max } = metric.scale;
+    beforeRatio = (beforeNum - min) / (max - min);
+    afterRatio = (afterNum - min) / (max - min);
+  } else {
+    const max = Math.max(beforeNum, afterNum) || 1;
+    beforeRatio = beforeNum / max;
+    afterRatio = afterNum / max;
+  }
+
+  return (
+    <article className="detail-scaling-metric-card">
+      <p className="detail-scaling-card-title">{metric.title}</p>
+
+      <div className="detail-thermal-bar-row">
+        <span className="detail-thermal-bar-label">Before</span>
+        <span className="detail-thermal-bar-value">{metric.before}</span>
+        <span className="detail-thermal-bar-track">
+          <span className="detail-thermal-bar-fill" style={{ width: `${Math.max(beforeRatio, 0) * 100}%` }} />
+        </span>
+      </div>
+      <div className="detail-thermal-bar-row">
+        <span className="detail-thermal-bar-label">After</span>
+        <span className="detail-thermal-bar-value">{metric.after}</span>
+        <span className="detail-thermal-bar-track">
+          <span className="detail-thermal-bar-fill is-after" style={{ width: `${Math.max(afterRatio, 0) * 100}%` }} />
+        </span>
+      </div>
+
+      <p className="detail-scaling-metric-note">{metric.note}</p>
+    </article>
+  );
+}
+
+function IndustrialScalingCard({ card }) {
+  const resultItems = card.lightweightSection.resultItems.map((item) => {
+    const primary = item.emphasisPrimary ?? [];
+    const secondary = item.emphasisSecondary ?? [];
+    return {
+      text: item.text,
+      phrases: [...primary, ...secondary],
+      emphasisClasses: Object.fromEntries([
+        ...primary.map((phrase) => [phrase, "is-teal is-scaling-primary"]),
+        ...secondary.map((phrase) => [phrase, "is-scaling-secondary"])
+      ])
+    };
+  });
+
+  return (
+    <article className="detail-problem-card detail-thermal-card">
+      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
+        <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
+        <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
+      </ContextRow>
+
+      <div className="detail-problem-details detail-thermal-details">
+        <section className="detail-thermal-section">
+          <div className="detail-thermal-merge-grid">
+            <div className="detail-thermal-merge-col">
+              <h4 className="detail-thermal-step-heading">{card.backboneFlow.title}</h4>
+              <figure className="detail-thermal-tradeoff detail-backbone-image">
+                <img src={card.backboneFlow.image} alt={card.backboneFlow.imageAlt} />
+              </figure>
+              <p>{card.backboneFlow.summary}</p>
+            </div>
+
+            <div className="detail-thermal-merge-col">
+              <h4 className="detail-thermal-step-heading">{card.stageFlow.title}</h4>
+              <ScalingFlow steps={card.stageFlow.steps} />
+              <div className="detail-scaling-criteria">
+                <span className="detail-scaling-criteria-label">평가 기준</span>
+                {card.stageFlow.criteria.map((item) => (
+                  <span key={item} className="detail-scaling-chip">{item}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="detail-thermal-section detail-thermal-augment-section">
+          <h4 className="detail-thermal-step-heading">{card.lightweightSection.title}</h4>
+          <p>{card.lightweightSection.summary}</p>
+          <div className="detail-scaling-stage-grid">
+            {card.lightweightSection.metrics.map((metric) => (
+              <ScalingMetricCard key={metric.title} metric={metric} />
+            ))}
+          </div>
+        </section>
+
+        <section className="detail-scaling-footer">
+          <div className="detail-scaling-footer-block">
+            <strong>결과</strong>
+            {resultItems.map((item, index) => (
+              <p key={index}>
+                <EmphasizedText text={item.text} phrases={item.phrases} emphasisClasses={item.emphasisClasses} />
+              </p>
+            ))}
+          </div>
+          <div className="detail-scaling-footer-row">
+            <strong>후속 과제</strong>
+            <span>{card.nextSteps}</span>
+          </div>
+        </section>
       </div>
     </article>
   );
@@ -525,7 +745,7 @@ function SqsTroubleshootingCard() {
     {
       accent: "teal",
       title: "Active Job 중복 차단",
-      description: "이미지당 QUEUED·RUNNING Job을 최대 1개로 제한해 중복 생성을 DB에서 차단",
+      description: "DB 제약으로 Active Job 중복 생성 차단",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/de4e810faa34021c2d3c257ddd1c6cd590f0692a/backend/src/main/resources/db/migration/V8__add_unique_active_analysis_job_per_image.sql#L1-L3",
       code: [
         "CREATE UNIQUE INDEX ux_analysis_jobs_one_active_per_image",
@@ -536,7 +756,7 @@ function SqsTroubleshootingCard() {
     {
       accent: "blue",
       title: "조건부 Claim",
-      description: "QUEUED 상태의 Job만 RUNNING으로 전환해 동일 Job의 중복 실행을 차단",
+      description: "QUEUED Job만 RUNNING으로 전이해 중복 실행 차단",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
       code: [
         "UPDATE analysis_jobs",
@@ -551,23 +771,21 @@ function SqsTroubleshootingCard() {
 
   return (
     <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
-      <h3 className="detail-problem-title">SQS 환경에서 분석 Job 중복 생성·실행 방지</h3>
-
-      <div className="detail-sqs-head-grid">
-        <section className="detail-sqs-block">
-          <strong>문제</strong>
-          <p><strong>연속 요청과 SQS 재전달이 겹치면 동일 이미지의 분석 Job이 중복 생성·실행될 수 있었습니다.</strong></p>
-        </section>
-        <section className="detail-sqs-block detail-sqs-highlight">
-          <strong>핵심 판단</strong>
-          <p><strong>이미지당 Active Job은 최대 1개</strong>로 제한하고, Worker는 <code>QUEUED → RUNNING</code>을 조건부 Claim하도록 설계했습니다.</p>
-        </section>
-      </div>
+      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
+        <p>연속 요청과 SQS 재전달이 겹칠 때 동일 이미지의 Active Job 중복 생성·동일 Job 중복 실행 가능</p>
+        <p>
+          생성 단계는 <strong className="detail-problem-emphasis">DB 제약</strong>으로 차단, 실행 단계는 QUEUED → RUNNING{" "}
+          <strong className="detail-problem-emphasis">조건부 Claim</strong>으로 제어
+        </p>
+      </ContextRow>
 
       <div className="detail-sqs-visual-grid">
-        <div className="detail-sqs-diagram-link" aria-hidden="true">
-          <img className="detail-sqs-diagram" src="/assets/projects/diagram.png" alt="SQS Job 상태 안정화 다이어그램" />
-        </div>
+        <section className="detail-sqs-diagram-section">
+          <h4>SQS 흐름도</h4>
+          <div className="detail-sqs-diagram-link" aria-hidden="true">
+            <img className="detail-sqs-diagram" src="/assets/projects/diagram.png" alt="SQS Job 상태 안정화 다이어그램" />
+          </div>
+        </section>
 
         <section className="detail-sqs-implementation">
           <h4>구현 근거</h4>
@@ -605,7 +823,7 @@ function SqsTroubleshootingCard() {
 
       <section className="detail-sqs-result">
         <h4>결과</h4>
-        <p><strong>DB 제약과 조건부 상태 전이로 동일 이미지의 Active Job 중복 생성과 동일 Job의 중복 실행을 방지했습니다.</strong></p>
+        <p>DB 제약과 조건부 상태 전이로 Active Job 중복 생성·동일 Job 중복 실행 차단</p>
       </section>
     </article>
   );
@@ -613,19 +831,32 @@ function SqsTroubleshootingCard() {
 
 function TroubleshootingCard({ card }) {
   return (
-    <article className="detail-problem-card">
-      <h3 className="detail-problem-title">{card.title}</h3>
-      <div className="detail-problem-grid">
-        <FieldBlock label="문제">{card.problem}</FieldBlock>
-        <FieldBlock label="판단·해결">{[card.decision, ...(card.implementation ?? [])].filter(Boolean)}</FieldBlock>
-        <FieldBlock label="결과">{card.result}</FieldBlock>
-      </div>
+    <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
+      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
+        <p>{card.problem}</p>
+        <div>
+          {card.decision ? <p>{card.decision}</p> : null}
+          {card.implementation?.length ? <BulletList items={card.implementation} /> : null}
+        </div>
+      </ContextRow>
+
+      <div className="detail-troubleshooting-middle" aria-hidden="true" />
+
+      {card.result ? (
+        <section className="detail-sqs-result">
+          <h4>결과</h4>
+          <p>{card.result}</p>
+        </section>
+      ) : null}
     </article>
   );
 }
 
 export function TroubleshootingSection({ id, section }) {
-  const cards = [section.card, ...(section.additionalCards ?? [])].filter(Boolean);
+  const rawCards = [section.card, ...(section.additionalCards ?? [])].filter(Boolean);
+  const cards = section.cardOrder
+    ? section.cardOrder.map((cardId) => rawCards.find((card) => card.id === cardId)).filter(Boolean)
+    : rawCards;
   const [activeCardId, setActiveCardId] = useState(cards[0]?.id ?? null);
 
   if (!cards.length) {
@@ -685,7 +916,9 @@ export function TroubleshootingSection({ id, section }) {
                   ? <WorkerScalingCard card={card} />
                   : card.kind === "thermal_experiment"
                     ? <ThermalExperimentCard card={card} />
-                    : <TroubleshootingCard card={card} />}
+                    : card.kind === "industrial_scaling"
+                      ? <IndustrialScalingCard card={card} />
+                      : <TroubleshootingCard card={card} />}
               </div>
             );
           })}
