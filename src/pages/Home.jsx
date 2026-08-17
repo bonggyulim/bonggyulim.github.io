@@ -4,61 +4,57 @@ import { projects } from "../data/projects";
 
 const capabilities = [
   {
-    title: "서비스·시스템 설계",
-    description: "요구사항·MVP·시스템 구조·서버 간 데이터 계약 설계"
+    title: "요구사항·시스템 설계",
+    description: "요구사항·MVP를 구조·데이터 흐름·API·DB 계약으로 구체화"
   },
   {
-    title: "백엔드·AI 서버 구현",
-    description: "Spring Boot 백엔드·FastAPI AI 서버 구현 및 연동"
+    title: "서비스·비동기 처리",
+    description: "Spring Boot·FastAPI 서비스와 비동기 처리·정합성 구현"
   },
   {
-    title: "비동기 처리·데이터 일관성",
-    description: "상태 전이·트랜잭션·중복 처리·실패 재처리 설계"
+    title: "AI 모델 실험·서빙",
+    description: "판정 성능·추론 자원·배포 조건 기반 모델 실험·서빙"
   },
   {
-    title: "에이전트·모델 서빙",
-    description: "LangGraph 승인 워크플로와 자원·비용 기반 모델 서빙"
+    title: "Agent 설계·구현",
+    description: "LangGraph·MCP 기반 판단·승인·실행 워크플로우 설계"
   },
   {
-    title: "CI/CD·운영 배포",
-    description: "Jenkins·GitHub Actions·AWS·K3s CI/CD·배포"
+    title: "배포·CI/CD",
+    description: "Docker·AWS·K3s·Jenkins·GitHub Actions 기반 배포"
   }
 ];
 
 const stackGroups = [
   {
     title: "Backend",
-    items: ["Java", "Spring Boot", "JPA", "Python", "FastAPI"]
+    items: ["Java", "Spring Boot", "JPA", "Python", "FastAPI", "SQLAlchemy"]
   },
   {
     title: "AI / Agent",
     items: [
       "PyTorch",
-      "TensorFlow",
-      "Scikit-Learn",
-      "YOLO",
-      "Anomalib",
+      "Scikit-learn",
       "ONNX Runtime",
-      "LLM",
       "RAG",
-      "LangChain",
-      "LangGraph"
+      "LangGraph",
+      "MCP",
+      "Gemini",
+      "Ollama"
     ]
   },
   {
     title: "Database / Storage",
-    items: ["MariaDB", "PostgreSQL", "Redis", "ChromaDB", "MinIO", "Flyway"]
+    items: ["PostgreSQL", "MariaDB", "Redis", "SQLite", "MinIO", "ChromaDB", "Flyway"]
   },
   {
     title: "Infra / DevOps",
     items: [
       "Docker",
       "Linux",
-      "Nginx",
       "AWS",
-      "Amazon S3",
-      "Amazon SQS",
       "K3s",
+      "Nginx",
       "Traefik",
       "Jenkins",
       "GitHub Actions"
@@ -66,7 +62,7 @@ const stackGroups = [
   },
 ];
 
-const featuredProjectSlugs = ["pv-insight", "industrial-ai-platform"];
+const featuredProjectSlugs = ["pv-insight", "industrial-ai-platform", "mcp-api-agent"];
 
 export default function Home() {
   const featuredProjects = featuredProjectSlugs
@@ -77,7 +73,7 @@ export default function Home() {
     <main>
       <section className="hero-section">
         <div className="page-shell hero-inner">
-          <p className="eyebrow">BACKEND · AI SERVICE · AGENT WORKFLOW</p>
+          <p className="eyebrow">BACKEND · AI SERVICE · AGENT</p>
           <h1>서비스 요구사항과 운영 제약을 기준으로<br />AI 서비스를 설계·구현하는<br />백엔드 개발자입니다.</h1>
           <div className="hero-actions">
           </div>
@@ -92,11 +88,11 @@ export default function Home() {
           <div className="intro-grid">
             <div className="section-card prose-card">
               <div className="prose-block">
-                <p>서비스 요구사항과 MVP를 시스템 구조·데이터 흐름·API로 구체화하고, 백엔드와 AI 서버를 연결해 운영 가능한 서비스로 구현해 왔습니다.</p>
+                <p>서비스 요구사항과 MVP를 시스템 구조와 데이터 흐름으로 구체화하고, AI 기능을 실제 서비스와 운영 환경에 연결해 구현해 왔습니다.</p>
                 <p>
-                  Spring Boot와 FastAPI를 기반으로 서비스 API와 AI 추론 서버를 구현했으며, 비동기 작업의 상태 전이·트랜잭션·데이터 일관성·인증과 권한을 고려해 처리 흐름을 설계했습니다.
+                  기능의 정상 동작뿐 아니라 데이터 정합성, 실패 조건, 자원 제약과 운영 가능성을 함께 검토합니다. AI 기능도 모델 성능만으로 판단하지 않고 실행 환경의 비용과 자원 사용량, 처리 성능을 기준으로 구조와 운영 방식을 결정합니다.
                 </p>
-                <p>AI 기능은 정확도뿐 아니라 추론 시간·메모리 사용량·운영 비용·배포 환경을 기준으로 평가하고, Docker·Nginx 자체 호스팅과 AWS·K3s 환경에서 CI/CD와 배포를 수행했습니다.</p>
+                <p>최근에는 외부 시스템을 조회·변경하는 업무 Agent를 설계·구현하며, LLM의 의미 판단과 정책·승인·실행·결과 검증의 책임을 분리하고 있습니다.</p>
               </div>
             </div>
 

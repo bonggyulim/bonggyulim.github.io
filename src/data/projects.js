@@ -9,9 +9,10 @@ export const projects = [
     status: "completed",
     statusLabel: "완료",
     summary: "제조 이미지 이상 탐지와 모델·Memory Bank 운영, 문서 기반 RAG를 결합한 설비 점검 지원 플랫폼",
-    homeSummary: "제조 이미지 이상 탐지, 모델·Memory Bank 운영과 문서 RAG를 결합한 설비 점검 지원 플랫폼",
+    homeSummary: "제조 이미지 이상 탐지와 모델·Memory Bank 운영, 문서 RAG를 결합한 설비 점검 지원 플랫폼",
     description:
-      "제조 이미지 이상 탐지와 카테고리별 Memory Bank 운영, 설비 문서 RAG 챗봇을 결합한 설비 점검 지원 플랫폼입니다. 정상 이미지 기반 Memory Bank 생성·적용, 검사 결과와 이상 위치 확인, 설비 문서 검색과 출처 기반 점검·대응 정보 조회를 지원합니다.",
+      "제조 이미지 이상 탐지와 카테고리별 Memory Bank 운영, 설비 문서 RAG 챗봇을 결합한 설비 점검 지원 플랫폼입니다. 이상 탐지 결과와 의심 위치를 시각화하고, 검사 이력을 관리하며 설비 문서 검색과 출처 기반 점검·대응 정보를 제공합니다.",
+    descriptionEmphasis: ["Memory Bank 운영", "설비 문서 RAG 챗봇"],
     meta: [
       "2026.04.17 ~ 2026.05.15",
       "7인 팀 프로젝트"
@@ -96,21 +97,21 @@ export const projects = [
       },
       {
         id: "troubleshooting",
-        title: "문제 해결",
+        title: "핵심 문제 해결",
         type: "problem_solution",
         card: {
           id: "category-scaling-strategy",
           kind: "industrial_scaling",
-          title: "신규 카테고리 확장을 고려한 탐지 구조·경량화 검증",
-          problem: "신규 카테고리에 대응하면서 카테고리별 재학습을 줄이고, 추론 비용까지 고려한 운영 구조 필요",
-          problemEmphasis: ["신규 카테고리", "카테고리별 재학습", "추론 비용"],
-          decision: "공통 Backbone + 카테고리별 Memory Bank 및 SPEED → PERFORMANCE 2-Stage 운영 기준과 경량화 대안 검증",
-          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "SPEED → PERFORMANCE", "경량화"],
+          title: "신규 카테고리 대응을 위한 모델 운영 구조·경량화 검증",
+          problem: "신규 카테고리마다 전체 모델을 재학습하지 않으면서, 추론 자원까지 고려할 모델 운영 구조 필요",
+          problemEmphasis: ["신규 카테고리", "전체 모델을 재학습", "추론 자원"],
+          decision: "공통 Backbone + 카테고리별 Memory Bank로 확장 구조를 설계하고, SPEED → PERFORMANCE 2-Stage 운영 기준과 Teacher–Student 경량화 검증",
+          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "SPEED → PERFORMANCE", "Teacher–Student 경량화"],
           backboneFlow: {
             title: "01. 공통 Backbone + 카테고리별 Memory Bank — 카테고리 대응 구조",
             image: "/assets/projects/memorybank.svg",
             imageAlt: "공통 Backbone + 카테고리별 Memory Bank 카테고리 대응 구조 다이어그램",
-            summary: "정상 이미지로 카테고리별 Memory Bank를 구축하고, 검사 시점에는 공통 Backbone으로 추출한 Feature를 비교해 카테고리별 이상 탐지 결과와 Score·Heatmap을 생성"
+            summary: "공통 Backbone으로 정상 이미지 Feature를 추출해 카테고리별 Memory Bank로 관리하고, 검사 Feature와 비교해 Anomaly Score·Heatmap 생성"
           },
           stageFlow: {
             title: "02. SPEED → PERFORMANCE 2-Stage 추론 기준",
@@ -119,38 +120,38 @@ export const projects = [
                 type: "box2",
                 primary: "SPEED",
                 secondary: "빠른 1차 판정",
-                note: { model: "WRN50 + PatchCore", reason: "처리 효율·GPU Memory 기준 우선" }
+                note: { model: "WRN50 + PatchCore", reason: "처리 효율·GPU Memory 우선" }
               },
               { type: "queue", content: "재검토 큐" },
               {
                 type: "box2",
                 primary: "PERFORMANCE",
                 secondary: "정밀 재판정",
-                note: { model: "DINOv2 기반", reason: "정확도·위치 성능 기준 우선" }
+                note: { model: "DINOv2 기반", reason: "정확도·위치 성능 우선" }
               }
             ],
-            criteria: ["F1-Score", "Latency", "GPU Memory Peak", "PRO"]
+            criteria: ["F1-Score", "Latency", "GPU Memory Peak", "PRO"],
+            summary: "SPEED로 1차 판정 후 저신뢰·경계 구간 결과만 재검토 큐로 분류해 PERFORMANCE로 정밀 재판정"
           },
           lightweightSection: {
-            title: "03. Teacher-Student 경량화 검증",
-            summary: "카테고리·분석량 증가 시 Backbone + Memory Bank 구조의 GPU 메모리·추론 비용 확대 가능성을 고려해 경량 Student 구조 검증",
+            title: "03. Teacher–Student 경량화 검증",
+            summary: "카테고리 확장에 따른 GPU 메모리 부담을 줄이기 위해 Teacher–Student 경량화 구조 검증",
             metrics: [
-              { title: "GPU Memory Peak", before: "847.48 MB", after: "87.26 MB", note: "약 90% 감소" },
+              { title: "GPU Memory Peak", before: "847.48 MB", after: "87.26 MB", note: "약 90% 절감" },
+              { title: "Throughput", before: "1.105 images/sec", after: "0.568 images/sec", note: "실측 처리량" },
               { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p 개선", scale: { min: 0.5, max: 1 } },
               { title: "F1-Score", before: "0.914", after: "0.959", note: "+4.5%p 개선", scale: { min: 0.5, max: 1 } },
-              { title: "Pixel AUROC", before: "0.985", after: "0.970", note: "-1.5%p 하락", scale: { min: 0.5, max: 1 } },
-              { title: "PRO", before: "0.842", after: "0.708", note: "-13.4%p 하락", scale: { min: 0.5, max: 1 } }
+              { title: "PRO", before: "0.842", after: "0.708", note: "위치 설명력 Trade-off", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
-              { text: "신규 카테고리의 Memory Bank 생성·적용·관리까지 이어지는 운영 구조 구축" },
+              { text: "카테고리별 Memory Bank 운영 구조를 설계하고 생성·적용·관리 흐름을 Spring–FastAPI로 연동" },
               {
                 text: "GPU Memory Peak 약 90% 절감, Image AUROC·F1 유지·개선 및 위치 설명력(PRO) Trade-off 확인",
                 emphasisPrimary: ["GPU Memory Peak 약 90% 절감"],
                 emphasisSecondary: ["Image AUROC·F1 유지·개선"]
               }
             ]
-          },
-          nextSteps: "축적된 Anomaly Heatmap·검사 결과를 활용한 결함 유형 분류로 확장"
+          }
         }
       }
     ]
@@ -162,7 +163,7 @@ export const projects = [
     status: "completed",
     statusLabel: "완료",
     summary: "드론 RGB·Thermal 이미지로 태양광 패널의 이상 후보를 탐지하고, 분석 결과와 조치 이력을 관리하는 플랫폼",
-    homeSummary: "드론 RGB·Thermal 이미지로 태양광 패널의 이상 후보와 후속 조치를 관리하는 점검 플랫폼",
+    homeSummary: "드론 RGB·열화상 이미지에서 태양광 패널 이상 후보를 탐지하고 후속 조치를 지원하는 플랫폼",
     description:
       "드론 RGB·Thermal 이미지에서 태양광 패널의 이상 후보를 탐지하고, 분석 결과와 조치 이력을 관리하는 플랫폼입니다.",
     descriptionEmphasis: [
@@ -296,15 +297,15 @@ export const projects = [
         cardOrder: ["worker-scaling-strategy", "sqs-job-state-consistency", "thermal-model-experiments"],
         card: {
           id: "sqs-job-state-consistency",
-          title: "SQS 환경에서 분석 Job 중복 생성·실행 방지",
+          title: "분석 Job 중복 생성·실행 및 재처리 안정화",
           problem:
-            "연속 요청과 SQS 재전달이 겹치면 동일 이미지의 분석 Job이 중복 생성·실행될 수 있었습니다.",
-          problemEmphasis: ["연속 요청과 SQS 재전달이 겹치면 동일 이미지의 분석 Job이 중복 생성·실행"],
+            "연속 요청에서는 동일 이미지의 Active Job이 중복 생성될 수 있고, SQS 재전달에서는 동일 Job이 다시 실행될 수 있음",
+          problemEmphasis: ["동일 이미지의 Active Job이 중복 생성", "동일 Job이 다시 실행"],
           solution:
-            "이미지당 Active Job은 최대 1개로 제한하고, Worker는 QUEUED → RUNNING을 조건부 Claim하도록 설계했습니다.",
+            "생성 단계는 DB 제약으로 Active Job을 제한하고, 실행 단계는 QUEUED → RUNNING 조건부 Claim으로 중복 처리를 제어",
           solutionEmphasis: [
-            "이미지당 Active Job은 최대 1개",
-            "QUEUED → RUNNING"
+            "DB 제약",
+            "QUEUED → RUNNING 조건부 Claim"
           ],
           expandable: true,
           flowCode: `# 1. 동일 이미지의 Active Job은 1개만 허용
@@ -336,8 +337,8 @@ if status in {"processed", "skipped"} or terminal:
 # non-terminal 실패는 삭제하지 않고
 # Visibility Timeout 이후 재수신`,
           result:
-            "DB 제약과 조건부 상태 전이로 동일 이미지의 Active Job 중복 생성과 동일 Job의 중복 실행을 방지했습니다.",
-          resultEmphasis: ["DB 제약과 조건부 상태 전이", "동일 이미지의 Active Job 중복 생성과 동일 Job의 중복 실행"],
+            "Active Job 중복 생성·실행을 제어하고, 완료 Transaction과 실패 유형별 SQS 재처리 정책으로 Job 처리 정합성 강화",
+          resultEmphasis: ["Active Job 중복 생성·실행을 제어", "완료 Transaction과 실패 유형별 SQS 재처리 정책"],
           evidence: [
             {
               title: "Active Job DB 제약",
@@ -365,10 +366,10 @@ if status in {"processed", "skipped"} or terminal:
           {
             id: "worker-scaling-strategy",
             kind: "worker_scaling",
-            title: "동시 분석 요청을 고려한 Worker 확장 전략 검증",
-            basis: "월 약 $107 예산으로 t3.large 단일 Node·CPU Worker 1개 구성",
-            scalingNeed: "분석 Job 누적에 대비해 Worker 처리 용량 확장 방식 검토",
-            comparisonNote: "Worker 복제와 Node 분산을 RGB·Thermal 각 100 Job으로 비교",
+            title: "분석 Job 누적에 대비한 Worker 확장 전략 검증",
+            basis: "월 약 $107의 MVP 운영 예산을 기준으로 t3.large 단일 Node·CPU Worker 1개를 Baseline으로 구성",
+            scalingNeed: "분석 Job 누적 시 처리 용량을 어떻게 확장할지 Worker 복제와 Node 분산 방식 비교",
+            comparisonNote: "RGB·Thermal 각 100 Job을 동일 조건으로 처리해 Worker 수와 Node 배치에 따른 처리량·CPU 경합 비교",
             budgetDescription: "AWS Pricing Calculator로 단일 EC2 기반 MVP 운영환경의 월 비용을 산정",
             costRows: [
               ["EC2 + EBS", "t3.large / gp3 100GB", "$85.04"],
@@ -383,28 +384,27 @@ if status in {"processed", "skipped"} or terminal:
               title: "1 EC2 / 1 Worker → 1 EC2 / 2 Workers",
               rgb: ["0.368 → 0.398 jobs/s", "+8.2%"],
               thermal: ["1.247 → 1.528 jobs/s", "+22.5%"],
-              conclusion: "Worker 수를 늘렸지만 CPU 경합으로 처리량 증가가 제한 (CPU Peak: ≈99%)"
+              conclusion: "동일 Node의 CPU 경합으로 Worker 증설 효과 제한 (CPU Peak ≈99%)"
             },
             comparisonTwo: {
               title: "1 EC2 / 2 Workers → 2 EC2 / 2 Workers",
               rgb: ["0.398 → 0.786 jobs/s", "+97.5%"],
               thermal: ["1.528 → 2.550 jobs/s", "+66.9%"],
-              conclusion: "Worker 수가 같아도 Node를 분산하자 처리량이 크게 증가 (CPU Peak≈76%)"
+              conclusion: "Worker 수를 유지한 채 Node를 분산하자 처리량이 크게 증가 (CPU Peak ≈76%)"
             },
-            baselineSummary: "Baseline → 최종 구성: RGB 처리시간 271.40s → 127.19s · -53.1%, Thermal 처리시간 80.19s → 39.21s · -51.1%",
             decision: "Worker 증설은 CPU 경합으로 효과가 제한됐고, Node 분산에서 처리량이 크게 증가해 이를 우선 확장 방식으로 결정",
             sourceUrl: "https://github.com/solar-ai-dev/pv-fusion/tree/develop/docs/benchmarks/worker-scaling"
           },
           {
             id: "thermal-model-experiments",
             kind: "thermal_experiment",
-            title: "Thermal 데이터 정제 개선과 모델 실험",
+            title: "Thermal 데이터 기준 재정의와 단계별 모델 실험",
             dataCards: [
               ["약 7,500장", "Raw + Augmentation 혼재", "", ""],
               ["약 1,250장", "Raw-only 분리", "", ""],
               ["약 850장", "Drone-view 선별", "", "teal"]
             ],
-            dataSummary: "증강본 제거 후 실제 서비스 입력과 유사한 Drone-view 중심 데이터로 재구성",
+            dataSummary: "증강본을 제거하고 실제 서비스 입력과 유사한 Drone-view 중심으로 실험 데이터 재구성",
             augmentationStages: [
               {
                 step: "01",
@@ -445,17 +445,141 @@ if status in {"processed", "skipped"} or terminal:
               ["String_Fault", "StringOpenCircuit", "StringReversedPolarity"]
             ],
             preprocess: [
-              ["LAW", "Original Thermal", "전처리 없는 원본", "/assets/projects/LAW.png"],
-              ["DUAL_EDGE", "Dual Edge", "Edge 강조", "/assets/projects/DUAL_EDGE.png"],
-              ["MEDIAN_SHIFT", "Median Shift", "분포 변환", "/assets/projects/MEDIAN_SHIFT.png"],
-              ["NLM_WEAK", "NLM Weak", "Noise 제거", "/assets/projects/NLM_WEAK.png"],
-              ["GUIDED_FILTER_WEAK", "Guided Filter Weak", "Edge 보존 평활화", "/assets/projects/GUIDED_FILTER_WEAK.png"],
-              ["LOWCUT_P15", "LOWCUT-P15", "밝기 하단 조정", "/assets/projects/LOWCUT_P15.png"]
+              { id: "RAW", title: "RAW", note: "전처리 없는 원본", src: "/assets/projects/LAW.png" },
+              { id: "DUAL_EDGE", title: "Dual Edge", note: "Edge 강조", src: "/assets/projects/DUAL_EDGE.png" },
+              { id: "MEDIAN_SHIFT", title: "Median Shift", note: "분포 변환", src: "/assets/projects/MEDIAN_SHIFT.png" },
+              { id: "NLM_WEAK", title: "NLM Weak", note: "Noise 제거", src: "/assets/projects/NLM_WEAK.png" },
+              { id: "GUIDED_FILTER_WEAK", title: "Guided Filter", note: "Edge 보존 평활화", src: "/assets/projects/GUIDED_FILTER_WEAK.png" },
+              { id: "LOWCUT_P15", title: "LOWCUT-P15", note: "밝기 하단 조정", src: "/assets/projects/LOWCUT_P15.png" }
             ],
-            finalDecision: "최종 Test set에서 F1 90.49% · mAP@0.5 90.45%로 목표 성능을 충족하고, Confidence 0.55 · IoU 0.45 운영 기준 확정",
-            finalDecisionEmphasis: ["F1 90.49% · mAP@0.5 90.45%로 목표 성능을 충족", "Confidence 0.55 · IoU 0.45 운영 기준 확정"]
+            preprocessConclusion: "모든 전처리 후보가 RAW F1 77.16%를 넘지 못해 추가 전처리를 적용하지 않고 RAW 유지",
+            finalDecision: "3개 Class 모두 목표 기준(F1 ≥85%, mAP@0.5 ≥80%) 충족 · Confidence 0.55 / IoU 0.45 확정",
+            finalDecisionEmphasis: []
           }
         ]
+      }
+    ]
+  },
+  {
+    slug: "mcp-api-agent",
+    title: "MCP·API 기반 업무 Agent",
+    detailPath: "/projects/mcp-api-agent",
+    status: "completed",
+    statusLabel: "완료",
+    // TODO: 레이아웃 확인용 임시 영상 — 실제 시연 영상 준비되면 교체
+    videoUrl: "/assets/projects/industrial-ai.mp4",
+    videoPoster: "/assets/projects/industrial-thumbnail.png",
+    summary: "MCP와 외부 API를 통해 외부 시스템 정보를 조회하고 승인된 작업만 실행·검증하는 업무 Agent",
+    homeSummary: "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent 서비스",
+    description:
+      "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent입니다. Main LangGraph와 6개 역할 Agent로 판단 책임을 분리하고, WRITE는 Policy·Schema·Validator 검증과 사용자 승인을 거쳐 실행합니다.",
+    descriptionEmphasis: [
+      "CRUD를 수행하는 업무 Agent",
+      "Policy·Schema·Validator 검증과 사용자 승인"
+    ],
+    meta: [
+      "2026.08.05 ~ 2026.08.20",
+      "2인 팀 프로젝트"
+    ],
+    tags: [
+      "Python",
+      "FastAPI",
+      "LangGraph",
+      "MCP",
+      "Pydantic",
+      "SQLAlchemy",
+      "SQLite",
+      "OAuth 2.0",
+      "Gemini API",
+      "Ollama"
+    ],
+    connectors: [
+      "Gmail API",
+      "Google Tasks API",
+      "Google Calendar API",
+      "GitHub API"
+    ],
+    highlights: [
+      "LangGraph 기반 판단·승인·실행 워크플로우 구현",
+      "MCP·외부 API 연동으로 외부 시스템 조회·실행 처리",
+      "정책·승인 단계와 실행 단계 책임 분리 설계",
+      "실행 결과 검증 및 상태 전이 관리"
+    ],
+    sections: [
+      {
+        id: "role",
+        title: "내 역할과 핵심 기여",
+        type: "contribution_cards",
+        layout: "role_rows",
+        cards: [
+          {
+            id: "implementation",
+            title: "핵심 기능 구현",
+            items: [
+              "Main LangGraph와 6개 역할 Agent(Subgraph) 구현",
+              "Gmail·Tasks·Calendar READ / WRITE 기능 구현",
+              "MCP 기반 외부 서비스 조회·실행 흐름 구현"
+            ]
+          },
+          {
+            id: "workflow-policy",
+            title: "워크플로우·정책 설계",
+            items: [
+              "규칙 기반 흐름 제어와 상태 관리 구조 설계",
+              "공통 정책과 Gmail·Tasks·Calendar별 정책 정의",
+              "READ / WRITE·승인·근거·허용 Tool 정책 적용"
+            ]
+          },
+          {
+            id: "output-control",
+            title: "LLM 출력·실행 통제",
+            items: [
+              "Schema로 LLM의 출력 형식과 허용 범위 제한",
+              "출력값과 실제 실행 인자를 Validator로 검증",
+              "승인 → 실행권 확보 → 실행 → 결과 검증·복구 흐름 구현"
+            ]
+          }
+        ]
+      },
+      {
+        id: "architecture",
+        title: "시스템 아키텍처 & LangGraph 워크플로우",
+        eyebrow: "ARCHITECTURE & LANGGRAPH",
+        type: "architecture_overview",
+        images: [
+          {
+            src: "/assets/projects/MCP-API-Work-Agent-acchitecture.png",
+            alt: "MCP·API 기반 업무 Agent 아키텍처 다이어그램",
+            label: "아키텍처"
+          },
+          {
+            src: "/assets/projects/LangGraph.svg",
+            alt: "LangGraph 판단·승인·실행 워크플로우 다이어그램",
+            label: "LangGraph 워크플로우"
+          }
+        ],
+        legend: null,
+        renderInDetail: true
+      },
+      {
+        id: "troubleshooting",
+        title: "핵심 문제 해결",
+        type: "problem_solution",
+        card: {
+          id: "policy-execution-boundary",
+          title: "판단·실행 책임 분리를 통한 승인되지 않은 작업 실행 방지",
+          problem:
+            "LLM의 의미 판단과 외부 시스템 실행을 분리하지 않으면, 정책 검증 없이 작업이 실행되거나 실행 결과를 신뢰하기 어려움",
+          decision:
+            "판단 → 정책 검증 → 승인 → 실행 → 결과 검증 단계를 분리하고, 각 단계를 Structured Output과 상태 전이로 관리",
+          implementation: [
+            "LLM 판단 결과를 Structured Output으로 고정해 정책 검증 단계에 전달",
+            "정책에 부합하는 요청만 승인 상태로 전이 후 MCP·외부 API로 실행",
+            "실행 결과를 별도 검증 단계에서 확인 후 상태 확정"
+          ],
+          result:
+            "판단·정책·승인·실행·검증 단계를 분리해 실행 전 정책 검증과 실행 후 결과 검증을 모두 거치는 흐름 확보"
+        }
       }
     ]
   }

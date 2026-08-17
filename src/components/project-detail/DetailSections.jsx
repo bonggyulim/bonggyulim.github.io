@@ -7,7 +7,56 @@ const contributionGroups = [
 
 const sectionEyebrows = {
   contribution_cards: "CONTRIBUTION",
-  contribution_summary: "CONTRIBUTION"
+  contribution_summary: "CONTRIBUTION",
+  architecture_overview: "ARCHITECTURE",
+  problem_solution: "PROBLEM SOLVING"
+};
+
+function ContributionIcon() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <circle cx="10" cy="6.6" r="3.1" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M3.6 16.4c0-3.2 2.9-5.4 6.4-5.4s6.4 2.2 6.4 5.4"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
+
+function ArchitectureIcon() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <rect x="2.6" y="2.6" width="5.4" height="5.4" rx="1.3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <rect x="12" y="2.6" width="5.4" height="5.4" rx="1.3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <rect x="7.3" y="12" width="5.4" height="5.4" rx="1.3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M5.3 8v2.2a1.6 1.6 0 0 0 1.6 1.6h1M14.7 8v2.2a1.6 1.6 0 0 1-1.6 1.6h-1" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+function ProblemSolvingIcon() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <path
+        d="M12.4 3.4a3.6 3.6 0 0 0-4.9 4.3L3 12.2v2.4h2.4l4.5-4.5a3.6 3.6 0 0 0 4.3-4.9l-2.3 2.3-1.7-.5-.5-1.7z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+const sectionIcons = {
+  contribution_cards: ContributionIcon,
+  contribution_summary: ContributionIcon,
+  architecture_overview: ArchitectureIcon,
+  problem_solution: ProblemSolvingIcon
 };
 
 const syntaxTokenPattern = /(#.*$|'[^']*'|\b(?:CREATE|UNIQUE|INDEX|ON|WHERE|IN|UPDATE|SET|AND|and|in|if|raise|with|as|or)\b|\b(?:save_result|save_defects|mark_succeeded|delete|cursor|commit|_insert_result|_insert_defects|_mark_job_succeeded|delete_message|rowcount)\b|\b(?:StateTransitionError|JobStateTransitionError)\b|\b[A-Za-z_][A-Za-z0-9_]*\b|==|!=|<=|>=|=>|->|[=:+\-*/()[\]{}.,])/g;
@@ -15,13 +64,13 @@ const syntaxKeywords = new Set(["CREATE", "UNIQUE", "INDEX", "ON", "WHERE", "IN"
 const syntaxFunctions = new Set(["save_result", "save_defects", "mark_succeeded", "delete", "cursor", "commit", "_insert_result", "_insert_defects", "_mark_job_succeeded", "delete_message", "rowcount"]);
 const troubleshootingTabs = {
   "sqs-job-state-consistency": {
-    title: "SQS 환경에서 분석 Job 중복 생성·실행 방지"
+    title: "분석 Job 중복 생성·실행 및 재처리 안정화"
   },
   "worker-scaling-strategy": {
-    title: "동시 분석 요청을 고려한 Worker 확장 전략 검증"
+    title: "분석 Job 누적에 대비한 Worker 확장 전략 검증"
   },
   "thermal-model-experiments": {
-    title: "Thermal 데이터 정제 개선과 모델 실험"
+    title: "Thermal 데이터 기준 재정의와 단계별 모델 실험"
   }
 };
 
@@ -83,17 +132,28 @@ function EmphasizedText({ text, phrases = [], emphasisClasses = {} }) {
   );
 }
 
-function DetailSection({ id, className = "", type, title, description, hideEyebrow = false, children }) {
+function DetailSection({ id, className = "", type, title, eyebrow, description, hideEyebrow = false, children }) {
   if (!children) {
     return null;
   }
+
+  const Icon = sectionIcons[type];
+  const eyebrowText = eyebrow ?? sectionEyebrows[type];
 
   return (
     <section id={id} className={`detail-content-section ${className}`.trim()}>
       {title ? (
         <header className="detail-section-heading">
-          {!hideEyebrow && sectionEyebrows[type] ? <span>{sectionEyebrows[type]}</span> : null}
-          <h2>{title}</h2>
+          {!hideEyebrow && eyebrowText ? (
+            <span className="detail-section-eyebrow">
+              {Icon ? (
+                <span className="detail-section-eyebrow-icon">
+                  <Icon />
+                </span>
+              ) : null}
+              {eyebrowText}
+            </span>
+          ) : null}
         </header>
       ) : null}
       {description ? <p className="detail-section-description">{description}</p> : null}
@@ -123,12 +183,8 @@ export function ProjectDetailHero({ project, metaItems }) {
     <section className="detail-hero">
       <div className="detail-hero-grid">
         <div className="detail-hero-content">
-          <p className="eyebrow">PROJECT DETAIL</p>
           <div className="detail-hero-head">
             <h1>{project.title}</h1>
-            <span className={`status-badge ${project.status === "in_progress" ? "is-progress" : ""}`}>
-              {project.statusLabel}
-            </span>
           </div>
           <p className="detail-summary"><EmphasizedText text={project.description} phrases={project.descriptionEmphasis} /></p>
           {metaItems?.length ? (
@@ -146,6 +202,19 @@ export function ProjectDetailHero({ project, metaItems }) {
                   {tag}
                 </span>
               ))}
+            </div>
+          ) : null}
+
+          {project.connectors?.length ? (
+            <div className="detail-hero-connectors">
+              <span className="detail-hero-connectors-label">현재 Connector</span>
+              <div className="connector-badge-list">
+                {project.connectors.map((tag) => (
+                  <span key={tag} className="connector-badge">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>
@@ -187,8 +256,8 @@ export function ContributionSummarySection({ id, section }) {
       id={id}
       type={section.type}
       title={section.title}
+      eyebrow={section.eyebrow}
       description={section.description}
-      hideEyebrow={isRoleRowsLayout}
     >
       <div className={isRoleRowsLayout ? "detail-contribution-role-rows" : "detail-contribution-panel"}>
         {isRoleRowsLayout ? (
@@ -321,27 +390,57 @@ function ContributionRoleRow({ card }) {
 }
 
 export function ArchitectureOverviewSection({ id, section }) {
+  const images = section.images ?? (section.image ? [{ src: section.image, alt: section.imageAlt }] : []);
+  const [pageIndex, setPageIndex] = useState(0);
+  const current = images[pageIndex] ?? images[0];
+  const hasMultiple = images.length > 1;
+
+  if (!current) {
+    return null;
+  }
+
+  const goPrev = () => setPageIndex((index) => (index - 1 + images.length) % images.length);
+  const goNext = () => setPageIndex((index) => (index + 1) % images.length);
+
   return (
     <DetailSection
       id={id}
       type={section.type}
       title={section.title}
+      eyebrow={section.eyebrow}
       description={section.description}
       className="detail-architecture-section"
     >
       <div className="detail-architecture-panel">
-        <div className="detail-architecture-image-card">
-          <a
-            className="detail-architecture-image-link"
-            href={section.externalUrl ?? section.image}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <MagnifyIcon />
-          </a>
-          <img src={section.image} alt={section.imageAlt ?? (section.title + " architecture diagram")} />
+        <div className={`detail-architecture-image-row ${hasMultiple ? "has-multiple" : ""}`.trim()}>
+          <div className="detail-architecture-image-card">
+            <a
+              className="detail-architecture-image-link"
+              href={section.externalUrl ?? current.src}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MagnifyIcon />
+            </a>
+            <img src={current.src} alt={current.alt ?? (section.title + " architecture diagram")} />
+          </div>
+          {hasMultiple ? (
+            <div className="detail-architecture-pager" role="group" aria-label="아키텍처 이미지 페이지 이동">
+              <button type="button" className="detail-architecture-pager-button" onClick={goPrev} aria-label="이전 이미지">
+                ▲
+              </button>
+              <span className="detail-architecture-pager-count">
+                <em>{pageIndex + 1}</em>
+                <i>/</i>
+                <em>{images.length}</em>
+              </span>
+              <button type="button" className="detail-architecture-pager-button" onClick={goNext} aria-label="다음 이미지">
+                ▼
+              </button>
+            </div>
+          ) : null}
         </div>
-        {section.legend ? (
+        {section.legend === null ? null : section.legend ? (
           <p className="detail-architecture-legend">{section.legend}</p>
         ) : (
           <p className="detail-architecture-legend">
@@ -421,7 +520,7 @@ function WorkerScalingCard({ card }) {
     <article className="detail-problem-card detail-worker-card">
       <TripleContextRow
         items={[
-          { label: "운영 기준", content: <EmphasizedText text={card.basis} phrases={["$107 예산", "t3.large 단일 Node·CPU Worker 1개"]} /> },
+          { label: "운영 기준", content: <EmphasizedText text={card.basis} phrases={["$107의 MVP 운영 예산", "t3.large 단일 Node·CPU Worker 1개"]} /> },
           { label: "확장 필요성", content: card.scalingNeed },
           { label: "비교", content: card.comparisonNote }
         ]}
@@ -553,13 +652,14 @@ function ThermalExperimentCard({ card }) {
           <section className="detail-thermal-section detail-thermal-preprocess-section">
             <h4 className="detail-thermal-step-heading">04. Thermal 전처리 후보 비교</h4>
             <div className="detail-thermal-image-grid">
-              {card.preprocess.map(([id, title, note, src]) => (
+              {card.preprocess.map(({ id, title, note, src }) => (
                 <figure key={id}>
                   <img src={src} alt={`${title} 전처리 결과`} />
-                  <figcaption><strong>{title}</strong><span> - {note}</span></figcaption>
+                  <figcaption><strong>{title}</strong><span> · {note}</span></figcaption>
                 </figure>
               ))}
             </div>
+            {card.preprocessConclusion ? <p>{card.preprocessConclusion}</p> : null}
           </section>
 
           <section className="detail-thermal-section detail-thermal-threshold-section">
@@ -571,7 +671,7 @@ function ThermalExperimentCard({ card }) {
           </section>
         </div>
 
-        <section className="detail-worker-decision"><h4>결정</h4><p><EmphasizedText text={card.finalDecision} phrases={card.finalDecisionEmphasis} /></p></section>
+        <section className="detail-worker-decision"><h4>결과</h4><p><EmphasizedText text={card.finalDecision} phrases={card.finalDecisionEmphasis} /></p></section>
       </div>
     </article>
   );
@@ -661,6 +761,13 @@ function ScalingMetricCard({ metric }) {
         </span>
       </div>
 
+      {metric.scale ? (
+        <div className="detail-scaling-metric-scale" aria-hidden="true">
+          <span>{metric.scale.min.toFixed(1)}</span>
+          <span>{metric.scale.max.toFixed(1)}</span>
+        </div>
+      ) : null}
+
       <p className="detail-scaling-metric-note">{metric.note}</p>
     </article>
   );
@@ -707,6 +814,7 @@ function IndustrialScalingCard({ card }) {
                   <span key={item} className="detail-scaling-chip">{item}</span>
                 ))}
               </div>
+              {card.stageFlow.summary ? <p className="detail-scaling-flow-summary">{card.stageFlow.summary}</p> : null}
             </div>
           </div>
         </section>
@@ -730,10 +838,6 @@ function IndustrialScalingCard({ card }) {
               </p>
             ))}
           </div>
-          <div className="detail-scaling-footer-row">
-            <strong>후속 과제</strong>
-            <span>{card.nextSteps}</span>
-          </div>
         </section>
       </div>
     </article>
@@ -744,8 +848,8 @@ function SqsTroubleshootingCard() {
   const codeBlocks = [
     {
       accent: "teal",
-      title: "Active Job 중복 차단",
-      description: "DB 제약으로 Active Job 중복 생성 차단",
+      title: "Active Job 생성 제어",
+      description: "이미지당 QUEUED/RUNNING Active Job 1개를 Partial Unique Index로 보장",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/de4e810faa34021c2d3c257ddd1c6cd590f0692a/backend/src/main/resources/db/migration/V8__add_unique_active_analysis_job_per_image.sql#L1-L3",
       code: [
         "CREATE UNIQUE INDEX ux_analysis_jobs_one_active_per_image",
@@ -755,8 +859,8 @@ function SqsTroubleshootingCard() {
     },
     {
       accent: "blue",
-      title: "조건부 Claim",
-      description: "QUEUED Job만 RUNNING으로 전이해 중복 실행 차단",
+      title: "실행 Claim",
+      description: "QUEUED Job만 RUNNING으로 조건부 전이해 이미 선점·처리된 Job의 중복 실행 제어",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
       code: [
         "UPDATE analysis_jobs",
@@ -772,10 +876,10 @@ function SqsTroubleshootingCard() {
   return (
     <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
       <ContextRow leftLabel="문제" rightLabel="핵심 판단">
-        <p>연속 요청과 SQS 재전달이 겹칠 때 동일 이미지의 Active Job 중복 생성·동일 Job 중복 실행 가능</p>
+        <p>연속 요청에서는 동일 이미지의 Active Job이 중복 생성될 수 있고, SQS 재전달에서는 동일 Job이 다시 실행될 수 있음</p>
         <p>
-          생성 단계는 <strong className="detail-problem-emphasis">DB 제약</strong>으로 차단, 실행 단계는 QUEUED → RUNNING{" "}
-          <strong className="detail-problem-emphasis">조건부 Claim</strong>으로 제어
+          생성 단계는 <strong className="detail-problem-emphasis">DB 제약</strong>으로 Active Job을 제한하고, 실행 단계는 QUEUED → RUNNING{" "}
+          <strong className="detail-problem-emphasis">조건부 Claim</strong>으로 중복 처리를 제어
         </p>
       </ContextRow>
 
@@ -823,7 +927,7 @@ function SqsTroubleshootingCard() {
 
       <section className="detail-sqs-result">
         <h4>결과</h4>
-        <p>DB 제약과 조건부 상태 전이로 Active Job 중복 생성·동일 Job 중복 실행 차단</p>
+        <p>Active Job 중복 생성·실행을 제어하고, 완료 Transaction과 실패 유형별 SQS 재처리 정책으로 Job 처리 정합성 강화</p>
       </section>
     </article>
   );
@@ -870,7 +974,7 @@ export function TroubleshootingSection({ id, section }) {
   };
 
   return (
-    <DetailSection id={id} type={section.type} title={section.title} description={section.description}>
+    <DetailSection id={id} type={section.type} title={section.title} eyebrow={section.eyebrow} description={section.description}>
       <div className="detail-troubleshooting-tabs-shell">
         <div className="detail-troubleshooting-tabs" role="tablist" aria-label="문제 해결 탭">
           {cards.map((card) => {
