@@ -469,6 +469,9 @@ if status in {"processed", "skipped"} or terminal:
     // TODO: 레이아웃 확인용 임시 영상 — 실제 시연 영상 준비되면 교체
     videoUrl: "/assets/projects/industrial-ai.mp4",
     videoPoster: "/assets/projects/industrial-thumbnail.png",
+    // TODO: 메인 카드 썸네일 — 실제 데모 스크린샷 준비되면 교체 (현재는 아키텍처 다이어그램으로 대체)
+    image: "/assets/projects/LangGraph.svg",
+    imageFit: "contain",
     summary: "MCP와 외부 API를 통해 외부 시스템 정보를 조회하고 승인된 작업만 실행·검증하는 업무 Agent",
     homeSummary: "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent 서비스",
     description:

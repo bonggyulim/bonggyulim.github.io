@@ -702,11 +702,30 @@ img {
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  padding: 7px 11px 7px 8px;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #0f766e;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.detail-hero-connectors-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  color: #0f766e;
+}
+
+.detail-hero-connectors-icon svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 .connector-badge-list {
@@ -728,7 +747,7 @@ img {
   white-space: nowrap;
   padding: 5px 8px;
   border: 1px solid rgba(51, 87, 112, 0.3);
-  border-radius: 5px;
+  border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   color: #33546b;
@@ -741,7 +760,7 @@ img {
   font-size: 11px;
   font-weight: 600;
   line-height: 1.2;
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid rgba(51, 87, 112, 0.3);
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);

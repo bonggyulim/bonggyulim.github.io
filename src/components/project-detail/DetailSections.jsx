@@ -52,6 +52,29 @@ function ProblemSolvingIcon() {
   );
 }
 
+function ConnectorIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
 const sectionIcons = {
   contribution_cards: ContributionIcon,
   contribution_summary: ContributionIcon,
@@ -207,7 +230,12 @@ export function ProjectDetailHero({ project, metaItems }) {
 
           {project.connectors?.length ? (
             <div className="detail-hero-connectors">
-              <span className="detail-hero-connectors-label">현재 Connector</span>
+              <span className="detail-hero-connectors-label">
+                <span className="detail-hero-connectors-icon">
+                  <ConnectorIcon />
+                </span>
+                현재 Connector
+              </span>
               <div className="connector-badge-list">
                 {project.connectors.map((tag) => (
                   <span key={tag} className="connector-badge">
