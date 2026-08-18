@@ -87,7 +87,7 @@ const syntaxKeywords = new Set(["CREATE", "UNIQUE", "INDEX", "ON", "WHERE", "IN"
 const syntaxFunctions = new Set(["save_result", "save_defects", "mark_succeeded", "delete", "cursor", "commit", "_insert_result", "_insert_defects", "_mark_job_succeeded", "delete_message", "rowcount"]);
 const troubleshootingTabs = {
   "sqs-job-state-consistency": {
-    title: "분석 Job 중복 생성·실행 및 재처리 안정화"
+    title: "비동기 분석 작업의 중복 실행 및 재처리 안정화"
   },
   "worker-scaling-strategy": {
     title: "분석 Job 누적에 대비한 Worker 확장 전략 검증"
@@ -876,38 +876,35 @@ function SqsTroubleshootingCard() {
   const codeBlocks = [
     {
       accent: "teal",
-      title: "Active Job 생성 제어",
-      description: "이미지당 QUEUED/RUNNING Active Job 1개를 Partial Unique Index로 보장",
+      title: "중복 분석 요청 생성 제어",
+      description: "동일 이미지에 동시에 진행 중인 분석 작업이 하나만 존재하도록 Partial Unique Index로 보장",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/de4e810faa34021c2d3c257ddd1c6cd590f0692a/backend/src/main/resources/db/migration/V8__add_unique_active_analysis_job_per_image.sql#L1-L3",
-      code: [
-        "CREATE UNIQUE INDEX ux_analysis_jobs_one_active_per_image",
-        "ON analysis_jobs (image_id)",
-        "WHERE job_status IN ('QUEUED', 'RUNNING');"
-      ].join("\n")
+      pointsHeading: "DB 제약으로 동시 분석 요청 제한",
+      points: [
+        "동일 이미지에 진행 중인 분석 작업 1개만 허용",
+        "Partial Unique Index로 동시 요청의 경쟁 조건 차단"
+      ]
     },
     {
       accent: "blue",
-      title: "실행 Claim",
-      description: "QUEUED Job만 RUNNING으로 조건부 전이해 이미 선점·처리된 Job의 중복 실행 제어",
+      title: "분석 작업 선점",
+      description: "처리 대기 중인 작업만 조건부 갱신으로 선점해 여러 Worker가 동일 작업을 동시에 실행하지 않도록 제어",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
-      code: [
-        "UPDATE analysis_jobs",
-        "SET job_status = 'RUNNING'",
-        "WHERE id = ? AND job_status = 'QUEUED';",
-        "",
-        "if cursor.rowcount == 0:",
-        "    raise JobStateTransitionError(...)"
-      ].join("\n")
+      pointsHeading: "조건부 갱신으로 작업 선점",
+      points: [
+        "처리 가능한 작업만 원자적으로 선점",
+        "이미 다른 Worker가 선점한 작업은 실행하지 않아 중복 처리 방지"
+      ]
     }
   ];
 
   return (
     <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
       <ContextRow leftLabel="문제" rightLabel="핵심 판단">
-        <p>연속 요청에서는 동일 이미지의 Active Job이 중복 생성될 수 있고, SQS 재전달에서는 동일 Job이 다시 실행될 수 있음</p>
+        <p>연속 요청에서는 동일 이미지에 대한 분석 작업이 중복 생성될 수 있고, SQS 재전달에서는 이미 처리 중인 작업이 다시 실행될 수 있음</p>
         <p>
-          생성 단계는 <strong className="detail-problem-emphasis">DB 제약</strong>으로 Active Job을 제한하고, 실행 단계는 QUEUED → RUNNING{" "}
-          <strong className="detail-problem-emphasis">조건부 Claim</strong>으로 중복 처리를 제어
+          생성 단계는 <strong className="detail-problem-emphasis">DB 제약</strong>으로 동일 이미지의 동시 분석 요청을 제한하고, 실행 단계는{" "}
+          <strong className="detail-problem-emphasis">조건부 갱신</strong>으로 작업을 선점해 중복 실행을 제어
         </p>
       </ContextRow>
 
@@ -936,7 +933,10 @@ function SqsTroubleshootingCard() {
                       <strong>{block.title}</strong>
                     </div>
                     <p className="detail-sqs-code-card-description">{block.description}</p>
-                    <pre className="detail-sqs-code"><HighlightedFlowCode code={block.code} /></pre>
+                    <div className="detail-sqs-code-points">
+                      <strong>{block.pointsHeading}</strong>
+                      <BulletList items={block.points} />
+                    </div>
                   </article>
                 </a>
               ) : (
@@ -945,7 +945,10 @@ function SqsTroubleshootingCard() {
                     <strong>{block.title}</strong>
                   </div>
                   <p className="detail-sqs-code-card-description">{block.description}</p>
-                  <pre className="detail-sqs-code"><HighlightedFlowCode code={block.code} /></pre>
+                  <div className="detail-sqs-code-points">
+                    <strong>{block.pointsHeading}</strong>
+                    <BulletList items={block.points} />
+                  </div>
                 </article>
               )
             ))}
@@ -955,7 +958,7 @@ function SqsTroubleshootingCard() {
 
       <section className="detail-sqs-result">
         <h4>결과</h4>
-        <p>Active Job 중복 생성·실행을 제어하고, 완료 Transaction과 실패 유형별 SQS 재처리 정책으로 Job 처리 정합성 강화</p>
+        <p>중복 분석 요청·실행을 제어하고, 결과 저장과 처리 완료를 하나의 트랜잭션으로 묶고 실패 유형별 SQS 재처리 정책을 적용해 비동기 처리 정합성 강화</p>
       </section>
     </article>
   );

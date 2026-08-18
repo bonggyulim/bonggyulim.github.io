@@ -2057,6 +2057,28 @@ img {
   line-height: 1.45;
 }
 
+.detail-sqs-code-points {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(15, 118, 110, 0.05);
+}
+
+.detail-sqs-code-points > strong {
+  color: var(--ps-color-text);
+  font-size: var(--ps-fs-small);
+  font-weight: var(--ps-fw-bold);
+}
+
+.detail-sqs-code-points .detail-card-list {
+  gap: 3px;
+  padding-left: 16px;
+  color: var(--ps-color-soft);
+  font-size: var(--ps-fs-tiny);
+  line-height: 1.5;
+}
+
 .detail-sqs-code-card-meta {
   display: grid;
   gap: 2px;

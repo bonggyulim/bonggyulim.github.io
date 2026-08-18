@@ -105,8 +105,8 @@ export const projects = [
           title: "신규 카테고리 대응을 위한 모델 운영 구조·경량화 검증",
           problem: "신규 카테고리마다 전체 모델을 재학습하지 않으면서, 추론 자원까지 고려할 모델 운영 구조 필요",
           problemEmphasis: ["신규 카테고리", "전체 모델을 재학습", "추론 자원"],
-          decision: "공통 Backbone + 카테고리별 Memory Bank로 확장 구조를 설계하고, SPEED → PERFORMANCE 2-Stage 운영 기준과 Teacher–Student 경량화 검증",
-          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "SPEED → PERFORMANCE", "Teacher–Student 경량화"],
+          decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 확장 구조를 설계하고, 자원 효율 기준 후보 선별 → 탐지 성능 검증의 2단계 평가와 Teacher–Student 경량화 실험 진행",
+          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "자원 효율 기준 후보 선별 → 탐지 성능 검증", "Teacher–Student 경량화 실험"],
           backboneFlow: {
             title: "01. 공통 Backbone + 카테고리별 Memory Bank — 카테고리 대응 구조",
             image: "/assets/projects/memorybank.svg",
@@ -114,24 +114,24 @@ export const projects = [
             summary: "공통 Backbone으로 정상 이미지 Feature를 추출해 카테고리별 Memory Bank로 관리하고, 검사 Feature와 비교해 Anomaly Score·Heatmap 생성"
           },
           stageFlow: {
-            title: "02. SPEED → PERFORMANCE 2-Stage 추론 기준",
+            title: "02. 자원 효율 → 탐지 성능 2단계 평가 기준",
             steps: [
               {
                 type: "box2",
-                primary: "SPEED",
+                primary: "1차 후보 선별",
                 secondary: "빠른 1차 판정",
                 note: { model: "WRN50 + PatchCore", reason: "처리 효율·GPU Memory 우선" }
               },
               { type: "queue", content: "재검토 큐" },
               {
                 type: "box2",
-                primary: "PERFORMANCE",
+                primary: "2차 성능 검증",
                 secondary: "정밀 재판정",
                 note: { model: "DINOv2 기반", reason: "정확도·위치 성능 우선" }
               }
             ],
             criteria: ["F1-Score", "Latency", "GPU Memory Peak", "PRO"],
-            summary: "SPEED로 1차 판정 후 저신뢰·경계 구간 결과만 재검토 큐로 분류해 PERFORMANCE로 정밀 재판정"
+            summary: "1차 후보 선별로 판정한 뒤 저신뢰·경계 구간 결과만 재검토 큐로 분류해 2차 성능 검증으로 정밀 재판정"
           },
           lightweightSection: {
             title: "03. Teacher–Student 경량화 검증",
@@ -144,11 +144,13 @@ export const projects = [
               { title: "PRO", before: "0.842", after: "0.708", note: "위치 설명력 Trade-off", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
-              { text: "카테고리별 Memory Bank 운영 구조를 설계하고 생성·적용·관리 흐름을 Spring–FastAPI로 연동" },
               {
-                text: "GPU Memory Peak 약 90% 절감, Image AUROC·F1 유지·개선 및 위치 설명력(PRO) Trade-off 확인",
-                emphasisPrimary: ["GPU Memory Peak 약 90% 절감"],
-                emphasisSecondary: ["Image AUROC·F1 유지·개선"]
+                text: "카테고리별 Memory Bank로 신규 품목 확장 구조를 유지하면서, Teacher–Student 경량화로 GPU 메모리를 약 90% 절감했습니다.",
+                emphasisPrimary: ["GPU 메모리를 약 90% 절감"]
+              },
+              {
+                text: "Image AUROC·F1은 유지·개선했고 위치 성능 저하를 함께 확인해 카테고리별 모델 전환 기준을 설정했습니다.",
+                emphasisSecondary: ["Image AUROC·F1은 유지·개선"]
               }
             ]
           }
@@ -237,7 +239,7 @@ export const projects = [
             items: [
               "사용자·권한·대시보드·관리자 기능 구현",
               "발전소 도메인과 이미지 분석·결과 조회 기능 구현",
-              "비동기 분석 Job의 상태 전이·재처리·결과 저장 흐름 안정화",
+              "SQS 기반 비동기 분석 처리의 중복 실행·재처리·결과 저장 흐름 안정화",
             ],
             emphasisIndex: 2
           },
@@ -297,48 +299,33 @@ export const projects = [
         cardOrder: ["worker-scaling-strategy", "sqs-job-state-consistency", "thermal-model-experiments"],
         card: {
           id: "sqs-job-state-consistency",
-          title: "분석 Job 중복 생성·실행 및 재처리 안정화",
+          title: "비동기 분석 작업의 중복 실행 및 재처리 안정화",
           problem:
-            "연속 요청에서는 동일 이미지의 Active Job이 중복 생성될 수 있고, SQS 재전달에서는 동일 Job이 다시 실행될 수 있음",
-          problemEmphasis: ["동일 이미지의 Active Job이 중복 생성", "동일 Job이 다시 실행"],
+            "연속 요청에서는 동일 이미지에 대한 분석 작업이 중복 생성될 수 있고, SQS 재전달에서는 이미 처리 중인 작업이 다시 실행될 수 있음",
+          problemEmphasis: ["동일 이미지에 대한 분석 작업이 중복 생성", "이미 처리 중인 작업이 다시 실행"],
           solution:
-            "생성 단계는 DB 제약으로 Active Job을 제한하고, 실행 단계는 QUEUED → RUNNING 조건부 Claim으로 중복 처리를 제어",
+            "생성 단계는 DB 제약으로 동일 이미지의 동시 분석 요청을 제한하고, 실행 단계는 조건부 갱신으로 작업을 선점해 중복 실행을 제어",
           solutionEmphasis: [
             "DB 제약",
-            "QUEUED → RUNNING 조건부 Claim"
+            "조건부 갱신으로 작업을 선점"
           ],
           expandable: true,
-          flowCode: `# 1. 동일 이미지의 Active Job은 1개만 허용
-CREATE UNIQUE INDEX ...
-ON analysis_jobs (image_id)
-WHERE job_status IN ('QUEUED', 'RUNNING');
+          flowCode: `# 1. 동일 이미지에 진행 중인 분석 작업은 1개만 허용
+DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
 
-# 2. QUEUED Job만 Worker가 선점
-UPDATE analysis_jobs
-SET job_status = 'RUNNING'
-WHERE id = job_id
-  AND job_status = 'QUEUED';
+# 2. 처리 대기 중인 작업만 Worker가 선점
+조건부 갱신으로 작업을 원자적으로 선점
+이미 선점된 작업은 재실행하지 않음
 
-if rowcount == 0:
-    raise StateTransitionError()
+# 3. 결과 저장과 처리 완료를 한 Transaction으로 처리
+분석 결과·결함 저장과 처리 완료 기록을 하나의 트랜잭션으로 처리
 
-# 3. 결과·결함·Job 성공 상태를 한 Transaction으로 처리
-with db.cursor() as cursor:
-    result_id = save_result(cursor, output)
-    save_defects(cursor, result_id, output.defects)
-    mark_succeeded(cursor, job_id)  # RUNNING → SUCCEEDED
-
-db.commit()
-
-# 4. 처리 결과에 따라 SQS ACK / Retry
-if status in {"processed", "skipped"} or terminal:
-    sqs.delete(message)
-
-# non-terminal 실패는 삭제하지 않고
-# Visibility Timeout 이후 재수신`,
+# 4. 처리 결과에 따라 메시지 삭제 / 재수신
+재시도 불필요 상태는 메시지 삭제
+재시도 가능 상태는 메시지를 유지해 재수신`,
           result:
-            "Active Job 중복 생성·실행을 제어하고, 완료 Transaction과 실패 유형별 SQS 재처리 정책으로 Job 처리 정합성 강화",
-          resultEmphasis: ["Active Job 중복 생성·실행을 제어", "완료 Transaction과 실패 유형별 SQS 재처리 정책"],
+            "중복 분석 요청·실행을 제어하고, 결과 저장과 처리 완료를 하나의 트랜잭션으로 묶고 실패 유형별 SQS 재처리 정책을 적용해 비동기 처리 정합성 강화",
+          resultEmphasis: ["중복 분석 요청·실행을 제어", "하나의 트랜잭션으로 묶고 실패 유형별 SQS 재처리 정책"],
           evidence: [
             {
               title: "Active Job DB 제약",
@@ -475,10 +462,10 @@ if status in {"processed", "skipped"} or terminal:
     summary: "MCP와 외부 API를 통해 외부 시스템 정보를 조회하고 승인된 작업만 실행·검증하는 업무 Agent",
     homeSummary: "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent 서비스",
     description:
-      "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent입니다. Main LangGraph와 6개 역할 Agent로 판단 책임을 분리하고, WRITE는 Policy·Schema·Validator 검증과 사용자 승인을 거쳐 실행합니다.",
+      "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent입니다. LangGraph 기반 역할별 Agent로 판단 책임을 분리하고, 외부 상태를 변경하는 작업은 정책·입력 구조·실행 조건 검증과 사용자 승인을 거쳐 수행하도록 설계했습니다.",
     descriptionEmphasis: [
       "CRUD를 수행하는 업무 Agent",
-      "Policy·Schema·Validator 검증과 사용자 승인"
+      "정책·입력 구조·실행 조건 검증과 사용자 승인"
     ],
     meta: [
       "2026.08.05 ~ 2026.08.20",
@@ -519,7 +506,7 @@ if status in {"processed", "skipped"} or terminal:
             id: "implementation",
             title: "핵심 기능 구현",
             items: [
-              "Main LangGraph와 6개 역할 Agent(Subgraph) 구현",
+              "LangGraph 기반 역할별 Agent(Subgraph) 구조 구현",
               "Gmail·Tasks·Calendar READ / WRITE 기능 구현",
               "MCP 기반 외부 서비스 조회·실행 흐름 구현"
             ]
@@ -529,17 +516,17 @@ if status in {"processed", "skipped"} or terminal:
             title: "워크플로우·정책 설계",
             items: [
               "규칙 기반 흐름 제어와 상태 관리 구조 설계",
-              "공통 정책과 Gmail·Tasks·Calendar별 정책 정의",
-              "READ / WRITE·승인·근거·허용 Tool 정책 적용"
+              "공통 정책과 Connector별 실행 정책 정의",
+              "READ / WRITE 작업별 승인·근거·허용 도구 정책 적용"
             ]
           },
           {
             id: "output-control",
             title: "LLM 출력·실행 통제",
             items: [
-              "Schema로 LLM의 출력 형식과 허용 범위 제한",
-              "출력값과 실제 실행 인자를 Validator로 검증",
-              "승인 → 실행권 확보 → 실행 → 결과 검증·복구 흐름 구현"
+              "구조화된 출력 스키마로 LLM 응답 형식과 허용 범위 제한",
+              "LLM 출력값과 실제 실행 인자의 일치 여부 검증",
+              "사용자 승인 → 외부 시스템 실행 → 결과 재조회·검증 흐름 구현"
             ]
           }
         ]
@@ -574,14 +561,14 @@ if status in {"processed", "skipped"} or terminal:
           problem:
             "LLM의 의미 판단과 외부 시스템 실행을 분리하지 않으면, 정책 검증 없이 작업이 실행되거나 실행 결과를 신뢰하기 어려움",
           decision:
-            "판단 → 정책 검증 → 승인 → 실행 → 결과 검증 단계를 분리하고, 각 단계를 Structured Output과 상태 전이로 관리",
+            "판단 → 정책 검증 → 승인 → 실행 → 결과 검증 책임을 분리하고, 단계 간 데이터는 Structured Output으로 전달",
           implementation: [
             "LLM 판단 결과를 Structured Output으로 고정해 정책 검증 단계에 전달",
-            "정책에 부합하는 요청만 승인 상태로 전이 후 MCP·외부 API로 실행",
-            "실행 결과를 별도 검증 단계에서 확인 후 상태 확정"
+            "정책에 부합하고 사용자가 승인한 요청만 MCP·외부 API로 실행",
+            "실행 후 외부 시스템을 재조회해 실제 상태 변경 여부를 검증"
           ],
           result:
-            "판단·정책·승인·실행·검증 단계를 분리해 실행 전 정책 검증과 실행 후 결과 검증을 모두 거치는 흐름 확보"
+            "판단·정책·승인·실행·검증 책임을 분리해 승인되지 않은 외부 상태 변경을 차단하고, 실행 후 재조회로 실제 반영 여부를 확인하는 흐름 구성"
         }
       }
     ]
