@@ -207,7 +207,7 @@ export const projects = [
     pptUrl: "https://drive.google.com/file/d/1aGiUSR2hrWWxOQss0XEdZAJtKm6wi4x0/view?usp=sharing",
     demoUrl: "",
     highlights: [
-      "Google OAuth2.0 + JWT 기반 사용자 인증·권한 구현",
+      "Spring Security OAuth2 기반 로그인·사용자 권한 검증",
       "발전소별 담당 데이터 접근 범위 검증",
       "SQS at-least-once 전제의 분석 Job 상태 안정화",
       "Thermal 모델 실험과 AWS·K3s 운영 배포 수행"
