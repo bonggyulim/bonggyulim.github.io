@@ -138,7 +138,6 @@ export const projects = [
             summary: "동시 추론 요청 증가 시 성능형 모델의 GPU 메모리 부담을 줄이기 위해 Teacher–Student 경량화 검증",
             metrics: [
               { title: "Peak GPU Memory", before: "847.48 MB", after: "87.26 MB", note: "약 90% 감소" },
-              { title: "Throughput", before: "1.105 img/s", after: "0.568 img/s", note: "약 48.6% 감소 · 추론 속도 저하·추가 개선 필요" },
               { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p", scale: { min: 0.5, max: 1 } },
               { title: "F1", before: "0.914", after: "0.959", note: "+4.5%p", scale: { min: 0.5, max: 1 } },
               { title: "Pixel AUROC", before: "0.985", after: "0.970", note: "-1.5%p", scale: { min: 0.5, max: 1 } },
