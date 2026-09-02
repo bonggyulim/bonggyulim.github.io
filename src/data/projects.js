@@ -103,10 +103,10 @@ export const projects = [
           id: "category-scaling-strategy",
           kind: "industrial_scaling",
           title: "신규 카테고리 대응을 위한 모델 운영 구조·경량화 검증",
-          problem: "신규 카테고리마다 전체 모델을 재학습하지 않으면서, 추론 자원까지 고려할 모델 운영 구조 필요",
-          problemEmphasis: ["신규 카테고리", "전체 모델을 재학습", "추론 자원"],
-          decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 확장 구조를 설계하고, 자원 효율 기준 후보 선별 → 탐지 성능 검증의 2단계 평가와 Teacher–Student 경량화 실험 진행",
-          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "자원 효율 기준 후보 선별 → 탐지 성능 검증", "Teacher–Student 경량화 실험"],
+          problem: "신규 카테고리에 빠르게 대응하면서, 추론 자원까지 고려한 모델 운영 구조 필요",
+          problemEmphasis: ["신규 카테고리에 빠르게 대응", "추론 자원"],
+          decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 대응 구조를 설계하고, 속도형·성능형으로 검사 역할 분리 → 동시 요청 증가에 대비해 성능형 Teacher–Student 경량화 검토",
+          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "속도형·성능형으로 검사 역할 분리", "성능형 Teacher–Student 경량화 검토"],
           backboneFlow: {
             title: "01. 공통 Backbone + 카테고리별 Memory Bank — 카테고리 대응 구조",
             image: "/assets/projects/memorybank.svg",
@@ -114,43 +114,41 @@ export const projects = [
             summary: "공통 Backbone으로 정상 이미지 Feature를 추출해 카테고리별 Memory Bank로 관리하고, 검사 Feature와 비교해 Anomaly Score·Heatmap 생성"
           },
           stageFlow: {
-            title: "02. 자원 효율 → 탐지 성능 2단계 평가 기준",
+            title: "02. 속도형·성능형 모델 역할 분리",
             steps: [
               {
                 type: "box2",
-                primary: "1차 후보 선별",
+                primary: "속도형 SPEED",
                 secondary: "빠른 1차 판정",
-                note: { model: "WRN50 + PatchCore", reason: "처리 효율·GPU Memory 우선" }
+                note: { model: "WRN50 + PatchCore", reason: "처리 속도·GPU Memory 우선" }
               },
               { type: "queue", content: "재검토 큐" },
               {
                 type: "box2",
-                primary: "2차 성능 검증",
-                secondary: "정밀 재판정",
-                note: { model: "DINOv2 기반", reason: "정확도·위치 성능 우선" }
+                primary: "성능형 PERFORMANCE",
+                secondary: "재검토·정밀 판정",
+                note: { model: "DINOv2 + PatchCore", reason: "판정 성능·위치 설명력 우선" }
               }
             ],
             criteria: ["F1-Score", "Latency", "GPU Memory Peak", "PRO"],
-            summary: "1차 후보 선별로 판정한 뒤 저신뢰·경계 구간 결과만 재검토 큐로 분류해 2차 성능 검증으로 정밀 재판정"
+            summary: "속도형 모델로 빠르게 1차 판정하고, 저신뢰·경계 구간 결과는 성능형 모델로 재검토·정밀 판정"
           },
           lightweightSection: {
             title: "03. Teacher–Student 경량화 검증",
-            summary: "카테고리 확장에 따른 GPU 메모리 부담을 줄이기 위해 Teacher–Student 경량화 구조 검증",
+            summary: "동시 추론 요청 증가 시 성능형 모델의 GPU 메모리 부담을 줄이기 위해 Teacher–Student 경량화 검증",
             metrics: [
-              { title: "GPU Memory Peak", before: "847.48 MB", after: "87.26 MB", note: "약 90% 절감" },
-              { title: "Throughput", before: "1.105 images/sec", after: "0.568 images/sec", note: "실측 처리량" },
-              { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p 개선", scale: { min: 0.5, max: 1 } },
-              { title: "F1-Score", before: "0.914", after: "0.959", note: "+4.5%p 개선", scale: { min: 0.5, max: 1 } },
-              { title: "PRO", before: "0.842", after: "0.708", note: "위치 설명력 Trade-off", scale: { min: 0.5, max: 1 } }
+              { title: "Peak GPU Memory", before: "847.48 MB", after: "87.26 MB", note: "약 90% 감소" },
+              { title: "Throughput", before: "1.105 img/s", after: "0.568 img/s", note: "약 48.6% 감소 · 추론 속도 저하·추가 개선 필요" },
+              { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p", scale: { min: 0.5, max: 1 } },
+              { title: "F1", before: "0.914", after: "0.959", note: "+4.5%p", scale: { min: 0.5, max: 1 } },
+              { title: "Pixel AUROC", before: "0.985", after: "0.970", note: "-1.5%p", scale: { min: 0.5, max: 1 } },
+              { title: "PRO", before: "0.842", after: "0.708", note: "-13.4%p · 위치 설명력 저하", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
               {
-                text: "카테고리별 Memory Bank로 신규 품목 확장 구조를 유지하면서, Teacher–Student 경량화로 GPU 메모리를 약 90% 절감했습니다.",
-                emphasisPrimary: ["GPU 메모리를 약 90% 절감"]
-              },
-              {
-                text: "Image AUROC·F1은 유지·개선했고 위치 성능 저하를 함께 확인해 카테고리별 모델 전환 기준을 설정했습니다.",
-                emphasisSecondary: ["Image AUROC·F1은 유지·개선"]
+                text: "카테고리별 Memory Bank로 신규 품목 대응 구조를 유지하면서, 성능형 모델 경량화에서 Peak GPU Memory를 약 90% 절감했습니다. Image AUROC·F1은 유지·개선됐지만 추론 속도와 위치 설명력은 추가 개선이 필요해, Student를 성능형의 경량 대체 후보로 검토했습니다.",
+                emphasisPrimary: ["Peak GPU Memory를 약 90% 절감"],
+                emphasisSecondary: ["Image AUROC·F1은 유지·개선", "추론 속도와 위치 설명력은 추가 개선이 필요"]
               }
             ]
           }
