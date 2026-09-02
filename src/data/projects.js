@@ -138,16 +138,16 @@ export const projects = [
             summary: "동시 추론 요청 증가 시 성능형 모델의 GPU 메모리 부담을 줄이기 위해 Teacher–Student 경량화 검증",
             metrics: [
               { title: "Peak GPU Memory", before: "847.48 MB", after: "87.26 MB", note: "약 90% 감소" },
+              { title: "Throughput", before: "1.105 images/sec", after: "0.568 images/sec", note: "약 49% 감소" },
               { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p", scale: { min: 0.5, max: 1 } },
-              { title: "F1", before: "0.914", after: "0.959", note: "+4.5%p", scale: { min: 0.5, max: 1 } },
               { title: "Pixel AUROC", before: "0.985", after: "0.970", note: "-1.5%p", scale: { min: 0.5, max: 1 } },
               { title: "PRO", before: "0.842", after: "0.708", note: "-13.4%p · 위치 설명력 저하", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
               {
-                text: "카테고리별 Memory Bank로 신규 품목 대응 구조를 유지하면서, 성능형 모델 경량화에서 Peak GPU Memory를 약 90% 절감했습니다. Image AUROC·F1은 유지·개선됐지만 추론 속도와 위치 설명력은 추가 개선이 필요해, Student를 성능형의 경량 대체 후보로 검토했습니다.",
+                text: "카테고리별 Memory Bank로 신규 품목 대응 구조를 유지하면서, 성능형 모델 경량화에서 Peak GPU Memory를 약 90% 절감했습니다. Image AUROC는 유지·개선됐지만 추론 속도와 위치 설명력은 추가 개선이 필요해, Student를 성능형의 경량 대체 후보로 검토했습니다.",
                 emphasisPrimary: ["Peak GPU Memory를 약 90% 절감"],
-                emphasisSecondary: ["Image AUROC·F1은 유지·개선", "추론 속도와 위치 설명력은 추가 개선이 필요"]
+                emphasisSecondary: ["Image AUROC는 유지·개선", "추론 속도와 위치 설명력은 추가 개선이 필요"]
               }
             ]
           }
