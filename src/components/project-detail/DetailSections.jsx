@@ -877,7 +877,6 @@ function SqsTroubleshootingCard() {
     {
       accent: "teal",
       title: "중복 Job 생성 차단",
-      description: "동일 이미지의 활성 Job 중복 생성 방지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/de4e810faa34021c2d3c257ddd1c6cd590f0692a/backend/src/main/resources/db/migration/V8__add_unique_active_analysis_job_per_image.sql#L1-L3",
       points: [
         "Partial Unique Index로 활성 Job 1개만 허용",
@@ -888,22 +887,20 @@ function SqsTroubleshootingCard() {
     {
       accent: "blue",
       title: "메시지 재전달 멱등 처리",
-      description: "동일 Job의 반복 실행 방지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
       points: [
         "조건부 상태 갱신으로 처리 가능한 Job만 선점",
-        "이미 처리 중인 Job은 재실행하지 않음"
+        "이미 선점되거나 완료된 Job은 재실행하지 않음"
       ],
       pointEmphasis: ["조건부 상태 갱신"]
     },
     {
       accent: "green",
       title: "결과·상태 정합성 보장",
-      description: "완료 단계의 DB 변경을 원자적으로 처리",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/develop/ai-worker/app/infrastructure/db/result_repository.py#L149-L284",
       points: [
         "결과·결함 저장 + Job 완료 변경을 단일 Transaction으로 처리",
-        "실패 시 함께 Rollback"
+        "일부만 반영되는 상태 불일치 방지"
       ],
       pointEmphasis: ["단일 Transaction"]
     }
@@ -940,7 +937,7 @@ function SqsTroubleshootingCard() {
                     <div className="detail-sqs-code-card-head">
                       <strong>{block.title}</strong>
                     </div>
-                    <p className="detail-sqs-code-card-description">{block.description}</p>
+                    {block.description ? <p className="detail-sqs-code-card-description">{block.description}</p> : null}
                     <div className="detail-sqs-code-points">
                       <ul className="detail-card-list">
                         {block.points.map((point) => (
@@ -955,7 +952,7 @@ function SqsTroubleshootingCard() {
                   <div className="detail-sqs-code-card-head">
                     <strong>{block.title}</strong>
                   </div>
-                  <p className="detail-sqs-code-card-description">{block.description}</p>
+                  {block.description ? <p className="detail-sqs-code-card-description">{block.description}</p> : null}
                   <div className="detail-sqs-code-points">
                     <ul className="detail-card-list">
                       {block.points.map((point) => (
