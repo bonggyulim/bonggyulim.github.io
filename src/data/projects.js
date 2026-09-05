@@ -130,7 +130,7 @@ export const projects = [
                 note: { model: "DINOv2 + PatchCore", reason: "판정 성능·위치 설명력 우선" }
               }
             ],
-            criteria: ["F1-Score", "Latency", "GPU Memory Peak", "PRO"],
+            criteria: ["Image AUROC", "F1-score", "Throughput", "Peak GPU Memory", "PRO"],
             summary: "속도형 모델로 빠르게 1차 판정하고, 저신뢰·경계 구간 결과는 성능형 모델로 재검토·정밀 판정"
           },
           lightweightSection: {
@@ -145,8 +145,8 @@ export const projects = [
             ],
             resultItems: [
               {
-                text: "카테고리별 Memory Bank로 신규 품목 대응 구조를 유지하면서, Student는 기존 속도형 대비 처리량을 약 3.7배 높이고 성능 저하는 제한했습니다. 또한 Teacher 대비 Peak GPU Memory를 약 90% 절감해, 데이터가 축적된 카테고리의 1차 판정용 경량 대안으로 적용 가능성을 확인했습니다.",
-                emphasisPrimary: ["처리량을 약 3.7배 높이고 성능 저하는 제한", "Peak GPU Memory를 약 90% 절감"],
+                text: "카테고리별 Memory Bank로 신규 카테고리 대응 구조를 유지하면서, Student는 기존 속도형 대비 처리량을 약 3.7배 높이고, Teacher 대비 Peak GPU Memory를 약 90% 절감했으며, 판정·위치 성능은 유사 수준으로 유지했습니다. 이를 통해 데이터가 축적된 카테고리의 1차 판정용 경량 대안으로 적용 가능성을 확인했습니다.",
+                emphasisPrimary: ["기존 속도형 대비 처리량을 약 3.7배 높이고, Teacher 대비 Peak GPU Memory를 약 90% 절감했으며, 판정·위치 성능은 유사 수준으로 유지"],
                 emphasisSecondary: ["1차 판정용 경량 대안"]
               }
             ]
