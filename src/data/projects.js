@@ -103,8 +103,8 @@ export const projects = [
           id: "category-scaling-strategy",
           kind: "industrial_scaling",
           title: "신규 카테고리 대응을 위한 모델 운영 구조·경량화 검증",
-          problem: "신규 카테고리에 빠르게 대응하면서, 추론 자원까지 고려한 모델 운영 구조 필요",
-          problemEmphasis: ["신규 카테고리에 빠르게 대응", "추론 자원"],
+          problem: "신규 카테고리마다 모델을 다시 학습하지 않고 빠르게 대응할 수 있는 구조가 필요했습니다. 동시에 검사 요청 증가에 대비해 판정 성능뿐 아니라 추론 속도와 GPU 자원 사용량까지 고려해야 했습니다.",
+          problemEmphasis: ["모델을 다시 학습하지 않고 빠르게 대응", "추론 속도와 GPU 자원 사용량"],
           decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 대응 구조를 설계하고, 속도형·성능형으로 검사 역할을 분리 → 기존 속도형보다 효율적인 1차 판정 모델을 만들기 위해 성능형을 Teacher로 둔 Student 경량화 검토",
           decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "속도형·성능형으로 검사 역할을 분리", "성능형을 Teacher로 둔 Student 경량화 검토"],
           backboneFlow: {
@@ -137,11 +137,11 @@ export const projects = [
             title: "03. Teacher–Student 경량화 검증",
             summary: "기존 속도형보다 효율적인 1차 판정 모델을 만들기 위해 성능형을 Teacher로 두고 Student 경량화 검증",
             metrics: [
-              { title: "Peak GPU Memory", before: "847.5 MB", after: "84.2 MB", note: "약 90% 감소" },
+              { title: "Peak GPU Memory", before: "847.5 MB", after: "84.2 MB", note: "약 90% 절감" },
               { title: "Throughput", beforeLabel: "SPEED", before: "20.8 img/s", afterLabel: "Student", after: "76.4 img/s", note: "약 3.7배 향상" },
-              { title: "Image AUROC", beforeLabel: "SPEED", before: "0.991", afterLabel: "Student", after: "0.995", note: "+0.004", scale: { min: 0.5, max: 1 } },
-              { title: "Pixel AUROC", beforeLabel: "SPEED", before: "0.981", afterLabel: "Student", after: "0.972", note: "-0.009", scale: { min: 0.5, max: 1 } },
-              { title: "PRO", beforeLabel: "SPEED", before: "0.779", afterLabel: "Student", after: "0.760", note: "-0.019", scale: { min: 0.5, max: 1 } }
+              { title: "Image AUROC", beforeLabel: "SPEED", before: "0.991", afterLabel: "Student", after: "0.995", note: "+0.4%p", scale: { min: 0.5, max: 1 } },
+              { title: "F1-score", beforeLabel: "SPEED", before: "0.966", afterLabel: "Student", after: "0.959", note: "-0.7%p", scale: { min: 0.5, max: 1 } },
+              { title: "PRO", beforeLabel: "SPEED", before: "0.779", afterLabel: "Student", after: "0.760", note: "-1.9%p", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
               {
