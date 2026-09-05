@@ -105,8 +105,8 @@ export const projects = [
           title: "신규 카테고리 대응을 위한 모델 운영 구조·경량화 검증",
           problem: "신규 카테고리에 빠르게 대응하면서, 추론 자원까지 고려한 모델 운영 구조 필요",
           problemEmphasis: ["신규 카테고리에 빠르게 대응", "추론 자원"],
-          decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 대응 구조를 설계하고, 속도형·성능형으로 검사 역할 분리 → 동시 요청 증가에 대비해 성능형 Teacher–Student 경량화 검토",
-          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "속도형·성능형으로 검사 역할 분리", "성능형 Teacher–Student 경량화 검토"],
+          decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 대응 구조를 설계하고, 속도형·성능형으로 검사 역할을 분리 → 기존 속도형보다 효율적인 1차 판정 모델을 만들기 위해 성능형을 Teacher로 둔 Student 경량화 검토",
+          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "속도형·성능형으로 검사 역할을 분리", "성능형을 Teacher로 둔 Student 경량화 검토"],
           backboneFlow: {
             title: "01. 공통 Backbone + 카테고리별 Memory Bank — 카테고리 대응 구조",
             image: "/assets/projects/memorybank.svg",
@@ -135,19 +135,19 @@ export const projects = [
           },
           lightweightSection: {
             title: "03. Teacher–Student 경량화 검증",
-            summary: "동시 추론 요청 증가 시 성능형 모델의 GPU 메모리 부담을 줄이기 위해 Teacher–Student 경량화 검증",
+            summary: "기존 속도형보다 효율적인 1차 판정 모델을 만들기 위해 성능형을 Teacher로 두고 Student 경량화 검증",
             metrics: [
-              { title: "Peak GPU Memory", before: "847.48 MB", after: "87.26 MB", note: "약 90% 감소" },
-              { title: "Throughput", before: "1.105 images/sec", after: "0.568 images/sec", note: "약 49% 감소" },
-              { title: "Image AUROC", before: "0.971", after: "0.995", note: "+2.4%p", scale: { min: 0.5, max: 1 } },
-              { title: "Pixel AUROC", before: "0.985", after: "0.970", note: "-1.5%p", scale: { min: 0.5, max: 1 } },
-              { title: "PRO", before: "0.842", after: "0.708", note: "-13.4%p · 위치 설명력 저하", scale: { min: 0.5, max: 1 } }
+              { title: "Peak GPU Memory", before: "847.5 MB", after: "84.2 MB", note: "약 90% 감소" },
+              { title: "Throughput", beforeLabel: "SPEED", before: "20.8 img/s", afterLabel: "Student", after: "76.4 img/s", note: "약 3.7배 향상" },
+              { title: "Image AUROC", beforeLabel: "SPEED", before: "0.991", afterLabel: "Student", after: "0.995", note: "+0.004", scale: { min: 0.5, max: 1 } },
+              { title: "Pixel AUROC", beforeLabel: "SPEED", before: "0.981", afterLabel: "Student", after: "0.972", note: "-0.009", scale: { min: 0.5, max: 1 } },
+              { title: "PRO", beforeLabel: "SPEED", before: "0.779", afterLabel: "Student", after: "0.760", note: "-0.019", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
               {
-                text: "카테고리별 Memory Bank로 신규 품목 대응 구조를 유지하면서, 성능형 모델 경량화에서 Peak GPU Memory를 약 90% 절감했습니다. Image AUROC는 유지·개선됐지만 추론 속도와 위치 설명력은 추가 개선이 필요해, Student를 성능형의 경량 대체 후보로 검토했습니다.",
-                emphasisPrimary: ["Peak GPU Memory를 약 90% 절감"],
-                emphasisSecondary: ["Image AUROC는 유지·개선", "추론 속도와 위치 설명력은 추가 개선이 필요"]
+                text: "카테고리별 Memory Bank로 신규 품목 대응 구조를 유지하면서, Student는 기존 속도형 대비 처리량을 약 3.7배 높이고 성능 저하는 제한했습니다. 또한 Teacher 대비 Peak GPU Memory를 약 90% 절감해, 데이터가 축적된 카테고리의 1차 판정용 경량 대안으로 적용 가능성을 확인했습니다.",
+                emphasisPrimary: ["처리량을 약 3.7배 높이고 성능 저하는 제한", "Peak GPU Memory를 약 90% 절감"],
+                emphasisSecondary: ["1차 판정용 경량 대안"]
               }
             ]
           }

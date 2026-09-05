@@ -775,14 +775,14 @@ function ScalingMetricCard({ metric }) {
       <p className="detail-scaling-card-title">{metric.title}</p>
 
       <div className="detail-thermal-bar-row">
-        <span className="detail-thermal-bar-label">Teacher</span>
+        <span className="detail-thermal-bar-label">{metric.beforeLabel ?? "Teacher"}</span>
         <span className="detail-thermal-bar-value">{metric.before}</span>
         <span className="detail-thermal-bar-track">
           <span className="detail-thermal-bar-fill" style={{ width: `${Math.max(beforeRatio, 0) * 100}%` }} />
         </span>
       </div>
       <div className="detail-thermal-bar-row">
-        <span className="detail-thermal-bar-label">Student</span>
+        <span className="detail-thermal-bar-label">{metric.afterLabel ?? "Student"}</span>
         <span className="detail-thermal-bar-value">{metric.after}</span>
         <span className="detail-thermal-bar-track">
           <span className="detail-thermal-bar-fill is-after" style={{ width: `${Math.max(afterRatio, 0) * 100}%` }} />
