@@ -87,7 +87,7 @@ const syntaxKeywords = new Set(["CREATE", "UNIQUE", "INDEX", "ON", "WHERE", "IN"
 const syntaxFunctions = new Set(["save_result", "save_defects", "mark_succeeded", "delete", "cursor", "commit", "_insert_result", "_insert_defects", "_mark_job_succeeded", "delete_message", "rowcount"]);
 const troubleshootingTabs = {
   "sqs-job-state-consistency": {
-    title: "비동기 분석 작업의 중복 실행 및 재처리 안정화"
+    title: "비동기 분석의 멱등성과 상태 정합성"
   },
   "worker-scaling-strategy": {
     title: "분석 Job 누적에 대비한 Worker 확장 전략 검증"
@@ -876,36 +876,44 @@ function SqsTroubleshootingCard() {
   const codeBlocks = [
     {
       accent: "teal",
-      title: "중복 분석 요청 생성 제어",
-      description: "동일 이미지에 동시에 진행 중인 분석 작업이 하나만 존재하도록 Partial Unique Index로 보장",
+      title: "중복 Job 생성 차단",
+      description: "동일 이미지의 활성 Job 중복 생성 방지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/de4e810faa34021c2d3c257ddd1c6cd590f0692a/backend/src/main/resources/db/migration/V8__add_unique_active_analysis_job_per_image.sql#L1-L3",
-      pointsHeading: "DB 제약으로 동시 분석 요청 제한",
       points: [
-        "동일 이미지에 진행 중인 분석 작업 1개만 허용",
-        "Partial Unique Index로 동시 요청의 경쟁 조건 차단"
-      ]
+        "Partial Unique Index로 활성 Job 1개만 허용",
+        "동시 요청 Race를 DB에서 차단"
+      ],
+      pointEmphasis: ["Partial Unique Index"]
     },
     {
       accent: "blue",
-      title: "분석 작업 선점",
-      description: "처리 대기 중인 작업만 조건부 갱신으로 선점해 여러 Worker가 동일 작업을 동시에 실행하지 않도록 제어",
+      title: "메시지 재전달 멱등 처리",
+      description: "동일 Job의 반복 실행 방지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
-      pointsHeading: "조건부 갱신으로 작업 선점",
       points: [
-        "처리 가능한 작업만 원자적으로 선점",
-        "이미 다른 Worker가 선점한 작업은 실행하지 않아 중복 처리 방지"
-      ]
+        "조건부 상태 갱신으로 처리 가능한 Job만 선점",
+        "이미 처리 중인 Job은 재실행하지 않음"
+      ],
+      pointEmphasis: ["조건부 상태 갱신"]
+    },
+    {
+      accent: "green",
+      title: "결과·상태 정합성 보장",
+      description: "완료 단계의 DB 변경을 원자적으로 처리",
+      linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/develop/ai-worker/app/infrastructure/db/result_repository.py#L149-L284",
+      points: [
+        "결과·결함 저장 + Job 완료 변경을 단일 Transaction으로 처리",
+        "실패 시 함께 Rollback"
+      ],
+      pointEmphasis: ["단일 Transaction"]
     }
   ];
 
   return (
     <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
       <ContextRow leftLabel="문제" rightLabel="핵심 판단">
-        <p>연속 요청에서는 동일 이미지에 대한 분석 작업이 중복 생성될 수 있고, SQS 재전달에서는 이미 처리 중인 작업이 다시 실행될 수 있음</p>
-        <p>
-          생성 단계는 <strong className="detail-problem-emphasis">DB 제약</strong>으로 동일 이미지의 동시 분석 요청을 제한하고, 실행 단계는{" "}
-          <strong className="detail-problem-emphasis">조건부 갱신</strong>으로 작업을 선점해 중복 실행을 제어
-        </p>
+        <p><EmphasizedText text="연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있음" phrases={["중복 Job", "메시지 재전달", "분석 결과와 Job 완료 상태"]} /></p>
+        <p><EmphasizedText text="생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 DB 트랜잭션으로 문제를 분리해 제어" phrases={["DB 제약", "조건부 상태 갱신", "DB 트랜잭션"]} /></p>
       </ContextRow>
 
       <div className="detail-sqs-visual-grid">
@@ -934,8 +942,11 @@ function SqsTroubleshootingCard() {
                     </div>
                     <p className="detail-sqs-code-card-description">{block.description}</p>
                     <div className="detail-sqs-code-points">
-                      <strong>{block.pointsHeading}</strong>
-                      <BulletList items={block.points} />
+                      <ul className="detail-card-list">
+                        {block.points.map((point) => (
+                          <li key={point}><EmphasizedText text={point} phrases={block.pointEmphasis} /></li>
+                        ))}
+                      </ul>
                     </div>
                   </article>
                 </a>
@@ -946,8 +957,11 @@ function SqsTroubleshootingCard() {
                   </div>
                   <p className="detail-sqs-code-card-description">{block.description}</p>
                   <div className="detail-sqs-code-points">
-                    <strong>{block.pointsHeading}</strong>
-                    <BulletList items={block.points} />
+                    <ul className="detail-card-list">
+                      {block.points.map((point) => (
+                        <li key={point}><EmphasizedText text={point} phrases={block.pointEmphasis} /></li>
+                      ))}
+                    </ul>
                   </div>
                 </article>
               )
@@ -958,7 +972,7 @@ function SqsTroubleshootingCard() {
 
       <section className="detail-sqs-result">
         <h4>결과</h4>
-        <p>중복 분석 요청·실행을 제어하고, 결과 저장과 처리 완료를 하나의 트랜잭션으로 묶고 실패 유형별 SQS 재처리 정책을 적용해 비동기 처리 정합성 강화</p>
+        <p>DB 제약과 조건부 상태 갱신으로 중복 요청·메시지 재전달을 멱등하게 처리하고, 완료 처리를 하나의 트랜잭션으로 묶어 분석 결과와 Job 상태의 정합성을 유지</p>
       </section>
     </article>
   );

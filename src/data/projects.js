@@ -296,15 +296,16 @@ export const projects = [
         cardOrder: ["worker-scaling-strategy", "sqs-job-state-consistency", "thermal-model-experiments"],
         card: {
           id: "sqs-job-state-consistency",
-          title: "비동기 분석 작업의 중복 실행 및 재처리 안정화",
+          title: "비동기 분석의 멱등성과 상태 정합성",
           problem:
-            "연속 요청에서는 동일 이미지에 대한 분석 작업이 중복 생성될 수 있고, SQS 재전달에서는 이미 처리 중인 작업이 다시 실행될 수 있음",
-          problemEmphasis: ["동일 이미지에 대한 분석 작업이 중복 생성", "이미 처리 중인 작업이 다시 실행"],
+            "연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있음",
+          problemEmphasis: ["중복 Job", "메시지 재전달", "분석 결과와 Job 완료 상태"],
           solution:
-            "생성 단계는 DB 제약으로 동일 이미지의 동시 분석 요청을 제한하고, 실행 단계는 조건부 갱신으로 작업을 선점해 중복 실행을 제어",
+            "생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 DB 트랜잭션으로 문제를 분리해 제어",
           solutionEmphasis: [
             "DB 제약",
-            "조건부 갱신으로 작업을 선점"
+            "조건부 상태 갱신",
+            "DB 트랜잭션"
           ],
           expandable: true,
           flowCode: `# 1. 동일 이미지에 진행 중인 분석 작업은 1개만 허용
@@ -321,8 +322,8 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
 재시도 불필요 상태는 메시지 삭제
 재시도 가능 상태는 메시지를 유지해 재수신`,
           result:
-            "중복 분석 요청·실행을 제어하고, 결과 저장과 처리 완료를 하나의 트랜잭션으로 묶고 실패 유형별 SQS 재처리 정책을 적용해 비동기 처리 정합성 강화",
-          resultEmphasis: ["중복 분석 요청·실행을 제어", "하나의 트랜잭션으로 묶고 실패 유형별 SQS 재처리 정책"],
+            "DB 제약과 조건부 상태 갱신으로 중복 요청·메시지 재전달을 멱등하게 처리하고, 완료 처리를 하나의 트랜잭션으로 묶어 분석 결과와 Job 상태의 정합성을 유지",
+          resultEmphasis: ["DB 제약", "조건부 상태 갱신", "하나의 트랜잭션"],
           evidence: [
             {
               title: "Active Job DB 제약",
