@@ -1065,6 +1065,10 @@ img {
   max-height: 337px;
 }
 
+.is-pv-insight .detail-architecture-legend {
+  margin-right: 50px;
+}
+
 .is-industrial .detail-architecture-image-card img {
   max-height: 388px;
 }
