@@ -504,7 +504,7 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
         cards: [
           {
             id: "agent-architecture-workflow",
-            title: "Agent 아키텍처·워크플로우 설계",
+            title: "Agent 워크플로우 설계",
             emphasizeAll: true,
             items: [
               "규칙 기반 Main Supervisor와 6개 역할 Agent 구조 설계",
@@ -515,7 +515,7 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
           },
           {
             id: "agent-runtime-safety",
-            title: "Agent Runtime·실행 안전성 구현",
+            title: "Agent 구현·안정성 강화",
             emphasizeAll: true,
             items: [
               "Main Graph·6개 Subgraph·Control Node 구현",
