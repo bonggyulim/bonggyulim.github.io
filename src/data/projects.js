@@ -487,6 +487,7 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
       "Python",
       "FastAPI",
       "LangGraph",
+      "LangSmith",
       "MCP",
       "Pydantic",
       "SQLAlchemy",
