@@ -289,12 +289,14 @@ export const projects = [
           {
             src: "/assets/projects/pv-insight-architecture.png",
             alt: "PV-Insight 시스템 아키텍처 다이어그램",
-            label: "아키텍처"
+            label: "아키텍처",
+            legend: "요청·분석 Spring Boot → SQS → AI Worker　│　데이터 RDS PostgreSQL · S3　│　배포 Jenkins → ECR → K3s"
           },
           {
             src: "/assets/projects/CICD-result.png",
             alt: "PV-Insight CI·CD Pipeline 결과 화면",
-            label: "CI·CD Pipeline"
+            label: "CI·CD Pipeline",
+            legend: "CI/CD GitHub main → Jenkins　│　Test / Build → Docker Image　│　ECR Push → EC2·K3s Rollout"
           }
         ],
         renderInDetail: true

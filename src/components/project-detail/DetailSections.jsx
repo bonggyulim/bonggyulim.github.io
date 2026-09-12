@@ -426,6 +426,7 @@ export function ArchitectureOverviewSection({ id, section }) {
   const [pageIndex, setPageIndex] = useState(0);
   const current = images[pageIndex] ?? images[0];
   const hasMultiple = images.length > 1;
+  const legend = current?.legend ?? section.legend;
 
   if (!current) {
     return null;
@@ -472,8 +473,8 @@ export function ArchitectureOverviewSection({ id, section }) {
             </div>
           ) : null}
         </div>
-        {section.legend === null ? null : section.legend ? (
-          <p className="detail-architecture-legend">{section.legend}</p>
+        {legend === null ? null : legend ? (
+          <p className="detail-architecture-legend">{legend}</p>
         ) : (
           <p className="detail-architecture-legend">
             요청·분석 Spring Boot → SQS → AI Worker　│　데이터 RDS PostgreSQL · S3　│　배포 Jenkins → ECR → K3s
