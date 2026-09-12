@@ -503,30 +503,25 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
         layout: "role_rows",
         cards: [
           {
-            id: "implementation",
-            title: "Multi-Agent 구조 구현",
+            id: "agent-architecture-workflow",
+            title: "Agent 아키텍처·워크플로우 설계",
+            emphasizeAll: true,
             items: [
-              "LangGraph 기반 역할별 Agent(Subgraph) 구조 구현",
-              "요청 이해·도구 선택·검색·분석·계획·검토 책임 분리",
-              "Gmail·Tasks·Calendar READ / WRITE 및 MCP 연동 구현"
+              "규칙 기반 Main Supervisor와 6개 역할 Agent 구조 설계",
+              "DAG가 아닌 State 기반 조건부 라우팅·순환형 흐름 구성",
+              "사용자 확인·승인·취소 후 중단 지점부터 재개",
+              "LLM 판단과 외부 시스템 변경 권한 분리"
             ]
           },
           {
-            id: "workflow-policy",
-            title: "상태 기반 워크플로우 설계",
+            id: "agent-runtime-safety",
+            title: "Agent Runtime·실행 안전성 구현",
+            emphasizeAll: true,
             items: [
-              "고정 DAG 대신 State 기반 조건부 라우팅으로 실행 경로 결정",
-              "승인·검증 결과에 따라 재계획·복구 경로로 재분기",
-              "READ / WRITE 작업별 Policy와 실행 조건 정의"
-            ]
-          },
-          {
-            id: "output-control",
-            title: "LLM 출력·실행 통제",
-            items: [
-              "LLM 판단과 실제 상태 변경을 분리해 결정적 실행 경계 구성",
-              "Schema·Validator·Policy로 실행 인자와 허용 작업 검증",
-              "사용자 승인 → 실행 → 재조회 → 검증·복구 흐름 구현"
+              "Main Graph·6개 Subgraph·Control Node 구현",
+              "공통 MCP/Port 연동 구조와 Google Workspace READ / WRITE 구현",
+              "승인 → 실행 → 외부 상태 재조회·검증 구현",
+              "응답 유실·중단 시 중복 WRITE 방지·복구 구현"
             ]
           }
         ]

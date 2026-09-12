@@ -407,11 +407,15 @@ function ContributionRoleRow({ card }) {
     <article className="detail-contribution-role-row">
       <h3>{card.title}</h3>
       <ul>
-        {(card.items ?? []).map((item, index) => (
-          <li key={item} className={index === card.emphasisIndex ? "is-emphasized" : ""}>
-            {index === card.emphasisIndex ? <strong>{item}</strong> : item}
+        {(card.items ?? []).map((item, index) => {
+          const isEmphasized = card.emphasizeAll || index === card.emphasisIndex;
+
+          return (
+          <li key={item} className={isEmphasized ? "is-emphasized" : ""}>
+            {isEmphasized ? <strong>{item}</strong> : item}
           </li>
-        ))}
+          );
+        })}
       </ul>
     </article>
   );
