@@ -459,10 +459,13 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
     summary: "MCP와 외부 API를 통해 외부 시스템 정보를 조회하고 승인된 작업만 실행·검증하는 업무 Agent",
     homeSummary: "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent 서비스",
     description:
-      "MCP 기반으로 다양한 외부 업무 시스템의 CRUD를 수행하는 업무 Agent입니다. LangGraph 기반 역할별 Agent로 판단 책임을 분리하고, 외부 상태를 변경하는 작업은 정책·입력 구조·실행 조건 검증과 사용자 승인을 거쳐 수행하도록 설계했습니다.",
+      "MCP 기반으로 외부 업무 시스템의 READ / WRITE를 수행하는 업무 Agent입니다. 역할별 Multi-Agent로 판단 책임을 분리하고, 상태 기반 조건부 라우팅으로 실행 흐름을 제어했습니다. 외부 상태 변경은 Policy·Schema 검증과 사용자 승인 후 실행하고, 재조회로 결과를 검증하도록 설계했습니다.",
     descriptionEmphasis: [
-      "CRUD를 수행하는 업무 Agent",
-      "정책·입력 구조·실행 조건 검증과 사용자 승인"
+      "READ / WRITE를 수행하는 업무 Agent",
+      "역할별 Multi-Agent로 판단 책임을 분리",
+      "상태 기반 조건부 라우팅",
+      "Policy·Schema 검증과 사용자 승인",
+      "재조회로 결과를 검증"
     ],
     meta: [
       "2026.08.05 ~ 2026.08.20",
@@ -501,29 +504,29 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
         cards: [
           {
             id: "implementation",
-            title: "핵심 기능 구현",
+            title: "Multi-Agent 구조 구현",
             items: [
               "LangGraph 기반 역할별 Agent(Subgraph) 구조 구현",
-              "Gmail·Tasks·Calendar READ / WRITE 기능 구현",
-              "MCP 기반 외부 서비스 조회·실행 흐름 구현"
+              "요청 이해·도구 선택·검색·분석·계획·검토 책임 분리",
+              "Gmail·Tasks·Calendar READ / WRITE 및 MCP 연동 구현"
             ]
           },
           {
             id: "workflow-policy",
-            title: "워크플로우·정책 설계",
+            title: "상태 기반 워크플로우 설계",
             items: [
-              "규칙 기반 흐름 제어와 상태 관리 구조 설계",
-              "공통 정책과 Connector별 실행 정책 정의",
-              "READ / WRITE 작업별 승인·근거·허용 도구 정책 적용"
+              "고정 DAG 대신 State 기반 조건부 라우팅으로 실행 경로 결정",
+              "승인·검증 결과에 따라 재계획·복구 경로로 재분기",
+              "READ / WRITE 작업별 Policy와 실행 조건 정의"
             ]
           },
           {
             id: "output-control",
             title: "LLM 출력·실행 통제",
             items: [
-              "구조화된 출력 스키마로 LLM 응답 형식과 허용 범위 제한",
-              "LLM 출력값과 실제 실행 인자의 일치 여부 검증",
-              "사용자 승인 → 외부 시스템 실행 → 결과 재조회·검증 흐름 구현"
+              "LLM 판단과 실제 상태 변경을 분리해 결정적 실행 경계 구성",
+              "Schema·Validator·Policy로 실행 인자와 허용 작업 검증",
+              "사용자 승인 → 실행 → 재조회 → 검증·복구 흐름 구현"
             ]
           }
         ]
