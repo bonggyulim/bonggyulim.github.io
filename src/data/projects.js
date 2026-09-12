@@ -266,6 +266,7 @@ export const projects = [
       {
         id: "architecture",
         title: "시스템 아키텍처",
+        eyebrow: "ARCHITECTURE & CI·CD Pipeline",
         type: "architecture_overview",
         overviewCards: [
           {
@@ -284,9 +285,18 @@ export const projects = [
             description: "Jenkins에서 이미지를 빌드·푸시하고, K3s 환경에서 ECR 이미지를 Rollout 배포합니다."
           }
         ],
-        image: "/assets/projects/pv-insight-architecture.png",
-        imageAlt: "PV-Insight 시스템 아키텍처 다이어그램",
-        externalUrl: "/assets/projects/pv-insight-architecture.png",
+        images: [
+          {
+            src: "/assets/projects/pv-insight-architecture.png",
+            alt: "PV-Insight 시스템 아키텍처 다이어그램",
+            label: "아키텍처"
+          },
+          {
+            src: "/assets/projects/CICD-result.png",
+            alt: "PV-Insight CI·CD Pipeline 결과 화면",
+            label: "CI·CD Pipeline"
+          }
+        ],
         renderInDetail: true
       },
       {
