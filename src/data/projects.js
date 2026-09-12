@@ -105,13 +105,13 @@ export const projects = [
           title: "신규 카테고리 대응을 위한 모델 운영 구조·경량화 검증",
           problem: "신규 카테고리마다 모델을 다시 학습하지 않고 빠르게 대응할 수 있는 구조가 필요했습니다. 동시에 검사 요청 증가에 대비해 판정 성능뿐 아니라 추론 속도와 GPU 자원 사용량까지 고려해야 했습니다.",
           problemEmphasis: ["모델을 다시 학습하지 않고 빠르게 대응", "추론 속도와 GPU 자원 사용량"],
-          decision: "공통 Backbone + 카테고리별 Memory Bank로 신규 카테고리 대응 구조를 설계하고, 속도형·성능형으로 검사 역할을 분리 → 기존 속도형보다 효율적인 1차 판정 모델을 만들기 위해 성능형을 Teacher로 둔 Student 경량화 검토",
-          decisionEmphasis: ["공통 Backbone + 카테고리별 Memory Bank", "속도형·성능형으로 검사 역할을 분리", "성능형을 Teacher로 둔 Student 경량화 검토"],
+          decision: "모델별 Backbone은 유지하면서 카테고리별 Memory Bank를 분리해 신규 카테고리에 대응하고, SPEED와 PERFORMANCE로 검사 역할을 분리했습니다. 이후 기존 SPEED보다 효율적인 1차 판정 모델을 검토하기 위해 PERFORMANCE를 Teacher로 둔 Student 경량화 실험 방향과 평가 기준을 설계했습니다.",
+          decisionEmphasis: ["모델별 Backbone", "카테고리별 Memory Bank", "SPEED와 PERFORMANCE로 검사 역할을 분리", "PERFORMANCE를 Teacher로 둔 Student 경량화"],
           backboneFlow: {
-            title: "01. 공통 Backbone + 카테고리별 Memory Bank — 카테고리 대응 구조",
+            title: "01. 모델별 Backbone + 카테고리별 Memory Bank — 신규 카테고리 대응 구조",
             image: "/assets/projects/memorybank.svg",
-            imageAlt: "공통 Backbone + 카테고리별 Memory Bank 카테고리 대응 구조 다이어그램",
-            summary: "공통 Backbone으로 정상 이미지 Feature를 추출해 카테고리별 Memory Bank로 관리하고, 검사 Feature와 비교해 Anomaly Score·Heatmap 생성"
+            imageAlt: "모델별 Backbone과 카테고리별 Memory Bank를 이용한 신규 카테고리 대응 구조 다이어그램",
+            summary: "각 모델의 Backbone에서 정상 이미지 Feature를 추출해 카테고리별 Memory Bank로 관리하고, 검사 이미지의 Feature와 비교해 Anomaly Score와 Heatmap을 생성합니다."
           },
           stageFlow: {
             title: "02. 속도형·성능형 모델 역할 분리",
@@ -135,19 +135,19 @@ export const projects = [
           },
           lightweightSection: {
             title: "03. Teacher–Student 경량화 검증",
-            summary: "기존 속도형보다 효율적인 1차 판정 모델을 만들기 위해 성능형을 Teacher로 두고 Student 경량화 검증",
+            summary: "기존 SPEED보다 효율적인 1차 판정 모델을 검토하기 위해 PERFORMANCE를 Teacher로 두고 Student를 학습했으며, 실제 운영 후보 평가는 기존 SPEED와 Student를 비교했습니다.",
             metrics: [
-              { title: "Peak GPU Memory", before: "847.5 MB", after: "84.2 MB", note: "약 90% 절감" },
-              { title: "Throughput", beforeLabel: "SPEED", before: "20.8 img/s", afterLabel: "Student", after: "76.4 img/s", note: "약 3.7배 향상" },
+              { title: "Peak GPU Memory", beforeLabel: "SPEED", before: "89.8 MB", afterLabel: "Student", after: "84.2 MB", note: "약 6.2% 감소" },
+              { title: "이미지 1장 평균 처리 시간", beforeLabel: "SPEED", before: "48.0 ms", afterLabel: "Student", after: "13.1 ms", note: "약 72.7% 단축" },
               { title: "Image AUROC", beforeLabel: "SPEED", before: "0.991", afterLabel: "Student", after: "0.995", note: "+0.4%p", scale: { min: 0.5, max: 1 } },
               { title: "F1-score", beforeLabel: "SPEED", before: "0.966", afterLabel: "Student", after: "0.959", note: "-0.7%p", scale: { min: 0.5, max: 1 } },
               { title: "PRO", beforeLabel: "SPEED", before: "0.779", afterLabel: "Student", after: "0.760", note: "-1.9%p", scale: { min: 0.5, max: 1 } }
             ],
             resultItems: [
               {
-                text: "카테고리별 Memory Bank로 신규 카테고리 대응 구조를 유지하면서, Student는 기존 속도형 대비 처리량을 약 3.7배 높이고, Teacher 대비 Peak GPU Memory를 약 90% 절감했으며, 판정·위치 성능은 유사 수준으로 유지했습니다. 이를 통해 데이터가 축적된 카테고리의 1차 판정용 경량 대안으로 적용 가능성을 확인했습니다.",
-                emphasisPrimary: ["기존 속도형 대비 처리량을 약 3.7배 높이고, Teacher 대비 Peak GPU Memory를 약 90% 절감했으며, 판정·위치 성능은 유사 수준으로 유지"],
-                emphasisSecondary: ["1차 판정용 경량 대안"]
+                text: "카테고리별 Memory Bank 기반의 신규 카테고리 대응 구조를 유지하면서, Student는 기존 SPEED 대비 이미지 1장 평균 처리 시간을 약 72.7% 단축하고 Peak GPU Memory를 약 6.2% 줄였습니다. 주요 판정·위치 성능 지표는 유사한 수준을 유지해, 빠른 1차 이상 판정을 위한 경량 모델 후보로 적용 가능성을 확인했습니다.",
+                emphasisPrimary: ["기존 SPEED 대비 이미지 1장 평균 처리 시간을 약 72.7% 단축", "Peak GPU Memory를 약 6.2% 줄였습니다", "판정·위치 성능 지표는 유사한 수준"],
+                emphasisSecondary: ["빠른 1차 이상 판정을 위한 경량 모델 후보"]
               }
             ]
           }
@@ -296,7 +296,7 @@ export const projects = [
         cardOrder: ["worker-scaling-strategy", "sqs-job-state-consistency", "thermal-model-experiments"],
         card: {
           id: "sqs-job-state-consistency",
-          title: "비동기 분석의 멱등성과 상태 정합성",
+          title: "비동기 분석의 재처리 안정성과 상태 정합성",
           problem:
             "연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있음",
           problemEmphasis: ["중복 Job", "메시지 재전달", "분석 결과와 Job 완료 상태"],
@@ -322,8 +322,8 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
 재시도 불필요 상태는 메시지 삭제
 재시도 가능 상태는 메시지를 유지해 재수신`,
           result:
-            "DB 제약과 조건부 상태 갱신으로 중복 요청·메시지 재전달을 멱등하게 처리하고, 완료 처리를 하나의 트랜잭션으로 묶어 분석 결과와 Job 상태의 정합성을 유지",
-          resultEmphasis: ["DB 제약", "조건부 상태 갱신", "하나의 트랜잭션"],
+            "DB 제약으로 중복 Job 생성을 차단하고, 조건부 상태 갱신으로 메시지 재전달 시 동일 Job의 중복 실행을 방지했습니다. 분석 결과 저장과 Job 완료 상태 변경은 하나의 트랜잭션으로 처리해 실패·재처리 상황에서도 결과와 Job 상태의 정합성을 유지했습니다.",
+          resultEmphasis: ["중복 Job 생성을 차단", "동일 Job의 중복 실행을 방지", "하나의 트랜잭션", "결과와 Job 상태의 정합성"],
           evidence: [
             {
               title: "Active Job DB 제약",
@@ -354,7 +354,7 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             title: "분석 Job 누적에 대비한 Worker 확장 전략 검증",
             basis: "월 약 $107의 MVP 운영 예산을 기준으로 t3.large 단일 Node·CPU Worker 1개를 Baseline으로 구성",
             scalingNeed: "분석 Job 누적 시 처리 용량을 어떻게 확장할지 Worker 복제와 Node 분산 방식 비교",
-            comparisonNote: "RGB·Thermal 각 100 Job을 동일 조건으로 처리해 Worker 수와 Node 배치에 따른 처리량·CPU 경합 비교",
+            comparisonNote: "RGB·Thermal 각 100 Job을 동일 조건으로 처리해 Worker 수와 Node 배치에 따른 처리 시간·CPU 경합 비교",
             budgetDescription: "AWS Pricing Calculator로 단일 EC2 기반 MVP 운영환경의 월 비용을 산정",
             costRows: [
               ["EC2 + EBS", "t3.large / gp3 100GB", "$85.04"],
@@ -367,17 +367,17 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             extraCost: ["별도 반영", "Public IPv4 / EIP", "+$3.65"],
             comparisonOne: {
               title: "1 EC2 / 1 Worker → 1 EC2 / 2 Workers",
-              rgb: ["0.368 → 0.398 jobs/s", "+8.2%"],
-              thermal: ["1.247 → 1.528 jobs/s", "+22.5%"],
+              rgb: ["271.4s → 251.4s", "약 7.4% 단축"],
+              thermal: ["80.2s → 65.4s", "약 18.4% 단축"],
               conclusion: "동일 Node의 CPU 경합으로 Worker 증설 효과 제한 (CPU Peak ≈99%)"
             },
             comparisonTwo: {
               title: "1 EC2 / 2 Workers → 2 EC2 / 2 Workers",
-              rgb: ["0.398 → 0.786 jobs/s", "+97.5%"],
-              thermal: ["1.528 → 2.550 jobs/s", "+66.9%"],
-              conclusion: "Worker 수를 유지한 채 Node를 분산하자 처리량이 크게 증가 (CPU Peak ≈76%)"
+              rgb: ["251.4s → 127.2s", "약 49.4% 단축"],
+              thermal: ["65.4s → 39.2s", "약 40.1% 단축"],
+              conclusion: "Worker 수를 유지한 채 Node를 분산하자 처리 시간이 크게 감소 (CPU Peak ≈76%)"
             },
-            decision: "Worker 증설은 CPU 경합으로 효과가 제한됐고, Node 분산에서 처리량이 크게 증가해 이를 우선 확장 방식으로 결정",
+            decision: "동일 Node에서 Worker를 늘렸을 때는 CPU 경합으로 개선 폭이 제한적이었고, Worker를 Node별로 분산했을 때 처리 시간이 크게 줄었습니다. 이를 바탕으로 노드당 1 Worker를 유지하고 Node를 수평 확장하는 방향을 우선 확장 전략으로 결정했습니다.",
             sourceUrl: "https://github.com/solar-ai-dev/pv-fusion/tree/develop/docs/benchmarks/worker-scaling"
           },
           {

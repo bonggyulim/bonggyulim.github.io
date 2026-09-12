@@ -62,7 +62,7 @@ const stackGroups = [
   },
 ];
 
-const featuredProjectSlugs = ["pv-insight", "industrial-ai-platform", "mcp-api-agent"];
+const featuredProjectSlugs = ["mcp-api-agent", "pv-insight", "industrial-ai-platform"];
 
 export default function Home() {
   const featuredProjects = featuredProjectSlugs

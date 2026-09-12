@@ -87,7 +87,7 @@ const syntaxKeywords = new Set(["CREATE", "UNIQUE", "INDEX", "ON", "WHERE", "IN"
 const syntaxFunctions = new Set(["save_result", "save_defects", "mark_succeeded", "delete", "cursor", "commit", "_insert_result", "_insert_defects", "_mark_job_succeeded", "delete_message", "rowcount"]);
 const troubleshootingTabs = {
   "sqs-job-state-consistency": {
-    title: "비동기 분석의 멱등성과 상태 정합성"
+    title: "비동기 분석의 재처리 안정성과 상태 정합성"
   },
   "worker-scaling-strategy": {
     title: "분석 Job 누적에 대비한 Worker 확장 전략 검증"
@@ -886,7 +886,7 @@ function SqsTroubleshootingCard() {
     },
     {
       accent: "blue",
-      title: "메시지 재전달 멱등 처리",
+      title: "메시지 재전달 시 재실행 방지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
       points: [
         "조건부 상태 갱신으로 처리 가능한 Job만 선점",
@@ -969,7 +969,7 @@ function SqsTroubleshootingCard() {
 
       <section className="detail-sqs-result">
         <h4>결과</h4>
-        <p>DB 제약과 조건부 상태 갱신으로 중복 요청·메시지 재전달을 멱등하게 처리하고, 완료 처리를 하나의 트랜잭션으로 묶어 분석 결과와 Job 상태의 정합성을 유지</p>
+        <p><EmphasizedText text="DB 제약으로 중복 Job 생성을 차단하고, 조건부 상태 갱신으로 메시지 재전달 시 동일 Job의 중복 실행을 방지했습니다. 분석 결과 저장과 Job 완료 상태 변경은 하나의 트랜잭션으로 처리해 실패·재처리 상황에서도 결과와 Job 상태의 정합성을 유지했습니다." phrases={["중복 Job 생성을 차단", "동일 Job의 중복 실행을 방지", "하나의 트랜잭션", "결과와 Job 상태의 정합성"]} /></p>
       </section>
     </article>
   );
