@@ -654,6 +654,16 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             decision:
               "실패 Trace에서 최초 오류 지점을 확인하고 원인에 따라 Prompt·State·Schema·Validator·모델 설정을 구분해 수정했습니다.",
             smokeTest: "E2E Smoke Test 6 / 6 PASS",
+            validationTitle: "01. 대표 검증 시나리오",
+            validationScenarios: [
+              { name: "대상 없는 일정", criteria: "임의 추측·READ 없이 추가 확인 요청", highlights: ["추가 확인 요청"] },
+              { name: "선택 리소스", criteria: "사용자가 선택한 일정 기준으로 정확한 정보 응답", highlights: ["정확한 정보 응답"] },
+              { name: "메일 신규 작성", criteria: "SOURCE / OUTPUT 구분 후 근거 기반 Preview 생성", highlights: ["근거 기반 Preview 생성"] },
+              { name: "기존 초안 수정", criteria: "원문·발송 금지 조건을 보존한 UPDATE Preview", highlights: ["UPDATE Preview"] },
+              { name: "다건 검색", criteria: "필요한 검색 결과를 누락 없이 반영", highlights: ["누락 없이 반영"] },
+              { name: "복합 Retrieval", criteria: "잘못된 검색 계획을 수정해 제한 횟수 내 결과 도달", highlights: ["제한 횟수 내 결과 도달"] }
+            ],
+            metricsTitle: "02. 테스트 결과",
             metrics: [
               ["Validation", "XX/60", "XX/60"],
               ["Holdout", "XX/12", "XX/12"],

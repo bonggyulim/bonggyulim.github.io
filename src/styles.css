@@ -3552,8 +3552,53 @@ p.detail-scaling-metric-note {
   font-weight: var(--ps-fw-bold);
 }
 
+.detail-mcp-comparison tbody tr:last-child th,
 .detail-mcp-comparison tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.detail-mcp-validation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detail-mcp-validation .detail-mcp-smoke-badge {
+  min-height: 0;
+  padding: 4px 8px;
+  font-size: var(--ps-fs-small);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.detail-mcp-validation-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.detail-mcp-validation-card {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.detail-mcp-validation-card strong {
+  color: var(--text);
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-bold);
+}
+
+.detail-mcp-validation-card p {
+  margin: 4px 0 0;
+  color: var(--text-soft);
+  font-size: var(--ps-fs-small);
+  font-weight: var(--ps-fw-regular);
+  line-height: 1.5;
+  word-break: keep-all;
 }
 
 .detail-mcp-comparison tr.is-selected td {
@@ -3650,6 +3695,12 @@ p.detail-scaling-metric-note {
   text-decoration: underline;
 }
 
+@media (max-width: 960px) {
+  .detail-mcp-validation-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   #actual-use-cases + #engineering-decisions {
     margin-top: 0;
@@ -3672,6 +3723,10 @@ p.detail-scaling-metric-note {
 
   .detail-mcp-decision-tabs {
     grid-template-columns: repeat(2, minmax(164px, 1fr));
+  }
+
+  .detail-mcp-validation-cards {
+    grid-template-columns: 1fr;
   }
 
   .detail-mcp-metric-grid {

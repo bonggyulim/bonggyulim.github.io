@@ -1359,7 +1359,22 @@ export function EngineeringDecisionsSection({ id, section }) {
             </ContextRow>
 
             <div className="detail-mcp-decision-details">
-              {activeTab.smokeTest ? <span className="detail-mcp-smoke-badge">{activeTab.smokeTest}</span> : null}
+              {activeTab.validationScenarios?.length ? (
+                <section className="detail-mcp-comparison detail-mcp-validation">
+                  <div className="detail-mcp-validation-head">
+                    <h4>{activeTab.validationTitle ?? "대표 검증 시나리오"}</h4>
+                    {activeTab.smokeTest ? <span className="detail-mcp-smoke-badge">{activeTab.smokeTest}</span> : null}
+                  </div>
+                  <div className="detail-mcp-validation-cards">
+                    {activeTab.validationScenarios.map((scenario) => (
+                      <article className="detail-mcp-validation-card" key={scenario.name}>
+                        <strong>{scenario.name}</strong>
+                        <p><EmphasizedText text={scenario.criteria} phrases={scenario.highlights} /></p>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
 
               {activeTab.flow?.length ? (
                 <div className="detail-mcp-experiment-flow" aria-label="성능 개선 실험 흐름">
