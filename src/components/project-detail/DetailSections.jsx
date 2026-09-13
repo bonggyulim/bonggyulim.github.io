@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 
 const contributionGroups = [
   { id: "build", title: "설계·구현" },
@@ -79,7 +80,9 @@ const sectionIcons = {
   contribution_cards: ContributionIcon,
   contribution_summary: ContributionIcon,
   architecture_overview: ArchitectureIcon,
-  problem_solution: ProblemSolvingIcon
+  problem_solution: ProblemSolvingIcon,
+  use_case_carousel: ContributionIcon,
+  mcp_engineering_decisions: ProblemSolvingIcon
 };
 
 const syntaxTokenPattern = /(#.*$|'[^']*'|\b(?:CREATE|UNIQUE|INDEX|ON|WHERE|IN|UPDATE|SET|AND|and|in|if|raise|with|as|or)\b|\b(?:save_result|save_defects|mark_succeeded|delete|cursor|commit|_insert_result|_insert_defects|_mark_job_succeeded|delete_message|rowcount)\b|\b(?:StateTransitionError|JobStateTransitionError)\b|\b[A-Za-z_][A-Za-z0-9_]*\b|==|!=|<=|>=|=>|->|[=:+\-*/()[\]{}.,])/g;
@@ -87,13 +90,13 @@ const syntaxKeywords = new Set(["CREATE", "UNIQUE", "INDEX", "ON", "WHERE", "IN"
 const syntaxFunctions = new Set(["save_result", "save_defects", "mark_succeeded", "delete", "cursor", "commit", "_insert_result", "_insert_defects", "_mark_job_succeeded", "delete_message", "rowcount"]);
 const troubleshootingTabs = {
   "sqs-job-state-consistency": {
-    title: "비동기 분석의 재처리 안정성과 상태 정합성"
+    title: "SQS 비동기 분석의 멱등성과 상태 정합성"
   },
   "worker-scaling-strategy": {
-    title: "분석 Job 누적에 대비한 Worker 확장 전략 검증"
+    title: "CPU 추론 Worker의 적정 확장 단위 검증"
   },
   "thermal-model-experiments": {
-    title: "Thermal 데이터 기준 재정의와 단계별 모델 실험"
+    title: "Thermal 데이터 재정의와 단계별 실험"
   }
 };
 
@@ -553,9 +556,9 @@ function WorkerScalingCard({ card }) {
     <article className="detail-problem-card detail-worker-card">
       <TripleContextRow
         items={[
-          { label: "운영 기준", content: <EmphasizedText text={card.basis} phrases={["$107의 MVP 운영 예산", "t3.large 단일 Node·CPU Worker 1개"]} /> },
-          { label: "확장 필요성", content: card.scalingNeed },
-          { label: "비교", content: card.comparisonNote }
+          { label: "초기 운영 조건", content: <EmphasizedText text={card.basis} phrases={["$107의 MVP 운영 예산", "EC2 t3.large 1대·CPU Worker 1개"]} /> },
+          { label: "검증 질문", content: card.scalingNeed },
+          { label: "비교 조건", content: card.comparisonNote }
         ]}
       />
       <div className="detail-problem-details detail-worker-details">
@@ -637,7 +640,7 @@ function ThermalExperimentCard({ card }) {
             </div>
 
             <div className="detail-thermal-merge-col">
-              <h4 className="detail-thermal-step-heading">02. 서비스 3-Class 재정의</h4>
+              <h4 className="detail-thermal-step-heading">02. 서비스 기준 3-Class 재정의</h4>
               <div className="detail-thermal-class-grid">
                 {card.classGroups.map((group) => {
                   const [head, ...rest] = group;
@@ -822,7 +825,7 @@ function IndustrialScalingCard({ card }) {
 
   return (
     <article className="detail-problem-card detail-thermal-card">
-      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
+      <ContextRow leftLabel={card.problemLabel ?? "문제"} rightLabel="핵심 판단">
         <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
         <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
       </ContextRow>
@@ -877,6 +880,46 @@ function IndustrialScalingCard({ card }) {
   );
 }
 
+function IndustrialRuntimeAlignmentCard({ card }) {
+  return (
+    <article className="detail-problem-card detail-thermal-card">
+      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
+        <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
+        <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
+      </ContextRow>
+
+      <div className="detail-problem-details detail-thermal-details">
+        <section className="detail-thermal-section">
+          <h4 className="detail-thermal-step-heading">{card.runtimeAlignment.title}</h4>
+          <figure className="detail-runtime-image">
+            <img src={card.runtimeAlignment.image} alt={card.runtimeAlignment.imageAlt} />
+          </figure>
+          <p><EmphasizedText text={card.runtimeAlignment.summary} phrases={card.runtimeAlignment.summaryEmphasis} /></p>
+        </section>
+
+        <section className="detail-thermal-section detail-runtime-criteria-section">
+          <h4 className="detail-thermal-step-heading">{card.inferenceCriteria.title}</h4>
+          <div className="detail-runtime-criteria-grid">
+            {card.inferenceCriteria.items.map((item) => (
+              <div key={item.title} className="detail-runtime-criteria-item">
+                <strong>{item.title}</strong>
+                <span>{item.description}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="detail-scaling-footer">
+          <div className="detail-scaling-footer-block">
+            <strong>결과</strong>
+            <p><EmphasizedText text={card.result} phrases={card.resultEmphasis} /></p>
+          </div>
+        </section>
+      </div>
+    </article>
+  );
+}
+
 function SqsTroubleshootingCard() {
   const codeBlocks = [
     {
@@ -901,7 +944,7 @@ function SqsTroubleshootingCard() {
     },
     {
       accent: "green",
-      title: "결과·상태 정합성 보장",
+      title: "결과·Job 상태 정합성 유지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/develop/ai-worker/app/infrastructure/db/result_repository.py#L149-L284",
       points: [
         "결과·결함 저장 + Job 완료 변경을 단일 Transaction으로 처리",
@@ -915,7 +958,7 @@ function SqsTroubleshootingCard() {
     <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
       <ContextRow leftLabel="문제" rightLabel="핵심 판단">
         <p><EmphasizedText text="연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있음" phrases={["중복 Job", "메시지 재전달", "분석 결과와 Job 완료 상태"]} /></p>
-        <p><EmphasizedText text="생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 DB 트랜잭션으로 문제를 분리해 제어" phrases={["DB 제약", "조건부 상태 갱신", "DB 트랜잭션"]} /></p>
+        <p><EmphasizedText text="생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 단일 DB 트랜잭션으로 중복 실행과 상태 불일치를 단계별로 제어" phrases={["DB 제약", "조건부 상태 갱신", "단일 DB 트랜잭션"]} /></p>
       </ContextRow>
 
       <div className="detail-sqs-visual-grid">
@@ -939,6 +982,7 @@ function SqsTroubleshootingCard() {
                   rel="noopener noreferrer"
                 >
                   <article className={`detail-sqs-code-card is-${block.accent}`.trim()}>
+                    <ExternalLinkIcon />
                     <div className="detail-sqs-code-card-head">
                       <strong>{block.title}</strong>
                     </div>
@@ -974,9 +1018,24 @@ function SqsTroubleshootingCard() {
 
       <section className="detail-sqs-result">
         <h4>결과</h4>
-        <p><EmphasizedText text="DB 제약으로 중복 Job 생성을 차단하고, 조건부 상태 갱신으로 메시지 재전달 시 동일 Job의 중복 실행을 방지했습니다. 분석 결과 저장과 Job 완료 상태 변경은 하나의 트랜잭션으로 처리해 실패·재처리 상황에서도 결과와 Job 상태의 정합성을 유지했습니다." phrases={["중복 Job 생성을 차단", "동일 Job의 중복 실행을 방지", "하나의 트랜잭션", "결과와 Job 상태의 정합성"]} /></p>
+        <p><EmphasizedText text="DB 제약과 조건부 상태 갱신으로 분석 Job 생성·실행 경로의 멱등성을 확보하고, 분석 결과 저장과 Job 완료 상태 변경을 하나의 트랜잭션으로 처리해 실패·재처리 상황에서도 결과와 Job 상태의 정합성을 유지했습니다." phrases={["분석 Job 생성·실행 경로의 멱등성", "하나의 트랜잭션", "결과와 Job 상태의 정합성"]} /></p>
       </section>
     </article>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg className="detail-sqs-code-card-link-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <path
+        d="M11 3h6v6M17 3l-8 8M9 5H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
   );
 }
 
@@ -1065,14 +1124,322 @@ export function TroubleshootingSection({ id, section }) {
                   ? <SqsTroubleshootingCard />
                   : card.kind === "worker_scaling"
                   ? <WorkerScalingCard card={card} />
-                  : card.kind === "thermal_experiment"
+                    : card.kind === "thermal_experiment"
                     ? <ThermalExperimentCard card={card} />
                     : card.kind === "industrial_scaling"
                       ? <IndustrialScalingCard card={card} />
+                      : card.kind === "industrial_runtime_alignment"
+                        ? <IndustrialRuntimeAlignmentCard card={card} />
                       : <TroubleshootingCard card={card} />}
               </div>
             );
           })}
+        </div>
+      </div>
+    </DetailSection>
+  );
+}
+
+export function UseCaseCarouselSection({ id, section }) {
+  const cases = section.cases ?? [];
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    containScroll: "trimSnaps",
+    dragThreshold: 56,
+    duration: 25,
+    loop: false,
+    skipSnaps: false
+  });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [snapPoints, setSnapPoints] = useState([]);
+  const viewportRef = useRef(null);
+
+  const setViewportRef = useCallback((node) => {
+    viewportRef.current = node;
+    emblaRef(node);
+  }, [emblaRef]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onInit = () => setSnapPoints(emblaApi.scrollSnapList());
+    onInit();
+    onSelect();
+    emblaApi.on("reInit", onInit).on("reInit", onSelect).on("select", onSelect);
+
+    return () => {
+      emblaApi.off("reInit", onInit).off("reInit", onSelect).off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const slowDragMotion = () => {
+      const engine = emblaApi.internalEngine();
+      if (engine.dragHandler.pointerDown()) {
+        engine.scrollBody.useDuration(1.5).useFriction(0.3);
+      }
+    };
+
+    emblaApi.on("pointerDown", slowDragMotion).on("scroll", slowDragMotion);
+
+    return () => {
+      emblaApi.off("pointerDown", slowDragMotion).off("scroll", slowDragMotion);
+    };
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const outwardDragLimit = 152;
+    let startX = null;
+    let boundary = null;
+    const readClientX = (event) => event.touches?.[0]?.clientX ?? event.clientX;
+    const reset = () => {
+      startX = null;
+      boundary = null;
+    };
+    const onStart = (event) => {
+      if (!viewportRef.current?.contains(event.target)) return;
+      startX = readClientX(event);
+      boundary = !emblaApi.canScrollPrev() ? "start" : !emblaApi.canScrollNext() ? "end" : null;
+    };
+    const onMove = (event) => {
+      if (startX === null || !boundary) return;
+      const currentX = readClientX(event);
+      const isOutwardDrag = (boundary === "start" && currentX > startX) || (boundary === "end" && currentX < startX);
+      if (!isOutwardDrag || Math.abs(currentX - startX) <= outwardDragLimit) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    };
+
+    const documentNode = viewportRef.current?.ownerDocument;
+    if (!documentNode) return;
+    documentNode.addEventListener("mousedown", onStart, true);
+    documentNode.addEventListener("touchstart", onStart, true);
+    documentNode.addEventListener("mousemove", onMove, true);
+    documentNode.addEventListener("touchmove", onMove, { capture: true, passive: false });
+    documentNode.addEventListener("mouseup", reset, true);
+    documentNode.addEventListener("touchend", reset, true);
+    documentNode.addEventListener("touchcancel", reset, true);
+
+    return () => {
+      documentNode.removeEventListener("mousedown", onStart, true);
+      documentNode.removeEventListener("touchstart", onStart, true);
+      documentNode.removeEventListener("mousemove", onMove, true);
+      documentNode.removeEventListener("touchmove", onMove, true);
+      documentNode.removeEventListener("mouseup", reset, true);
+      documentNode.removeEventListener("touchend", reset, true);
+      documentNode.removeEventListener("touchcancel", reset, true);
+    };
+  }, [emblaApi]);
+
+  if (!cases.length) {
+    return null;
+  }
+
+  const handleKeyDown = (event) => {
+    if (!emblaApi) return;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      emblaApi.scrollPrev();
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      emblaApi.scrollNext();
+    }
+  };
+
+  return (
+    <DetailSection id={id} type={section.type} title={section.title} eyebrow={section.eyebrow}>
+      <div className="detail-use-case-carousel" role="region" aria-label="실제 업무 처리 예시">
+        <div className="detail-use-case-viewport" ref={setViewportRef} tabIndex="0" onKeyDown={handleKeyDown}>
+          <div className="detail-use-case-container">
+            {cases.map((useCase) => (
+              <article className="detail-use-case-slide" key={useCase.id} aria-label={`${useCase.badge} 사례`}>
+                <div className="detail-use-case-head">
+                  <span className="detail-use-case-badge">{useCase.badge}</span>
+                  <p className="detail-use-case-request">{useCase.request}</p>
+                </div>
+                <figure className="detail-use-case-screen">
+                  {useCase.screenshot ? (
+                    <img src={useCase.screenshot} alt={useCase.screenshotAlt ?? `${useCase.badge} 제품 화면`} />
+                  ) : (
+                    <figcaption>실제 제품 화면 추가 예정</figcaption>
+                  )}
+                </figure>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="detail-use-case-controls">
+          <div className="detail-use-case-dots" role="tablist" aria-label="업무 사례 선택">
+            {snapPoints.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                className={index === selectedIndex ? "is-active" : ""}
+                onClick={() => emblaApi?.scrollTo(index)}
+                aria-label={`${index + 1}번째 업무 사례로 이동`}
+                aria-selected={index === selectedIndex}
+                role="tab"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </DetailSection>
+  );
+}
+
+export function EngineeringDecisionsSection({ id, section }) {
+  const tabs = section.tabs ?? [];
+  const [activeTabId, setActiveTabId] = useState(tabs[0]?.id ?? null);
+  const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
+
+  if (!activeTab) {
+    return null;
+  }
+
+  const handleKeyDown = (event, index) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const nextIndex = event.key === "ArrowLeft"
+      ? (index - 1 + tabs.length) % tabs.length
+      : event.key === "ArrowRight"
+        ? (index + 1) % tabs.length
+        : event.key === "Home"
+          ? 0
+          : tabs.length - 1;
+    setActiveTabId(tabs[nextIndex].id);
+  };
+
+  return (
+    <DetailSection id={id} type={section.type} title={section.title} eyebrow={section.eyebrow}>
+      <div className="detail-mcp-decisions-shell">
+        <div className="detail-troubleshooting-tabs detail-mcp-decision-tabs" role="tablist" aria-label="MCP Engineering Decisions 탭">
+          {tabs.map((tab, index) => {
+            const isActive = tab.id === activeTab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                className={`detail-troubleshooting-tab ${isActive ? "is-active" : ""}`.trim()}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`detail-panel-${tab.id}`}
+                id={`detail-tab-${tab.id}`}
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => setActiveTabId(tab.id)}
+                onKeyDown={(event) => handleKeyDown(event, index)}
+              >
+                <strong>{tab.title}</strong>
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          className="detail-mcp-decision-panel"
+          role="tabpanel"
+          id={`detail-panel-${activeTab.id}`}
+          aria-labelledby={`detail-tab-${activeTab.id}`}
+        >
+          <article className="detail-problem-card detail-sqs-flow-card detail-mcp-decision-card">
+            <ContextRow leftLabel="문제" rightLabel={activeTab.decisionLabel}>
+              <p><EmphasizedText text={activeTab.problem} phrases={activeTab.problemHighlights} /></p>
+              <p><EmphasizedText text={activeTab.decision} phrases={activeTab.decisionHighlights} /></p>
+            </ContextRow>
+
+            <div className="detail-mcp-decision-details">
+              {activeTab.smokeTest ? <span className="detail-mcp-smoke-badge">{activeTab.smokeTest}</span> : null}
+
+              {activeTab.flow?.length ? (
+                <div className="detail-mcp-experiment-flow" aria-label="성능 개선 실험 흐름">
+                  {activeTab.flow.map((step, index) => (
+                    <span key={step}>
+                      {step}
+                      {index < activeTab.flow.length - 1 ? <i aria-hidden="true">→</i> : null}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+
+              {activeTab.comparisonRows?.length ? (
+                <section className="detail-mcp-comparison">
+                  <h4>실험 결과</h4>
+                  <div className="detail-mcp-comparison-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>구성</th>
+                          <th>HTTP 요청</th>
+                          <th>Node Latency</th>
+                          <th>목록 표시</th>
+                          <th>Error</th>
+                          <th>비고</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeTab.comparisonRows.map((row) => (
+                          <tr key={row[0]} className={row[5] === "Selected" ? "is-selected" : ""}>
+                            {row.map((value, index) => <td key={`${row[0]}-${index}`}>{value}</td>)}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ) : null}
+
+              {activeTab.finalDecision ? (
+                <section className="detail-mcp-final-decision">
+                  <h4>최종 판단</h4>
+                  <strong>{activeTab.finalDecision.selected}</strong>
+                  <ul>
+                    {activeTab.finalDecision.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                  </ul>
+                </section>
+              ) : null}
+
+              {activeTab.metrics?.length ? (
+                <>
+                  {activeTab.metricsTitle ? <h4 className="detail-mcp-metrics-title">{activeTab.metricsTitle}</h4> : null}
+                  <div className="detail-mcp-metric-grid">
+                    {activeTab.metrics.map(([label, before, after, note]) => (
+                      <div className="detail-mcp-metric" key={label}>
+                        <strong>{label}</strong>
+                        <span>{before} <i aria-hidden="true">→</i> {after}</span>
+                        {note ? <small>{note}</small> : null}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+
+              {activeTab.summary ? (
+                <section className="detail-scaling-footer">
+                  <div className="detail-scaling-footer-block">
+                    <strong>결과</strong>
+                    <p><EmphasizedText text={activeTab.summary} phrases={activeTab.summaryEmphasis} /></p>
+                  </div>
+                </section>
+              ) : null}
+
+              {activeTab.fullResultsUrl ? (
+                <a className="detail-mcp-results-link" href={activeTab.fullResultsUrl} target="_blank" rel="noopener noreferrer">
+                  전체 실험 결과 · 측정 조건 · Raw Data 보기 ↗
+                </a>
+              ) : null}
+            </div>
+          </article>
         </div>
       </div>
     </DetailSection>

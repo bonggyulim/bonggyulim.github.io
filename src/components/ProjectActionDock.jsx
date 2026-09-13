@@ -35,12 +35,14 @@ function ExternalLinkIcon() {
 }
 
 export default function ProjectActionDock({ project }) {
-  const actions = actionDefinitions
-    .map((definition) => ({
-      ...definition,
-      href: project[definition.urlKey]
-    }))
-    .filter((action) => action.href);
+  const actions = project.actionItems?.length
+    ? project.actionItems
+    : actionDefinitions
+      .map((definition) => ({
+        ...definition,
+        href: project[definition.urlKey]
+      }))
+      .filter((action) => action.href);
 
   if (actions.length === 0) {
     return null;
@@ -52,18 +54,23 @@ export default function ProjectActionDock({ project }) {
       style={{ "--action-count": actions.length }}
       aria-label={`${project.title} 프로젝트 링크`}
     >
-      {actions.map((action) => (
+      {actions.map((action) => action.href ? (
         <a
           key={action.key}
           className="project-action-link"
           href={action.href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={action.ariaLabel(project.title)}
+          aria-label={action.ariaLabel?.(project.title) ?? `${project.title} ${action.label} 열기`}
         >
           <span>{action.label}</span>
           <ExternalLinkIcon />
         </a>
+      ) : (
+        <span key={action.key} className="project-action-link is-static">
+          <span>{action.label}</span>
+          <ExternalLinkIcon />
+        </span>
       ))}
     </nav>
   );

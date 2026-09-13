@@ -3,6 +3,8 @@ import ProjectActionDock from "../components/ProjectActionDock";
 import {
   ArchitectureOverviewSection,
   ContributionSummarySection,
+  EngineeringDecisionsSection,
+  UseCaseCarouselSection,
   ProjectDetailHero,
   TroubleshootingSection
 } from "../components/project-detail/DetailSections";
@@ -38,6 +40,14 @@ function renderSection(section) {
 
   if (section.type === "problem_solution") {
     return <TroubleshootingSection key={section.id} {...commonProps} />;
+  }
+
+  if (section.type === "use_case_carousel") {
+    return <UseCaseCarouselSection key={section.id} {...commonProps} />;
+  }
+
+  if (section.type === "mcp_engineering_decisions") {
+    return <EngineeringDecisionsSection key={section.id} {...commonProps} />;
   }
 
   return null;
