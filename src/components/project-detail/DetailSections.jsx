@@ -1480,16 +1480,60 @@ export function EngineeringDecisionsSection({ id, section }) {
                       ) : null}
                     </div>
                   ) : null}
-                  <div className="detail-mcp-metric-grid">
-                    {activeTab.metrics.map(([label, before, after, note]) => (
-                      <div className="detail-mcp-metric" key={label}>
-                        <strong>{label}</strong>
-                        <div className="detail-mcp-metric-values">
-                          <span>{before} <i aria-hidden="true">→</i> {after}</span>
-                          {note ? <small>{note}</small> : null}
+                  <div className={`detail-mcp-metrics-layout ${activeTab.metricsWorkflow ? "has-workflow" : ""} ${activeTab.metricsResult ? "has-result" : ""}`.trim()}>
+                    <div className="detail-mcp-metric-set">
+                      {activeTab.metricsGridLabel ? (
+                        <div className="detail-mcp-panel-heading">
+                          <strong className="detail-mcp-panel-title">{activeTab.metricsGridLabel}</strong>
                         </div>
+                      ) : null}
+                      <div className={`detail-mcp-metric-grid ${activeTab.metrics.length === 3 ? "is-three" : ""} ${activeTab.metricsWorkflow ? "is-stacked" : ""}`.trim()}>
+                        {activeTab.metrics.map(([label, before, after, note]) => (
+                          <div className="detail-mcp-metric" key={label}>
+                            <strong className="detail-mcp-panel-item-title">{label}</strong>
+                            <div className={`detail-mcp-metric-values ${after ? "" : "is-detail"}`.trim()}>
+                              {before ? <span>{before}{after ? <><i aria-hidden="true"> → </i>{after}</> : null}</span> : null}
+                              {note ? <small>{note}</small> : null}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                    {activeTab.metricsWorkflow ? (
+                      <>
+                        <i className="detail-mcp-metrics-flow-arrow" aria-hidden="true">→</i>
+                        <section className="detail-mcp-improvement-workflow">
+                          <div className="detail-mcp-panel-heading">
+                            <strong className="detail-mcp-panel-title">{activeTab.metricsWorkflow.title}</strong>
+                          </div>
+                          <div className="detail-mcp-improvement-workflow-steps">
+                            {activeTab.metricsWorkflow.steps.map((step) => <span key={step}>{step}</span>)}
+                          </div>
+                          <p>
+                            <EmphasizedText text={activeTab.metricsWorkflow.description} phrases={activeTab.metricsWorkflow.descriptionHighlights} />
+                          </p>
+                        </section>
+                        {activeTab.metricsResult ? (
+                          <>
+                            <i className="detail-mcp-metrics-flow-arrow" aria-hidden="true">→</i>
+                            <section className="detail-mcp-improvement-result">
+                              <div className="detail-mcp-panel-heading detail-mcp-improvement-result-head">
+                                <strong className="detail-mcp-panel-title">{activeTab.metricsResult.title}</strong>
+                                <span className="detail-mcp-panel-subtitle">{activeTab.metricsResult.subtitle}</span>
+                              </div>
+                              <div className="detail-mcp-improvement-result-list">
+                                {activeTab.metricsResult.items.map(([label, value]) => (
+                                  <div key={label}>
+                                    <strong className="detail-mcp-panel-item-title">{label}</strong>
+                                    <span>{value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </section>
+                          </>
+                        ) : null}
+                      </>
+                    ) : null}
                   </div>
                 </>
               ) : null}
@@ -1497,7 +1541,7 @@ export function EngineeringDecisionsSection({ id, section }) {
               {activeTab.summary ? (
                 <section className="detail-scaling-footer">
                   <div className="detail-scaling-footer-block">
-                    <strong>결과</strong>
+                    <strong>{activeTab.summaryLabel ?? "결과"}</strong>
                     <p><EmphasizedText text={activeTab.summary} phrases={activeTab.summaryEmphasis} /></p>
                   </div>
                 </section>

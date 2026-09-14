@@ -3761,6 +3761,146 @@ p.detail-scaling-metric-note {
   border-bottom: 1px solid var(--border);
 }
 
+.detail-mcp-metric-grid.is-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detail-mcp-metrics-layout.has-workflow {
+  display: grid;
+  grid-template-columns: minmax(0, 2.5fr) minmax(40px, 1fr) minmax(0, 3.5fr);
+  align-items: stretch;
+  gap: 12px;
+}
+
+.detail-mcp-metrics-layout.has-workflow.has-result {
+  grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr) 32px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.detail-mcp-metric-set {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.detail-mcp-metric-grid.is-stacked {
+  grid-template-columns: 1fr;
+}
+
+.detail-mcp-metric-grid.is-stacked .detail-mcp-metric + .detail-mcp-metric {
+  border-top: 1px solid var(--border);
+  border-left: 0;
+}
+
+.detail-mcp-metrics-flow-arrow {
+  display: grid;
+  align-self: stretch;
+  place-items: center;
+  color: #0f766e;
+  font-size: 28px;
+  font-style: normal;
+  line-height: 1;
+}
+
+.detail-mcp-improvement-workflow {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.detail-mcp-panel-heading {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-height: 36px;
+}
+
+.detail-mcp-panel-title {
+  color: var(--text);
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-bold);
+  line-height: 1.45;
+}
+
+.detail-mcp-panel-subtitle {
+  color: var(--ps-color-soft);
+  font-size: var(--ps-fs-small);
+  font-weight: var(--ps-fw-regular);
+  line-height: 1.45;
+}
+
+.detail-mcp-improvement-workflow-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-mcp-improvement-workflow-steps span {
+  color: #0f766e;
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-bold);
+  line-height: 1.5;
+}
+
+.detail-mcp-improvement-workflow-steps span::before {
+  content: "-";
+  margin-right: 8px;
+  color: var(--ps-color-text);
+}
+
+.detail-mcp-improvement-workflow p {
+  margin: 0;
+  color: var(--ps-color-text);
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-regular);
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.detail-mcp-improvement-result {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.detail-mcp-improvement-result-head {
+  min-height: 36px;
+}
+
+.detail-mcp-improvement-result-list {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-mcp-improvement-result-list > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.detail-mcp-improvement-result-list > div + div {
+  border-top: 1px solid var(--border);
+}
+
+.detail-mcp-improvement-result-list strong {
+  color: var(--text);
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-bold);
+  line-height: 1.45;
+}
+
+.detail-mcp-improvement-result-list span {
+  color: #0f766e;
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-bold);
+  line-height: 1.55;
+}
+
 .detail-mcp-metric {
   display: grid;
   gap: 4px;
@@ -3773,6 +3913,13 @@ p.detail-scaling-metric-note {
 }
 
 .detail-mcp-metric strong {
+  color: var(--text);
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-bold);
+  line-height: 1.45;
+}
+
+.detail-mcp-panel-item-title {
   color: var(--text);
   font-size: var(--ps-fs-body);
   font-weight: var(--ps-fw-bold);
@@ -3792,6 +3939,31 @@ p.detail-scaling-metric-note {
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+}
+
+.detail-mcp-metric-values.is-detail {
+  display: grid;
+  align-items: start;
+  gap: 4px;
+}
+
+.detail-mcp-metric-values.is-detail small {
+  color: var(--ps-color-text);
+  font-size: var(--ps-fs-body);
+  font-weight: var(--ps-fw-regular);
+  line-height: 1.55;
+  white-space: normal;
+}
+
+@media (max-width: 720px) {
+  .detail-mcp-metrics-layout.has-workflow {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-mcp-metrics-flow-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
 }
 
 .detail-mcp-metric small {

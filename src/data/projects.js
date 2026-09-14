@@ -658,16 +658,16 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             id: "local-llm-quality",
             title: "Local LLM 품질 검증",
             problem:
-              "9B급 Local LLM으로 복합 요청을 안정적으로 처리하기 위해 판단을 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리했지만, Node 간 의미 손실·불필요한 Tool 선택·검색 조건 오류가 발생했습니다.",
-            problemHighlights: ["요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리"],
+              "9B급 Local LLM으로 복합 요청을 안정적으로 처리하기 위해 판단을 요청 이해·도구 선택·검색·분석·계획·검토의 6개 역할로 분리했습니다.\n그러나 단계를 세분화하면서 참고할 정보와 실행 대상을 혼동하거나, 불필요한 Tool을 선택하고, 검색 조건을 잘못 조합하는 판단 오류가 발생했습니다.",
+            problemHighlights: ["요청 이해·도구 선택·검색·분석·계획·검토의 6개 역할", "참고할 정보와 실행 대상을 혼동하거나, 불필요한 Tool을 선택하고, 검색 조건을 잘못 조합하는 판단 오류"],
             decisionLabel: "개선 방향",
             decision:
-              "LangSmith Trace의 최초 오류 지점을 기준으로 원인을 구분하고, 예외 규칙을 누적하기보다 Prompt·State·Schema·Validator·모델 설정의 책임 계층을 나눠 수정했습니다.",
-            decisionHighlights: ["최초 오류 지점", "Prompt·State·Schema·Validator·모델 설정"],
+              "LangSmith Trace에서 최초로 잘못 판단한 Node를 기준으로 원인을 구분하고, 모든 오류를 Prompt 예외 규칙으로 추가하지 않고 원인에 따라 수정 위치를 분리했습니다.\nPrompt·State·Schema·Validator·Model Setting의 책임을 나누어 수정하고 있습니다.",
+            decisionHighlights: ["최초로 잘못 판단한 Node", "원인에 따라 수정 위치를 분리", "Prompt·State·Schema·Validator·Model Setting"],
             smokeTest: "6 / 6 PASS",
-            validationTitle: "01. 대표 검증 시나리오",
-            validationDescription: "주요 실패 유형을 대표하는 6개 E2E 시나리오를 실제 Production 경로에서 검증했고, 재실행 없이 6/6 PASS를 확인했습니다.",
-            validationDescriptionHighlights: ["6개 E2E 시나리오를 실제 Production 경로에서 검증", "6/6 PASS"],
+            validationTitle: "01. Production E2E Smoke Test",
+            validationDescription: "주요 실패 유형을 대표하는 6개 E2E 시나리오를 실제 Production 경로에서 검증해, 재실행 없이 6 / 6 PASS를 확인했습니다.",
+            validationDescriptionHighlights: ["6개 E2E 시나리오를 실제 Production 경로에서 검증", "6 / 6 PASS"],
             validationScenarios: [
               { name: "대상 없는 일정", topic: "불명확한 참조 처리", criteria: "임의 추측·READ 없이 사용자 확인 후 동일 흐름 재개", highlights: ["사용자 확인 후 동일 흐름 재개"], traceUrl: "https://smith.langchain.com/public/9cf45b88-665d-4979-ab8a-7e513ae45aa5/r/01a09ce9-538d-75d2-93bd-f94225bad11b?start_time=2026-09-13T22%3A35%3A32.108278Z" },
               { name: "선택 리소스", topic: "선택 Context 전달", criteria: "선택 Resource를 State에 유지해 대상 혼동 없이 정확히 응답", highlights: ["대상 혼동 없이 정확히 응답"], traceUrl: "https://smith.langchain.com/public/0ca002ce-bcaa-48ab-8667-e64c5cdf7f9f/r/01a09cea-39e2-7082-b3f2-045e306860a7?start_time=2026-09-13T22%3A36%3A31.073512Z" },
@@ -676,16 +676,34 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
               { name: "복합 Retrieval", topic: "검색 계획 수정·재시도", criteria: "검증 실패 시 검색 계획을 수정해 최종 근거까지 도달", highlights: ["최종 근거까지 도달"], traceUrl: "https://smith.langchain.com/public/c187e6b8-a929-4771-a541-7e892b531995/r/01a09ced-a734-77c2-bd7b-adbace131eec?start_time=2026-09-13T22%3A40%3A15.665318Z" },
               { name: "기존 초안 수정", topic: "기존 Resource 보존형 UPDATE", criteria: "원문·발송 금지 조건을 유지하고 지정 내용만 수정", highlights: ["지정 내용만 수정"], traceUrl: "https://smith.langchain.com/public/9d2c62b8-d996-4e2e-9cd6-57fcb11d1b67/r/01a09cef-5eae-7fa1-90ea-6ec6e5077568?start_time=2026-09-13T22%3A42%3A08.172472Z" }
             ],
-            metricsTitle: "02. 테스트 결과",
-            metricsDescription: "E2E Smoke 6/6 PASS 이후 Validation 60 · Stress 20 · Holdout 12, 총 92건으로 평가를 확장했습니다.\n80건은 실패 분석·수정에 사용하고, Holdout 12건은 수정 없이 별도 평가해 새로운 요청에 대한 대응을 확인했습니다.",
+            metricsTitle: "02. 품질 평가셋 구성 및 반복 개선",
+            metricsDescription: "Smoke Test 통과 후 대표 시나리오만으로는 전체 판단 품질을 확인하기 어렵다고 보고, 총 92개 시나리오를 Validation·Stress·Holdout으로 분리해 평가 범위를 확장했습니다.",
+            metricsDescriptionHighlights: ["총 92개 시나리오를 Validation·Stress·Holdout으로 분리해 평가 범위를 확장"],
+            metricsGridLabel: "평가셋 구성",
             metrics: [
-              ["Validation", "XX/60", "XX/60", "XX%p 개선"],
-              ["Holdout", "XX/12", "XX/12", "XX%p 개선"],
-              ["Stress", "XX/20", "XX/20", "XX%p 개선"],
-              ["Total", "XX.X%", "XX.X%", "XX%p 개선"]
+              ["Validation · 60 Cases", null, null, "주요 기능과 일반적인 복합 요청의 판단 정확성 검증"],
+              ["Stress · 20 Cases", null, null, "경계 조건·복합 조건에서의 판단 안정성 검증"],
+              ["Holdout · 12 Cases", null, null, "수정 과정에 노출하지 않은 요청의 일반화 성능 검증"]
             ],
+            metricsWorkflow: {
+              title: "개선 방식",
+              steps: ["LangSmith Trace에서 최초 오판 Node 추적", "원인별 책임 계층 수정", "Validation·Stress 재평가", "Holdout 일반화 검증"],
+              description: "실패 원인을 Prompt · State · Schema · Validator · Model Setting 중 해당 책임 계층에 매핑해 수정하고, 동일 평가셋으로 개선 효과와 Regression을 반복 확인하고 있습니다.",
+              descriptionHighlights: ["Prompt · State · Schema · Validator · Model Setting", "개선 효과와 Regression을 반복 확인"]
+            },
+            metricsResult: {
+              title: "개선 결과",
+              subtitle: "Baseline 기준 → 최종",
+              items: [
+                ["Validation · 60 Cases", "07/60 → 07/60"],
+                ["Stress · 20 Cases", "00/20 → 00/20"],
+                ["Holdout · 12 Cases", "02/12 → 02/12"]
+              ]
+            },
+            summaryLabel: "최종 검증 예정",
             summary:
-              "최초 오류 지점에 따라 Prompt·State·Schema·Validator·모델 설정의 책임을 나눠 수정해, 9B급 Local LLM의 역할별 판단 구조와 복합 요청 처리 안정성을 개선했습니다.",
+              "동일한 92개 평가셋을 기준으로 수정 전·후의 전체 Pass Rate·Holdout 성능·Regression 여부를 비교하고 있으며, 품질 안정화 후 최종 개선 수치를 반영할 예정입니다.",
+            summaryEmphasis: ["전체 Pass Rate·Holdout 성능·Regression 여부", "최종 개선 수치"],
           },
           {
             id: "provider-api-performance",
