@@ -158,6 +158,48 @@ function EmphasizedText({ text, phrases = [], emphasisClasses = {} }) {
   );
 }
 
+function ComparisonSection({ tab }) {
+  if (!tab.comparisonRows?.length) {
+    return null;
+  }
+
+  return (
+    <section className="detail-mcp-comparison">
+      <h4>{tab.comparisonTitle ?? "실험 결과"}</h4>
+      <div className="detail-mcp-comparison-scroll">
+        <table>
+          <thead>
+            <tr>
+              {(tab.comparisonHeaders ?? ["구성", "HTTP 요청", "Node Latency", "목록 표시", "Error", "비고"]).map((header) => <th key={header}>{header}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {tab.comparisonRows.map((row) => {
+              const status = tab.comparisonStatuses?.[row[0]];
+
+              return (
+                <tr key={row[0]} className={status === "Selected" ? "is-selected" : ""}>
+                  {row.map((value, index) => (
+                    <td key={`${row[0]}-${index}`}>
+                      {value}
+                      {index === 0 && status ? <span className={`detail-mcp-comparison-status is-${status.toLowerCase()}`}>{status}</span> : null}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {tab.comparisonDescription ? (
+        <p className="detail-mcp-comparison-description">
+          <EmphasizedText text={tab.comparisonDescription} phrases={tab.comparisonDescriptionHighlights} />
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
 function DetailSection({ id, className = "", type, title, eyebrow, description, hideEyebrow = false, children }) {
   if (!children) {
     return null;
@@ -656,7 +698,6 @@ function ThermalExperimentCard({ card }) {
                   );
                 })}
               </div>
-              <p className="detail-thermal-class-transition"><strong>원천 8-Class</strong><span> → </span><strong className="is-teal">서비스 기준 3-Class</strong></p>
             </div>
           </div>
         </section>
@@ -959,8 +1000,8 @@ function SqsTroubleshootingCard() {
   return (
     <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
       <ContextRow leftLabel="문제" rightLabel="핵심 판단">
-        <p><EmphasizedText text="연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있음" phrases={["중복 Job", "메시지 재전달", "분석 결과와 Job 완료 상태"]} /></p>
-        <p><EmphasizedText text="생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 단일 DB 트랜잭션으로 중복 실행과 상태 불일치를 단계별로 제어" phrases={["DB 제약", "조건부 상태 갱신", "단일 DB 트랜잭션"]} /></p>
+        <p><EmphasizedText text="연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있었습니다." phrases={["중복 Job이 생성될 수 있고", "분석 결과와 Job 완료 상태가 서로 어긋날 수 있었습니다."]} /></p>
+        <p><EmphasizedText text="생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 단일 DB 트랜잭션으로 나눠 중복 실행과 상태 불일치를 단계별로 제어하도록 설계했습니다." phrases={["DB 제약", "조건부 상태 갱신", "단일 DB 트랜잭션"]} /></p>
       </ContextRow>
 
       <div className="detail-sqs-visual-grid">
@@ -1391,8 +1432,8 @@ export function EngineeringDecisionsSection({ id, section }) {
                           ) : null}
                         </div>
                         <div className="detail-mcp-validation-purpose">
-                          <span>검증 목적</span>
-                          <code>{scenario.topic}</code>
+                          <span className="detail-mcp-validation-label">검증 목적</span>
+                          <span className="detail-mcp-validation-topic">{scenario.topic}</span>
                         </div>
                           <p>
                             <span className="detail-mcp-validation-field">정상 기준</span>
@@ -1415,44 +1456,7 @@ export function EngineeringDecisionsSection({ id, section }) {
                 </div>
               ) : null}
 
-              {activeTab.comparisonRows?.length ? (
-                <section className="detail-mcp-comparison">
-                  <h4>{activeTab.comparisonTitle ?? "실험 결과"}</h4>
-                  <div className="detail-mcp-comparison-scroll">
-                    <table>
-                      <thead>
-                        <tr>
-                          {(activeTab.comparisonHeaders ?? ["구성", "HTTP 요청", "Node Latency", "목록 표시", "Error", "비고"]).map((header) => <th key={header}>{header}</th>)}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {activeTab.comparisonRows.map((row) => (
-                          <tr key={row[0]} className={row.includes("Selected") ? "is-selected" : ""}>
-                            {row.map((value, index) => <td key={`${row[0]}-${index}`}>{value}</td>)}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
-              ) : null}
-
-              {activeTab.productionVerification ? (
-                <section className="detail-mcp-comparison detail-mcp-production-verification">
-                  <h4>{activeTab.productionVerification.title}</h4>
-                  <div className="detail-mcp-production-metric-grid">
-                    {activeTab.productionVerification.metrics.map(([label, value, note]) => (
-                      <div className="detail-mcp-production-metric" key={label}>
-                        <strong>{label}</strong>
-                        <div>
-                          <span>{value}</span>
-                          {note ? <small>{note}</small> : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
+              <ComparisonSection tab={activeTab} />
 
               {activeTab.finalDecision ? (
                 <section className="detail-mcp-final-decision">

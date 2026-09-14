@@ -353,10 +353,10 @@ export const projects = [
           id: "sqs-job-state-consistency",
           title: "SQS 비동기 분석의 멱등성과 상태 정합성",
           problem:
-            "연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있음",
-          problemEmphasis: ["중복 Job", "메시지 재전달", "분석 결과와 Job 완료 상태"],
+            "연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있었습니다.",
+          problemEmphasis: ["중복 Job이 생성될 수 있고", "분석 결과와 Job 완료 상태가 서로 어긋날 수 있었습니다."],
           solution:
-            "생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 단일 DB 트랜잭션으로 중복 실행과 상태 불일치를 단계별로 제어",
+            "생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 단일 DB 트랜잭션으로 나눠 중복 실행과 상태 불일치를 단계별로 제어하도록 설계했습니다.",
           solutionEmphasis: [
             "DB 제약",
             "조건부 상태 갱신",
@@ -407,9 +407,9 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             id: "worker-scaling-strategy",
             kind: "worker_scaling",
             title: "CPU 추론 Worker의 적정 확장 단위 검증",
-            basis: "월 약 $107의 MVP 운영 예산을 기준으로 EC2 t3.large 1대·CPU Worker 1개를 Baseline으로 설정",
-            scalingNeed: "CPU 기반 추론에서 동일 Node의 Worker 증설과 Node 수평 확장 중 어떤 방식이 처리 시간 개선에 유리한지 비교",
-            comparisonNote: "RGB·Thermal 각 100 Job을 동일 조건으로 처리해 Worker 수와 Node 배치에 따른 처리 시간·CPU 사용률 비교",
+            basis: "월 약 $107의 MVP 운영 예산을 기준으로 EC2 t3.large 1대·CPU Worker 1개를 Baseline으로 설정했습니다.",
+            scalingNeed: "CPU 기반 추론에서 동일 Node의 Worker 증설과 Node 수평 확장 중 어떤 방식이 처리 시간 개선에 유리한지 비교했습니다.",
+            comparisonNote: "RGB·Thermal 각 100 Job을 동일 조건으로 처리하고, Worker 수와 Node 배치에 따른 처리 시간·CPU 사용률을 비교했습니다.",
             budgetDescription: "AWS Pricing Calculator로 단일 EC2 기반 MVP 운영환경의 월 비용을 산정",
             costRows: [
               ["EC2 + EBS", "t3.large / gp3 100GB", "$85.04"],
@@ -567,34 +567,34 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             title: "Agent 워크플로우 설계",
             items: [
               {
-                text: "9B Local LLM의 판단 부담을 줄이기 위해 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리",
-                highlights: ["9B Local LLM의 판단 부담을 줄이기 위해", "6개 역할로 분리"]
+                text: "9B Local LLM의 판단 부담을 줄이기 위해 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 책임 분리",
+                highlights: ["9B Local LLM", "6개 역할로 책임 분리"]
               },
               {
                 text: "Agent 결과를 Typed State에 반영하고 Supervisor가 다음 단계·완료 여부를 재판단",
                 highlights: ["Typed State", "Supervisor가 다음 단계·완료 여부를 재판단"]
               },
               {
-                text: "외부 조회·사용자 응답에 따라 재분기하도록 State 기반 순환형 흐름 구성",
-                highlights: ["State 기반 순환형 흐름"]
+                text: "외부 조회·사용자 응답에 따라 재분기할 수 있도록 DAG가 아닌 State 기반 순환형 흐름으로 구성",
+                highlights: ["DAG가 아닌 State 기반 순환형 흐름"]
               }
             ]
           },
           {
             id: "agent-runtime-safety",
-            title: "사용자 통제·실행 안전성",
+            title: "WRITE 실행 제어·검증 설계",
             items: [
               {
-                text: "대상이 불명확하면 임의 실행하지 않고 사용자 확인 후 State 반영·재분기",
-                highlights: ["사용자 확인 후 State 반영·재분기"]
+                text: "대상이 불명확하면 임의 실행하지 않고 사용자 확인 결과를 State에 반영해 재분기",
+                highlights: ["사용자 확인 결과를 State에 반영해 재분기"]
               },
               {
-                text: "LLM은 실행을 제안하고, WRITE는 Policy·Schema·Validator·사용자 승인 통과 후 수행",
-                highlights: ["Policy·Schema·Validator·사용자 승인 통과 후 수행"]
+                text: "LLM 판단과 실제 WRITE 실행 권한을 분리하고, Policy·Schema·Validator·사용자 승인 통과 시만 수행",
+                highlights: ["LLM 판단과 실제 WRITE 실행 권한을 분리", "Policy·Schema·Validator·사용자 승인 통과 시만 수행"]
               },
               {
-                text: "WRITE 후 재조회·검증, 실패 시 Recovery 결과를 State에 반영해 재판단",
-                highlights: ["재조회·검증"]
+                text: "WRITE 후 외부 상태를 재조회·검증하고, 실패 시 Recovery 결과를 State에 반영해 재판단",
+                highlights: ["외부 상태를 재조회·검증", "Recovery 결과를 State에 반영해 재판단"]
               }
             ]
           }
@@ -691,32 +691,27 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             id: "provider-api-performance",
             title: "Provider API 조회 성능 개선",
             problem:
-              "Gmail 최근 20건 목록 조회가 느리게 체감됐습니다. 조회 경로에서 List 1회 + Detail 20회, 총 21개의 Physical HTTP 요청을 확인했습니다.",
-            problemHighlights: ["Gmail 최근 20건 목록 조회", "List 1회 + Detail 20회", "총 21개의 Physical HTTP 요청"],
+              "Gmail 최근 20건 목록 조회가 느리게 체감돼 조회 경로를 확인했습니다.\n목록 응답만으로 필요한 Metadata를 구성할 수 없어 Thread별 Detail 조회가 추가됐고, List 1회 + Detail 20회로 HTTP 요청이 21회 발생했습니다.",
+            problemHighlights: ["List 1회 + Detail 20회로 HTTP 요청이 21회 발생"],
             decisionLabel: "실험 설계",
             decision:
-              "Batch Size × Worker 10개 후보를 각 100회 비교하고, 선정한 Candidate를 실제 Production READ Node에서 A/B 재검증했습니다.",
-            decisionHighlights: ["Batch Size × Worker 10개 후보를 각 100회", "Production READ Node에서 A/B 재검증"],
-            comparisonTitle: "01. Provider Candidate 탐색",
-            comparisonHeaders: ["구성", "Physical HTTP", "Provider p95", "Error", "비고"],
+              "이를 개선하기 위해 Gmail API 권장 Batch 범위에서 Batch Size × Worker 10개 조합을 비교했습니다.\n먼저 조회 결과 정합성과 오류 안정성을 확인하고, 이후 p95·HTTP 요청 수·CPU·구현 단순성을 기준으로 후보를 비교했습니다.",
+            decisionHighlights: ["Gmail API 권장 Batch 범위에서 Batch Size × Worker 10개 조합을 비교", "p95·HTTP 요청 수·CPU·구현 단순성"],
+            comparisonTitle: "Provider 후보 비교",
+            comparisonHeaders: ["구성", "HTTP 요청", "Provider p95", "Provider CPU", "Error"],
             comparisonRows: [
-              ["Individual / 3W", "21", "XXms", "XX%", "Baseline"],
-              ["Batch 5 / 2W", "XX", "XXms", "XX%", ""],
-              ["Batch 10 / 2W", "XX", "XXms", "XX%", ""],
-              ["Batch XX / XXW", "XX", "XXms", "XX%", "Selected"]
+              ["Individual / 3W", "21", "5.71s", "149.4ms/job", "0%"],
+              ["Individual / 10W", "21", "2.90s", "143.6ms/job", "0%"],
+              ["Batch 5 / 4W", "5", "2.01s", "56.0ms/job", "0%"],
+              ["Batch 20 / 1W", "2", "2.00s", "33.1ms/job", "0%"]
             ],
-            productionVerification: {
-              title: "02. Production Node 검증",
-              metrics: [
-                ["Node p95", "XX → XXms", "(-XX%)"],
-                ["Physical HTTP", "21 → XX"],
-                ["Error", "XX%"],
-                ["결과 정합성", "PASS"]
-              ]
-            },
+            comparisonStatuses: { "Individual / 3W": "Baseline", "Batch 20 / 1W": "Selected" },
+            comparisonDescription:
+              "Worker 증설은 p95를 줄였지만 HTTP 요청 수와 CPU 사용량은 거의 유지됐습니다.\nBatch 적용 시 두 지표가 함께 감소했고, B20W1은 B5W4와 비슷한 p95에서 HTTP 요청 수와 CPU 사용량이 가장 낮았습니다.",
+            comparisonDescriptionHighlights: ["HTTP 요청 수와 CPU 사용량은 거의 유지", "B20W1은 B5W4와 비슷한 p95에서 HTTP 요청 수와 CPU 사용량이 가장 낮았습니다."],
             summary:
-              "Batch XX / Worker XX를 최종 구성으로 선정했습니다. Provider p95와 실제 Production Node p95 모두 개선됐으며, 동일 20건의 조회 결과 정합성을 유지했습니다.",
-            summaryEmphasis: ["Batch XX / Worker XX", "Provider p95", "Production Node p95", "동일 20건의 조회 결과 정합성"],
+              "선정한 B20W1은 Provider 수준에서 끝내지 않고 Production READ Node와 Local API에서 다시 검증했습니다.\n동일한 조회 결과와 Metadata 정합성을 유지하면서 HTTP 요청 21회 -> 2회, Production READ Node p95 63.2% 단축, Local API p95 68.0% 단축을 확인했습니다. Error·Timeout·429는 발생하지 않았습니다.",
+            summaryEmphasis: ["Production READ Node와 Local API에서 다시 검증", "HTTP 요청 21회 -> 2회, Production READ Node p95 63.2% 단축, Local API p95 68.0% 단축"],
             fullResultsLabel: "전체 실험 결과 · 측정 조건 · Raw Data 보기 ↗"
           }
         ]

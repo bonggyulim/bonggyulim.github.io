@@ -24,7 +24,7 @@
   --ps-fs-small: 11px;   /* 작은 글씨: 카드 내부 설명·세부 근거 */
   --ps-fs-tiny: 10px;    /* 보조 글씨: 축 숫자·단위·phase tag 등 */
   --ps-fw-regular: 400;
-  --ps-fw-bold: 700;
+  --ps-fw-bold: 600;
   --ps-color-text: var(--text);       /* Dark: 제목·본문·결과 */
   --ps-color-soft: var(--text-soft);  /* Muted: 세부 설명·단위·주석 */
   --ps-color-accent: #0f766e;         /* Green: 상단 Context Label 전용 */
@@ -3000,10 +3000,6 @@ img {
   opacity: 0.7;
 }
 
-.detail-thermal-class-transition .is-teal {
-  color: var(--ps-color-text);
-}
-
 .detail-scaling-flow {
   display: flex;
   flex: 1;
@@ -3557,49 +3553,38 @@ p.detail-scaling-metric-note {
   border-bottom: 0;
 }
 
-.detail-mcp-production-verification {
-  gap: 8px;
-}
-
-.detail-mcp-production-metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.detail-mcp-production-metric {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-  padding: 12px 14px;
-}
-
-.detail-mcp-production-metric + .detail-mcp-production-metric {
-  border-left: 1px solid var(--border);
-}
-
-.detail-mcp-production-metric strong {
-  color: var(--text);
-  font-size: var(--ps-fs-body);
+.detail-mcp-comparison-status {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: rgba(51, 84, 107, 0.1);
+  color: #33546b;
+  font-size: var(--ps-fs-tiny);
   font-weight: var(--ps-fw-bold);
-  line-height: 1.45;
+  line-height: 1.2;
+  vertical-align: middle;
 }
 
-.detail-mcp-production-metric > div {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  min-width: 0;
-}
-
-.detail-mcp-production-metric span,
-.detail-mcp-production-metric small {
+.detail-mcp-comparison-status.is-selected {
+  background: rgba(15, 118, 110, 0.1);
   color: #0f766e;
-  font-size: var(--ps-fs-body);
-  font-weight: var(--ps-fw-bold);
-  line-height: 1.45;
-  white-space: nowrap;
+}
+
+.detail-mcp-comparison-description {
+  margin: 0;
+  color: var(--ps-color-text) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+.detail-mcp-comparison-description .detail-problem-emphasis {
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
 
 .detail-mcp-validation-head {
@@ -3677,10 +3662,10 @@ p.detail-scaling-metric-note {
   margin-top: 6px;
 }
 
-.detail-mcp-validation-purpose > span,
+.detail-mcp-validation-label,
 .detail-mcp-validation-field {
   color: var(--text-soft);
-  font-size: var(--ps-fs-tiny);
+  font-size: var(--ps-fs-small);
   font-weight: var(--ps-fw-bold);
 }
 
@@ -3688,15 +3673,11 @@ p.detail-scaling-metric-note {
   margin-right: 6px;
 }
 
-.detail-mcp-validation-card code {
-  padding: 2px 4px;
-  border-radius: 3px;
-  background: rgba(15, 118, 110, 0.07);
-  color: var(--primary-strong);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: var(--ps-fs-tiny);
-  font-weight: var(--ps-fw-bold);
-  white-space: nowrap;
+.detail-mcp-validation-topic {
+  color: var(--ps-color-text);
+  font-size: var(--ps-fs-small);
+  font-weight: var(--ps-fw-regular);
+  line-height: 1.45;
 }
 
 .detail-mcp-validation-trace-link {
@@ -3839,10 +3820,36 @@ p.detail-scaling-metric-note {
   text-decoration: none;
 }
 
+.detail-mcp-decision-card .detail-context-col p,
+.detail-mcp-decision-card .detail-scaling-footer-block p {
+  white-space: pre-line;
+}
+
+.detail-context-col p,
+.detail-problem-flow-description,
+.detail-problem-outcome p,
+.detail-worker-section > p,
+.detail-worker-decision p,
+.detail-worker-summary,
+.detail-sqs-result p,
+.detail-thermal-section > p,
+.detail-thermal-merge-col > p,
+.detail-thermal-gain-grid p,
+.detail-scaling-footer-block p,
+.detail-mcp-comparison-description,
+.detail-mcp-validation-title-block p,
+.detail-mcp-metrics-head p {
+  color: var(--ps-color-text);
+  font-weight: var(--ps-fw-regular);
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
 @media (max-width: 960px) {
   .detail-mcp-validation-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
 }
 
 @media (max-width: 720px) {
@@ -3871,19 +3878,6 @@ p.detail-scaling-metric-note {
 
   .detail-mcp-validation-cards {
     grid-template-columns: 1fr;
-  }
-
-  .detail-mcp-production-metric-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .detail-mcp-production-metric:nth-child(3) {
-    border-top: 1px solid var(--border);
-    border-left: 0;
-  }
-
-  .detail-mcp-production-metric:nth-child(4) {
-    border-top: 1px solid var(--border);
   }
 
 }
@@ -3966,20 +3960,6 @@ p.detail-thermal-bar-result {
   color: var(--ps-color-text);
   font-size: var(--ps-fs-tiny);
   font-weight: var(--ps-fw-bold);
-}
-
-p.detail-thermal-class-transition {
-  margin: 10px 0 0;
-  color: var(--ps-color-text);
-  font-size: var(--ps-fs-small);
-  font-weight: var(--ps-fw-regular);
-  line-height: 1.7;
-  word-break: keep-all;
-}
-
-.detail-thermal-class-transition strong {
-  color: inherit;
-  font-weight: var(--ps-fw-regular);
 }
 
 .detail-thermal-class-grid > div {
