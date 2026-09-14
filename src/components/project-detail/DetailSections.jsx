@@ -411,12 +411,14 @@ function ContributionRoleRow({ card }) {
       <h3>{card.title}</h3>
       <ul>
         {(card.items ?? []).map((item, index) => {
+          const text = typeof item === "string" ? item : item.text;
+          const highlights = typeof item === "string" ? [] : item.highlights;
           const isEmphasized = card.emphasizeAll || index === card.emphasisIndex;
 
           return (
-          <li key={item} className={isEmphasized ? "is-emphasized" : ""}>
-            {isEmphasized ? <strong>{item}</strong> : item}
-          </li>
+            <li key={text} className={isEmphasized ? "is-emphasized" : ""}>
+              {isEmphasized ? <strong>{text}</strong> : <EmphasizedText text={text} phrases={highlights} />}
+            </li>
           );
         })}
       </ul>
@@ -1362,16 +1364,42 @@ export function EngineeringDecisionsSection({ id, section }) {
               {activeTab.validationScenarios?.length ? (
                 <section className="detail-mcp-comparison detail-mcp-validation">
                   <div className="detail-mcp-validation-head">
-                    <h4>{activeTab.validationTitle ?? "대표 검증 시나리오"}</h4>
+                    <div className="detail-mcp-validation-title-block">
+                      <h4>{activeTab.validationTitle ?? "대표 검증 시나리오"}</h4>
+                      {activeTab.validationDescription ? (
+                        <p>
+                          <EmphasizedText text={activeTab.validationDescription} phrases={activeTab.validationDescriptionHighlights} />
+                        </p>
+                      ) : null}
+                    </div>
                     {activeTab.smokeTest ? <span className="detail-mcp-smoke-badge">{activeTab.smokeTest}</span> : null}
                   </div>
                   <div className="detail-mcp-validation-cards">
                     {activeTab.validationScenarios.map((scenario) => (
                       <article className="detail-mcp-validation-card" key={scenario.name}>
-                        <strong>{scenario.name}</strong>
-                        <p><EmphasizedText text={scenario.criteria} phrases={scenario.highlights} /></p>
-                      </article>
-                    ))}
+                        <div className="detail-mcp-validation-card-head">
+                          <strong>{scenario.name}</strong>
+                          {scenario.traceUrl ? (
+                            <a
+                              className="detail-mcp-validation-trace-link"
+                              href={scenario.traceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              🔗 Trace 보기 ↗
+                            </a>
+                          ) : null}
+                        </div>
+                        <div className="detail-mcp-validation-purpose">
+                          <span>검증 목적</span>
+                          <code>{scenario.topic}</code>
+                        </div>
+                          <p>
+                            <span className="detail-mcp-validation-field">정상 기준</span>
+                            <EmphasizedText text={scenario.criteria} phrases={scenario.highlights} />
+                          </p>
+                        </article>
+                      ))}
                   </div>
                 </section>
               ) : null}
@@ -1389,27 +1417,39 @@ export function EngineeringDecisionsSection({ id, section }) {
 
               {activeTab.comparisonRows?.length ? (
                 <section className="detail-mcp-comparison">
-                  <h4>실험 결과</h4>
+                  <h4>{activeTab.comparisonTitle ?? "실험 결과"}</h4>
                   <div className="detail-mcp-comparison-scroll">
                     <table>
                       <thead>
                         <tr>
-                          <th>구성</th>
-                          <th>HTTP 요청</th>
-                          <th>Node Latency</th>
-                          <th>목록 표시</th>
-                          <th>Error</th>
-                          <th>비고</th>
+                          {(activeTab.comparisonHeaders ?? ["구성", "HTTP 요청", "Node Latency", "목록 표시", "Error", "비고"]).map((header) => <th key={header}>{header}</th>)}
                         </tr>
                       </thead>
                       <tbody>
                         {activeTab.comparisonRows.map((row) => (
-                          <tr key={row[0]} className={row[5] === "Selected" ? "is-selected" : ""}>
+                          <tr key={row[0]} className={row.includes("Selected") ? "is-selected" : ""}>
                             {row.map((value, index) => <td key={`${row[0]}-${index}`}>{value}</td>)}
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                </section>
+              ) : null}
+
+              {activeTab.productionVerification ? (
+                <section className="detail-mcp-comparison detail-mcp-production-verification">
+                  <h4>{activeTab.productionVerification.title}</h4>
+                  <div className="detail-mcp-production-metric-grid">
+                    {activeTab.productionVerification.metrics.map(([label, value, note]) => (
+                      <div className="detail-mcp-production-metric" key={label}>
+                        <strong>{label}</strong>
+                        <div>
+                          <span>{value}</span>
+                          {note ? <small>{note}</small> : null}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </section>
               ) : null}
@@ -1426,13 +1466,24 @@ export function EngineeringDecisionsSection({ id, section }) {
 
               {activeTab.metrics?.length ? (
                 <>
-                  {activeTab.metricsTitle ? <h4 className="detail-mcp-metrics-title">{activeTab.metricsTitle}</h4> : null}
+                  {activeTab.metricsTitle ? (
+                    <div className="detail-mcp-metrics-head">
+                      <h4 className="detail-mcp-metrics-title">{activeTab.metricsTitle}</h4>
+                      {activeTab.metricsDescription ? (
+                        <p>
+                          <EmphasizedText text={activeTab.metricsDescription} phrases={activeTab.metricsDescriptionHighlights} />
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                   <div className="detail-mcp-metric-grid">
                     {activeTab.metrics.map(([label, before, after, note]) => (
                       <div className="detail-mcp-metric" key={label}>
                         <strong>{label}</strong>
-                        <span>{before} <i aria-hidden="true">→</i> {after}</span>
-                        {note ? <small>{note}</small> : null}
+                        <div className="detail-mcp-metric-values">
+                          <span>{before} <i aria-hidden="true">→</i> {after}</span>
+                          {note ? <small>{note}</small> : null}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1452,6 +1503,8 @@ export function EngineeringDecisionsSection({ id, section }) {
                 <a className="detail-mcp-results-link" href={activeTab.fullResultsUrl} target="_blank" rel="noopener noreferrer">
                   전체 실험 결과 · 측정 조건 · Raw Data 보기 ↗
                 </a>
+              ) : activeTab.fullResultsLabel ? (
+                <span className="detail-mcp-results-link is-static">{activeTab.fullResultsLabel}</span>
               ) : null}
             </div>
           </article>

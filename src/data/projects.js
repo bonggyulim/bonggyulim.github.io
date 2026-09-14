@@ -565,23 +565,37 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
           {
             id: "agent-architecture-workflow",
             title: "Agent 워크플로우 설계",
-            emphasizeAll: true,
             items: [
-              "규칙 기반 Main Supervisor와 6개 역할 Agent 구조 설계",
-              "DAG가 아닌 State 기반 조건부 라우팅·순환형 흐름 구성",
-              "사용자 확인·승인·취소 기반 실행 흐름 설계",
-              "LLM 판단과 외부 시스템 변경 권한 분리"
+              {
+                text: "9B Local LLM의 판단 부담을 줄이기 위해 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리",
+                highlights: ["9B Local LLM의 판단 부담을 줄이기 위해", "6개 역할로 분리"]
+              },
+              {
+                text: "Agent 결과를 Typed State에 반영하고 Supervisor가 다음 단계·완료 여부를 재판단",
+                highlights: ["Typed State", "Supervisor가 다음 단계·완료 여부를 재판단"]
+              },
+              {
+                text: "외부 조회·사용자 응답에 따라 재분기하도록 State 기반 순환형 흐름 구성",
+                highlights: ["State 기반 순환형 흐름"]
+              }
             ]
           },
           {
             id: "agent-runtime-safety",
-            title: "Agent 구현·안정성 강화",
-            emphasizeAll: true,
+            title: "사용자 통제·실행 안전성",
             items: [
-              "Main Graph·6개 Subgraph의 상태 전이와 Control Node 구현",
-              "공통 MCP/Port 연동 구조와 Gmail·Tasks·Calendar READ / WRITE 구현",
-              "승인 -> 실행 -> 외부 상태 재조회·검증 구현",
-              "응답 유실·실행 중단 시 중복 WRITE 방지와 복구 흐름 구현"
+              {
+                text: "대상이 불명확하면 임의 실행하지 않고 사용자 확인 후 State 반영·재분기",
+                highlights: ["사용자 확인 후 State 반영·재분기"]
+              },
+              {
+                text: "LLM은 실행을 제안하고, WRITE는 Policy·Schema·Validator·사용자 승인 통과 후 수행",
+                highlights: ["Policy·Schema·Validator·사용자 승인 통과 후 수행"]
+              },
+              {
+                text: "WRITE 후 재조회·검증, 실패 시 Recovery 결과를 State에 반영해 재판단",
+                highlights: ["재조회·검증"]
+              }
             ]
           }
         ]
@@ -589,17 +603,12 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
       {
         id: "architecture",
         title: "시스템 아키텍처 & LangGraph 워크플로우",
-        eyebrow: "ARCHITECTURE & LANGGRAPH",
+        eyebrow: "LANGGRAPH",
         type: "architecture_overview",
         images: [
           {
             src: "/assets/projects/MCP-API-Work-Agent-acchitecture.png",
-            alt: "MCP·API 기반 업무 Agent 아키텍처 다이어그램",
-            label: "아키텍처"
-          },
-          {
-            src: "/assets/projects/LangGraph.svg",
-            alt: "LangGraph 판단·승인·실행 워크플로우 다이어그램",
+            alt: "MCP·API 기반 업무 Agent LangGraph 워크플로우 다이어그램",
             label: "LangGraph 워크플로우"
           }
         ],
@@ -649,49 +658,66 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             id: "local-llm-quality",
             title: "Local LLM 품질 검증",
             problem:
-              "9B급 Local LLM으로 복합 요청을 처리하기 위해 판단 단계를 역할별로 분리했지만, Node 간 정보 전달에서 의미가 달라지거나 불필요한 Tool 선택·검색 조건 조합 오류가 발생했습니다.",
+              "9B급 Local LLM으로 복합 요청을 안정적으로 처리하기 위해 판단을 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리했지만, Node 간 의미 손실·불필요한 Tool 선택·검색 조건 오류가 발생했습니다.",
+            problemHighlights: ["요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리"],
             decisionLabel: "개선 방향",
             decision:
-              "실패 Trace에서 최초 오류 지점을 확인하고 원인에 따라 Prompt·State·Schema·Validator·모델 설정을 구분해 수정했습니다.",
-            smokeTest: "E2E Smoke Test 6 / 6 PASS",
+              "LangSmith Trace의 최초 오류 지점을 기준으로 원인을 구분하고, 예외 규칙을 누적하기보다 Prompt·State·Schema·Validator·모델 설정의 책임 계층을 나눠 수정했습니다.",
+            decisionHighlights: ["최초 오류 지점", "Prompt·State·Schema·Validator·모델 설정"],
+            smokeTest: "6 / 6 PASS",
             validationTitle: "01. 대표 검증 시나리오",
+            validationDescription: "주요 실패 유형을 대표하는 6개 E2E 시나리오를 실제 Production 경로에서 검증했고, 재실행 없이 6/6 PASS를 확인했습니다.",
+            validationDescriptionHighlights: ["6개 E2E 시나리오를 실제 Production 경로에서 검증", "6/6 PASS"],
             validationScenarios: [
-              { name: "대상 없는 일정", criteria: "임의 추측·READ 없이 추가 확인 요청", highlights: ["추가 확인 요청"] },
-              { name: "선택 리소스", criteria: "사용자가 선택한 일정 기준으로 정확한 정보 응답", highlights: ["정확한 정보 응답"] },
-              { name: "메일 신규 작성", criteria: "SOURCE / OUTPUT 구분 후 근거 기반 Preview 생성", highlights: ["근거 기반 Preview 생성"] },
-              { name: "기존 초안 수정", criteria: "원문·발송 금지 조건을 보존한 UPDATE Preview", highlights: ["UPDATE Preview"] },
-              { name: "다건 검색", criteria: "필요한 검색 결과를 누락 없이 반영", highlights: ["누락 없이 반영"] },
-              { name: "복합 Retrieval", criteria: "잘못된 검색 계획을 수정해 제한 횟수 내 결과 도달", highlights: ["제한 횟수 내 결과 도달"] }
+              { name: "대상 없는 일정", topic: "불명확한 참조 처리", criteria: "임의 추측·READ 없이 사용자 확인 후 동일 흐름 재개", highlights: ["사용자 확인 후 동일 흐름 재개"], traceUrl: "https://smith.langchain.com/public/9cf45b88-665d-4979-ab8a-7e513ae45aa5/r/01a09ce9-538d-75d2-93bd-f94225bad11b?start_time=2026-09-13T22%3A35%3A32.108278Z" },
+              { name: "선택 리소스", topic: "선택 Context 전달", criteria: "선택 Resource를 State에 유지해 대상 혼동 없이 정확히 응답", highlights: ["대상 혼동 없이 정확히 응답"], traceUrl: "https://smith.langchain.com/public/0ca002ce-bcaa-48ab-8667-e64c5cdf7f9f/r/01a09cea-39e2-7082-b3f2-045e306860a7?start_time=2026-09-13T22%3A36%3A31.073512Z" },
+              { name: "메일 신규 작성", topic: "다중 근거 기반 Draft 생성", criteria: "SOURCE와 OUTPUT을 구분해 근거 기반 Draft 생성 · 발송 금지", highlights: ["근거 기반 Draft 생성 · 발송 금지"], traceUrl: "https://smith.langchain.com/public/788deade-d1b0-4a90-9564-594bfd035fd8/r/01a09cea-c73c-7921-b9cd-455d68fdfaa8?start_time=2026-09-13T22%3A37%3A07.260078Z" },
+              { name: "다건 검색", topic: "검색 결과 완전성", criteria: "일부 결과에서 종료하지 않고 필요한 항목 전체 수집·반영", highlights: ["필요 항목 전체 수집·반영"], traceUrl: "https://smith.langchain.com/public/65facd3e-6c0b-4242-a24f-a3e55fd8138d/r/01a09ceb-b6e6-73c0-8b7b-bd88f63048f0?start_time=2026-09-13T22%3A38%3A08.613879Z" },
+              { name: "복합 Retrieval", topic: "검색 계획 수정·재시도", criteria: "검증 실패 시 검색 계획을 수정해 최종 근거까지 도달", highlights: ["최종 근거까지 도달"], traceUrl: "https://smith.langchain.com/public/c187e6b8-a929-4771-a541-7e892b531995/r/01a09ced-a734-77c2-bd7b-adbace131eec?start_time=2026-09-13T22%3A40%3A15.665318Z" },
+              { name: "기존 초안 수정", topic: "기존 Resource 보존형 UPDATE", criteria: "원문·발송 금지 조건을 유지하고 지정 내용만 수정", highlights: ["지정 내용만 수정"], traceUrl: "https://smith.langchain.com/public/9d2c62b8-d996-4e2e-9cd6-57fcb11d1b67/r/01a09cef-5eae-7fa1-90ea-6ec6e5077568?start_time=2026-09-13T22%3A42%3A08.172472Z" }
             ],
             metricsTitle: "02. 테스트 결과",
+            metricsDescription: "E2E Smoke 6/6 PASS 이후 Validation 60 · Stress 20 · Holdout 12, 총 92건으로 평가를 확장했습니다.\n80건은 실패 분석·수정에 사용하고, Holdout 12건은 수정 없이 별도 평가해 새로운 요청에 대한 대응을 확인했습니다.",
             metrics: [
-              ["Validation", "XX/60", "XX/60"],
-              ["Holdout", "XX/12", "XX/12"],
-              ["Stress", "XX/20", "XX/20"],
-              ["Total", "XX.X%", "XX.X%"]
+              ["Validation", "XX/60", "XX/60", "XX%p 개선"],
+              ["Holdout", "XX/12", "XX/12", "XX%p 개선"],
+              ["Stress", "XX/20", "XX/20", "XX%p 개선"],
+              ["Total", "XX.X%", "XX.X%", "XX%p 개선"]
             ],
             summary:
-              "Smoke Test를 본 평가 진입 기준으로 사용하고 Validation·Holdout·Stress 총 92건으로 검증 범위를 확대했습니다. 개선 과정에서 사용하지 않은 Holdout 요청까지 별도로 평가해 주요 업무 흐름과 새로운 요청에 대한 대응력을 함께 확인했습니다."
+              "최초 오류 지점에 따라 Prompt·State·Schema·Validator·모델 설정의 책임을 나눠 수정해, 9B급 Local LLM의 역할별 판단 구조와 복합 요청 처리 안정성을 개선했습니다.",
           },
           {
             id: "provider-api-performance",
             title: "Provider API 조회 성능 개선",
             problem:
-              "Gmail 목록 20개 조회에 List 1회와 Thread Detail 20회가 발생해 총 21회 외부 HTTP 요청이 필요했습니다. I/O Bound 특성을 고려해 3 Worker로 병렬 처리했지만, 외부 요청 수 자체는 줄지 않아 MCP Node와 사용자 목록 표시 지연이 남았습니다.",
-            problemHighlights: ["20개 조회", "총 21회 외부 HTTP 요청", "3 Worker"],
+              "Gmail 최근 20건 목록 조회가 느리게 체감됐습니다. 조회 경로에서 List 1회 + Detail 20회, 총 21개의 Physical HTTP 요청을 확인했습니다.",
+            problemHighlights: ["Gmail 최근 20건 목록 조회", "List 1회 + Detail 20회", "총 21개의 Physical HTTP 요청"],
             decisionLabel: "실험 설계",
             decision:
-              "Provider 권장 Batch 범위 내에서 Batch Size × Worker 조합을 변경해 비교했습니다. MCP Node Latency·사용자 목록 표시 시간·외부 HTTP 요청 횟수·오류율·CPU / Memory·중첩 요청 시 Local API 응답성을 측정해 응답 시간·안정성·자원 사용량의 균형점을 선정했습니다.",
-            decisionHighlights: ["Batch Size × Worker", "응답 시간·안정성·자원 사용량의 균형점 선정"],
+              "Batch Size × Worker 10개 후보를 각 100회 비교하고, 선정한 Candidate를 실제 Production READ Node에서 A/B 재검증했습니다.",
+            decisionHighlights: ["Batch Size × Worker 10개 후보를 각 100회", "Production READ Node에서 A/B 재검증"],
+            comparisonTitle: "01. Provider Candidate 탐색",
+            comparisonHeaders: ["구성", "Physical HTTP", "Provider p95", "Error", "비고"],
             comparisonRows: [
-              ["기존 1+N / 3W", "21", "XX.Xs", "XX.Xs", "XX%", "Baseline"],
-              ["Batch 5 / 2W", "XX", "XX.Xs", "XX.Xs", "XX%", ""],
-              ["Batch 10 / 2W", "XX", "XX.Xs", "XX.Xs", "XX%", ""],
-              ["Batch XX / XXW", "XX", "XX.Xs", "XX.Xs", "XX%", "Selected"]
+              ["Individual / 3W", "21", "XXms", "XX%", "Baseline"],
+              ["Batch 5 / 2W", "XX", "XXms", "XX%", ""],
+              ["Batch 10 / 2W", "XX", "XXms", "XX%", ""],
+              ["Batch XX / XXW", "XX", "XXms", "XX%", "Selected"]
             ],
+            productionVerification: {
+              title: "02. Production Node 검증",
+              metrics: [
+                ["Node p95", "XX → XXms", "(-XX%)"],
+                ["Physical HTTP", "21 → XX"],
+                ["Error", "XX%"],
+                ["결과 정합성", "PASS"]
+              ]
+            },
             summary:
-              "Batch XX / XXW 조합을 최종 구성으로 선정했습니다. 외부 HTTP 요청을 21회 → XX회로 줄이고, MCP Node Latency를 XX.Xs → XX.Xs로 단축했습니다. 그 결과 사용자 목록 표시 시간이 XX.Xs → XX.Xs로 감소해 실제 사용자 체감 응답성을 개선했습니다.",
-            summaryEmphasis: ["Batch XX / XXW", "21회 → XX회", "XX.Xs → XX.Xs"]
+              "Batch XX / Worker XX를 최종 구성으로 선정했습니다. Provider p95와 실제 Production Node p95 모두 개선됐으며, 동일 20건의 조회 결과 정합성을 유지했습니다.",
+            summaryEmphasis: ["Batch XX / Worker XX", "Provider p95", "Production Node p95", "동일 20건의 조회 결과 정합성"],
+            fullResultsLabel: "전체 실험 결과 · 측정 조건 · Raw Data 보기 ↗"
           }
         ]
       }
