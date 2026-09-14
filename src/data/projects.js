@@ -712,7 +712,7 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             summary:
               "선정한 B20W1은 Provider 수준에서 끝내지 않고 Production READ Node와 Local API에서 다시 검증했습니다.\n동일한 조회 결과와 Metadata 정합성을 유지하면서 HTTP 요청 21회 -> 2회, Production READ Node p95 63.2% 단축, Local API p95 68.0% 단축을 확인했습니다. Error·Timeout·429는 발생하지 않았습니다.",
             summaryEmphasis: ["Production READ Node와 Local API에서 다시 검증", "HTTP 요청 21회 -> 2회, Production READ Node p95 63.2% 단축, Local API p95 68.0% 단축"],
-            fullResultsLabel: "전체 실험 결과 · 측정 조건 · Raw Data 보기 ↗"
+            fullResultsUrl: "https://github.com/solar-ai-dev/google-work-agent/tree/main/evaluation/results/gmail-metadata-hydration-20260914-7afac9f5"
           }
         ]
       }
