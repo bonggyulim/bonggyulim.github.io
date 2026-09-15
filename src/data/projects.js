@@ -545,9 +545,10 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
       "Google Calendar API",
       "GitHub API"
     ],
+    githubUrl: "https://github.com/solar-ai-dev/mcp-work-agent",
     actionItems: [
       { key: "installer", label: "설치 파일" },
-      { key: "github", label: "GitHub" }
+      { key: "github", label: "GitHub", href: "https://github.com/solar-ai-dev/mcp-work-agent" }
     ],
     highlights: [
       "LangGraph 기반 판단·승인·실행 워크플로우 구현",
@@ -565,36 +566,29 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
           {
             id: "agent-architecture-workflow",
             title: "Agent 워크플로우 설계",
+            emphasizeAll: true,
             items: [
               {
-                text: "9B Local LLM의 판단 부담을 줄이기 위해 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 책임 분리",
-                highlights: ["9B Local LLM", "6개 역할로 책임 분리"]
+                text: "9B Local LLM의 판단 부담을 줄이기 위해 요청 이해·도구 선택·검색·분석·계획·검토 6개 역할로 분리"
               },
               {
-                text: "Agent 결과를 Typed State에 반영하고 Supervisor가 다음 단계·완료 여부를 재판단",
-                highlights: ["Typed State", "Supervisor가 다음 단계·완료 여부를 재판단"]
+                text: "Agent 결과를 Typed State에 반영하고 Supervisor가 상태에 따라 다음 단계·완료 여부를 재판단"
               },
               {
-                text: "외부 조회·사용자 응답에 따라 재분기할 수 있도록 DAG가 아닌 State 기반 순환형 흐름으로 구성",
-                highlights: ["DAG가 아닌 State 기반 순환형 흐름"]
+                text: "외부 조회·사용자 응답에 따라 재분기할 수 있도록 DAG가 아닌 State 기반 순환형 흐름으로 구성"
               }
             ]
           },
           {
-            id: "agent-runtime-safety",
-            title: "WRITE 실행 제어·검증 설계",
+            id: "local-llm-quality-improvement",
+            title: "Local LLM 판단 품질 보완",
+            emphasizeAll: true,
             items: [
               {
-                text: "대상이 불명확하면 임의 실행하지 않고 사용자 확인 결과를 State에 반영해 재분기",
-                highlights: ["사용자 확인 결과를 State에 반영해 재분기"]
+                text: "Smoke 6/6 PASS를 기준으로 Validation 60·Stress 20·Holdout 12, 총 92개 평가셋으로 검증 범위 확대"
               },
               {
-                text: "LLM 판단과 실제 WRITE 실행 권한을 분리하고, Policy·Schema·Validator·사용자 승인 통과 시만 수행",
-                highlights: ["LLM 판단과 실제 WRITE 실행 권한을 분리", "Policy·Schema·Validator·사용자 승인 통과 시만 수행"]
-              },
-              {
-                text: "WRITE 후 외부 상태를 재조회·검증하고, 실패 시 Recovery 결과를 State에 반영해 재판단",
-                highlights: ["외부 상태를 재조회·검증", "Recovery 결과를 State에 반영해 재판단"]
+                text: "LangSmith Trace로 최초 오판 Node를 추적하고 Prompt·State·Schema·Validator·Model Setting으로 수정 책임 분리"
               }
             ]
           }
@@ -620,31 +614,183 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
         title: "ACTUAL USE CASES",
         eyebrow: "ACTUAL USE CASES",
         type: "use_case_carousel",
+        description: "Production E2E 6개 Smoke로 검증한 Agent의 대표 업무 처리 시나리오",
         cases: [
           {
-            id: "gmail-read",
-            badge: "Gmail READ",
-            request: "이번 주에 받은 프로젝트 관련 메일을 찾아줘"
+            id: "schedule-without-target",
+            badge: "대상 없는 일정",
+            title: "대상 미지정 일정 요청",
+            dataSubtitle: "대상 미지정 요청 → 사용자 재질문 → WAITING_CONFIRMATION",
+            description: "대상이 빠진 일정 요청을 임의로 조회하지 않고, 사용자에게 필요한 정보를 다시 질문한 사례입니다.",
+            request: "그 일정 언제야?",
+            dataTitle: "대상 미지정 일정 요청",
+            dataContent: "“그 일정 언제야?” → 원하는 일정을 구체적으로 알려 달라는 확인 질문",
+            verification: "target_resource 누락 · 외부 조회 0회 · WAITING_CONFIRMATION",
+            screenshot: "/assets/projects/대상없는일정.png",
+            screenshotAlt: "대상이 없는 일정 요청에 추가 정보를 요청하는 Agent 실행 화면",
+            agentFlow: ["요청 분석"],
+            agentCount: "1 / 6",
+            agentCountLabel: "1 / 6 Agent · 1회 경유",
+            keyOutputAgent: "요청 분석",
+            keyOutput: "target_resource 누락 감지 → 추가 정보 요청 → WAITING_CONFIRMATION",
+            traceUrl: "https://smith.langchain.com/public/b7d05fe4-04e1-4dcc-8c87-cc961e7f42b1/r",
+            traceId: "01a0a13b-3847-7ec1-b7ae-e0ef88b1d591",
+            agentOutputs: [
+              ["요청 분석", "일정 대상이 특정되지 않아 확인 질문을 생성하고 실행을 중단"]
+            ],
+            tools: [],
+            detail: "대상 단서가 없는 일정 요청을 임의의 Calendar Event에 연결하지 않고, 사용자가 대상을 구체화할 때까지 안전하게 대기하는 흐름을 검증했습니다.",
+            outcome: "사용자 재질문 표시 · WAITING_CONFIRMATION · 외부 조회 없음",
           },
           {
-            id: "tasks-update",
-            badge: "Tasks UPDATE",
-            request: "진행 중인 포트폴리오 작업을 완료 처리해줘"
+            id: "selected-resource",
+            badge: "선택 리소스",
+            title: "선택한 일정 Context를 유지해 정확한 대상 조회",
+            dataSubtitle: "프로젝트 검토 회의 · 2026-08-18 10:00~11:00",
+            description: "사용자가 선택한 일정을 다른 일정과 혼동하지 않고 유지해, 프로젝트 검토 회의의 정확한 시간을 조회한 사례입니다.",
+            request: "그 일정 언제야?",
+            dataTitle: "프로젝트 검토 회의",
+            dataContent: "2026년 8월 18일 오전 10:00~11:00 · Asia/Seoul",
+            verification: "선택 Resource: 프로젝트 검토 회의 · 2026-08-18 10:00~11:00 · Asia/Seoul",
+            screenshot: "/assets/projects/선택리소스.png",
+            screenshotAlt: "선택한 일정 Context를 유지하는 Agent 실행 화면",
+            agentFlow: ["요청 분석", "자료 경로 선택", "자료 검색", "계획 생성"],
+            agentCount: "4 / 6",
+            agentCountLabel: "4 / 6 Agent · 4회 경유",
+            keyOutputAgent: "자료 검색",
+            keyOutput: "선택 Resource identity 유지 → 해당 Calendar Event 조회",
+            keyOutputNote: "2026-08-18 10:00~11:00 · Asia/Seoul",
+            traceUrl: "https://smith.langchain.com/public/0ca002ce-bcaa-48ab-8667-e64c5cdf7f9f/r/01a09cea-39e2-7082-b3f2-045e306860a7?start_time=2026-09-13T22%3A36%3A31.073512Z",
+            traceId: "01a09cea-39e2-7082-b3f2-045e306860a7",
+            agentOutputs: [
+              ["요청 분석", "선택된 Resource identity를 요청 Context로 유지"],
+              ["자료 경로 선택", "선택 Event READ 경로 사용"],
+              ["자료 검색", "선택 Resource의 최신 내용을 재조회"],
+              ["계획 생성", "선택한 일정만 근거로 최종 응답 작성"]
+            ],
+            tools: ["calendar_get_event"],
+            detail: "사용자가 선택한 Resource는 단순 UI Context가 아니라 후속 Agent가 재사용하는 identity로 유지되며, 대상 혼동 없이 동일 Resource를 조회하는지를 검증했습니다.",
+            outcome: "선택 Resource identity 유지 · 정확한 대상 응답",
           },
           {
-            id: "calendar-create",
-            badge: "Calendar WRITE",
-            request: "다음 주 화요일 오후 3시에 프로젝트 회의 일정 생성"
+            id: "new-mail-draft",
+            badge: "메일 신규 작성",
+            title: "할 일·일정을 확인해 Gmail 초안 작성",
+            dataSubtitle: "[Atlas 준비 상황] 할 일 및 일정 안내 Draft Preview",
+            description: "Google Tasks와 Calendar에서 필요한 정보를 확인해 Gmail 초안을 만들고, 실제 저장이나 전송 전에 사용자 승인을 요청한 사례입니다.",
+            request: "Atlas 할 일과 인쇄소 일정 보고 qhdrbdhkdwks@naver.com에 준비 상황을 알릴 메일을 Gmail 임시보관함에 저장해줘. 보내지는 마.",
+            dataTitle: "[Atlas 준비 상황] 할 일 및 일정 안내",
+            dataContent: "Atlas 할 일·인쇄소 일정 기반 Gmail Draft Preview · 승인 전 저장·전송 없음",
+            screenshot: "/assets/projects/메일신규작성.png",
+            screenshotAlt: "Gmail 초안 생성 승인을 보여 주는 Agent 실행 화면",
+            agentFlow: ["요청 분석", "자료 경로 선택", "자료 검색", "계획 생성", "계획 검토"],
+            agentCount: "5 / 6",
+            agentCountLabel: "5 / 6 Agent · 5회 경유",
+            keyOutputAgent: "계획 생성",
+            keyOutput: "Atlas Tasks·Calendar 근거 → Gmail Draft Preview 생성 → WAITING_APPROVAL",
+            keyOutputNote: "실제 전송 없음",
+            traceUrl: "https://smith.langchain.com/public/788deade-d1b0-4a90-9564-594bfd035fd8/r/01a09cea-c73c-7921-b9cd-455d68fdfaa8?start_time=2026-09-13T22%3A37%3A07.260078Z",
+            traceId: "01a09cea-c73c-7921-b9cd-455d68fdfaa8",
+            agentOutputs: [
+              ["요청 분석", "Tasks·Calendar 조회와 Gmail Draft CREATE 요구, SEND 금지 조건을 구조화"],
+              ["자료 경로 선택", "Tasks·Calendar 조회 경로와 Gmail Draft CREATE 실행안을 분리"],
+              ["자료 검색", "Atlas 할 일 상태와 인쇄소 일정을 근거로 확보"],
+              ["계획 생성", "수신자·제목·본문을 포함한 Draft CREATE Preview 구성"],
+              ["계획 검토", "근거·실행 범위·SEND 금지 조건을 검토"]
+            ],
+            tools: ["tasks_list_tasks", "calendar_list_events"],
+            detail: "Tasks와 Calendar를 조회해 실제 업무 상태를 Draft에 반영하고, WRITE 실행안을 생성한 뒤 Review를 통과해야 사용자 승인 단계로 이동하도록 구성했습니다.",
+            outcome: "Draft Preview 생성 · WAITING_APPROVAL · 승인 전 WRITE / SEND = 0",
           },
           {
-            id: "write-approval",
-            badge: "WRITE 승인·검증",
-            request: "선택한 업무 일정을 변경해줘"
+            id: "multi-search",
+            badge: "다건 검색",
+            title: "Juniper 관련 메일 제목 26건 전체 조회",
+            dataSubtitle: "Juniper 관련 메일 제목 26건 전체 회수",
+            description: "검색 첫 페이지에서 끝내지 않고 다음 결과까지 이어서 조회해, Juniper 관련 메일 제목 26건을 모두 수집한 사례입니다.",
+            request: "Juniper 단말 교체 준비 메일 제목들 전부 모아줘.",
+            dataTitle: "Juniper 단말 교체 준비 관련 Gmail",
+            dataContent: "Pagination을 끝까지 수행해 관련 메일 제목 26건 전체 회수",
+            screenshot: "/assets/projects/다건검색.png",
+            screenshotAlt: "Juniper 관련 메일을 다건 검색하는 Agent 실행 화면",
+            agentFlow: ["요청 분석", "자료 경로 선택", "자료 검색 ×2", "계획 생성"],
+            agentCount: "4 / 6",
+            agentCountLabel: "4 / 6 Agent · 자료 검색 2회",
+            keyOutputAgent: "자료 검색",
+            keyOutput: "Pagination 반복 조회 → Juniper Gmail 제목 26 / 26건 수집",
+            traceUrl: "https://smith.langchain.com/public/65facd3e-6c0b-4242-a24f-a3e55fd8138d/r/01a09ceb-b6e6-73c0-8b7b-bd88f63048f0?start_time=2026-09-13T22%3A38%3A08.613879Z",
+            traceId: "01a09ceb-b6e6-73c0-8b7b-bd88f63048f0",
+            agentOutputs: [
+              ["요청 분석", "특정 한 건이 아닌 전체 Collection 조회 요청으로 판단"],
+              ["자료 경로 선택", "Gmail Thread 검색 경로 선택"],
+              ["자료 검색 · 1차", "첫 검색 결과를 정리하고 다음 페이지 존재 여부 확인"],
+              ["자료 검색 · 2차", "다음 페이지를 이어서 조회해 전체 범위 완료 여부 확인"],
+              ["계획 생성", "수집한 제목 전체를 사용자 응답으로 정리"]
+            ],
+            tools: ["gmail_search_threads"],
+            detail: "ALL_ITEMS 요청으로 판단하고 Pagination을 완료할 때까지 조회해 독립 Thread 26건을 모두 회수하는지를 검증했습니다.",
+            outcome: "26 / 26 전체 회수 · COMPLETED / SUCCESS",
           },
           {
-            id: "combined-request",
-            badge: "복합 요청",
-            request: "오늘 마감인 업무와 관련 일정을 함께 확인해줘"
+            id: "complex-retrieval",
+            badge: "복합 Retrieval",
+            title: "여러 메일을 비교해 최종 출고일·담당자 판별",
+            dataSubtitle: "후보 10건 비교 → [Atlas] 출고 일정 확정 → 8월 19일 오전 · 담당 지민",
+            description: "관련 메일 후보와 상세 내용을 반복해서 비교해, 최종 출고일과 담당자가 명시된 최신 확정 메일을 찾아낸 사례입니다.",
+            request: "메일에 나온 Atlas 물건이 언제 나가는지 최종 기준과 담당 확인해줘.",
+            dataTitle: "[Atlas] 출고 일정 확정",
+            dataContent: "후보 근거 10건과 상세 메일을 비교해 출고일 8월 19일 오전·담당자 지민 도출",
+            screenshot: "/assets/projects/복합 Retrieval.png",
+            screenshotAlt: "여러 메일 근거를 조회한 Agent 실행 화면",
+            agentFlow: ["요청 분석", "자료 경로 선택", "자료 검색 ×13", "계획 생성"],
+            agentCount: "4 / 6",
+            agentCountLabel: "4 / 6 Agent · 자료 검색 13회",
+            keyOutputAgent: "자료 검색",
+            keyOutput: "후보 근거 10건 비교 → 최종 확정 근거 선택 → 8월 19일 오전 · 담당 지민",
+            traceUrl: "https://smith.langchain.com/public/c187e6b8-a929-4771-a541-7e892b531995/r/01a09ced-a734-77c2-bd7b-adbace131eec?start_time=2026-09-13T22%3A40%3A15.665318Z",
+            traceId: "01a09ced-a734-77c2-bd7b-adbace131eec",
+            agentOutputs: [
+              ["요청 분석", "Atlas 최종 출고 기준과 담당자 확인을 Gmail READ 요청으로 구조화"],
+              ["자료 경로 선택", "Gmail Thread 검색·상세 조회 경로 확정"],
+              ["자료 검색", "후보 검색 → 상세 조회 → 최신 확정 근거 선택"],
+              ["계획 생성", "선택된 최신 근거를 기반으로 최종 답변 작성"]
+            ],
+            tools: ["gmail_search_threads", "gmail_get_thread"],
+            detail: "단일 검색 결과를 바로 답으로 사용하지 않고, 여러 후보를 조회한 뒤 상세 내용을 비교해 최종 확정 근거까지 도달하는 Retrieval 흐름을 검증했습니다.",
+            outcome: "출고일: 8월 19일 오전 · 담당자: 지민",
+          },
+          {
+            id: "update-existing-draft",
+            badge: "기존 초안 수정",
+            title: "기존 Gmail Draft의 지정 내용만 수정 후 재조회 검증",
+            dataSubtitle: "Quartz 납품 회신 검토에 지정 문장 1회 추가 · 재조회 검증",
+            description: "기존 Gmail 초안의 제목·수신자·본문을 유지하면서 지정된 문장만 추가하고, 수정 결과를 Gmail에서 다시 확인한 사례입니다.",
+            request: "임시보관함의 “Quartz 납품 회신 검토” 초안 끝에 “8월 21일 입고 준비를 확인 중입니다.”만 추가해줘. 보내지는 마.",
+            dataTitle: "Quartz 납품 회신 검토",
+            dataContent: "기존 초안 끝에 지정 문장을 1회 추가하고 SEND 없이 Provider 재조회 검증",
+            screenshot: "/assets/projects/초안수정.png",
+            screenshotAlt: "기존 Gmail 초안을 수정하는 Agent 실행 화면",
+            agentFlow: ["요청 분석", "자료 경로 선택", "자료 검색", "계획 생성", "계획 검토", "사용자 승인", "작업 실행", "결과 검증"],
+            agentCount: "5 / 6",
+            agentCountLabel: "5 / 6 Agent · 실행·검증 포함 7단계",
+            keyOutputAgent: "계획 생성",
+            keyOutput: "기존 Draft 보존 → 지정 문장만 추가하는 UPDATE 실행안 생성",
+            keyOutputNote: "승인 후 UPDATE → 재조회 VERIFIED",
+            traceUrl: "https://smith.langchain.com/public/4d26d569-500b-46e9-8f66-7b17dc3c6ba9/r",
+            traceId: "01a095d1-5613-7a92-a40b-f395212cfa15",
+            agentOutputs: [
+              ["요청 분석", "기존 Draft UPDATE 요청과 exact append 문장, SEND 금지 조건을 유지"],
+              ["자료 경로 선택", "기존 Gmail Draft READ와 Draft UPDATE 실행안을 분리"],
+              ["자료 검색", "기존 제목·수신자·본문·Thread를 확인"],
+              ["계획 생성", "지정 문장만 추가하는 UPDATE Preview 생성"],
+              ["계획 검토", "원문 보존 조건·SEND 금지·수정 범위를 검토"],
+              ["작업 실행", "사용자 승인 후 Gmail Draft UPDATE 수행"],
+              ["결과 검증", "Provider 재조회 결과를 승인 Snapshot과 비교해 VERIFIED 판정"]
+            ],
+            tools: ["gmail_search_drafts", "gmail_get_draft", "gmail_update_draft"],
+            detail: "승인 후에는 Agent Flow와 분리된 Deterministic WRITE Pipeline에서 Preflight, Draft UPDATE, Provider 재조회, 승인 Snapshot 비교를 수행합니다.",
+            writePipeline: ["WAITING_APPROVAL", "사용자 승인", "Preflight", "Gmail Draft UPDATE", "Provider 재조회", "승인 Snapshot 비교", "VERIFIED"],
+            outcome: "기존 Draft UPDATE 완료 · 지정 문장만 추가 · SEND 없음 · Google 재조회 검증 완료",
           }
         ]
       },
@@ -669,12 +815,12 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             validationDescription: "주요 실패 유형을 대표하는 6개 E2E 시나리오를 실제 Production 경로에서 검증해, 재실행 없이 6 / 6 PASS를 확인했습니다.",
             validationDescriptionHighlights: ["6개 E2E 시나리오를 실제 Production 경로에서 검증", "6 / 6 PASS"],
             validationScenarios: [
-              { name: "대상 없는 일정", topic: "불명확한 참조 처리", criteria: "임의 추측·READ 없이 사용자 확인 후 동일 흐름 재개", highlights: ["사용자 확인 후 동일 흐름 재개"], traceUrl: "https://smith.langchain.com/public/9cf45b88-665d-4979-ab8a-7e513ae45aa5/r/01a09ce9-538d-75d2-93bd-f94225bad11b?start_time=2026-09-13T22%3A35%3A32.108278Z" },
-              { name: "선택 리소스", topic: "선택 Context 전달", criteria: "선택 Resource를 State에 유지해 대상 혼동 없이 정확히 응답", highlights: ["대상 혼동 없이 정확히 응답"], traceUrl: "https://smith.langchain.com/public/0ca002ce-bcaa-48ab-8667-e64c5cdf7f9f/r/01a09cea-39e2-7082-b3f2-045e306860a7?start_time=2026-09-13T22%3A36%3A31.073512Z" },
-              { name: "메일 신규 작성", topic: "다중 근거 기반 Draft 생성", criteria: "SOURCE와 OUTPUT을 구분해 근거 기반 Draft 생성 · 발송 금지", highlights: ["근거 기반 Draft 생성 · 발송 금지"], traceUrl: "https://smith.langchain.com/public/788deade-d1b0-4a90-9564-594bfd035fd8/r/01a09cea-c73c-7921-b9cd-455d68fdfaa8?start_time=2026-09-13T22%3A37%3A07.260078Z" },
-              { name: "다건 검색", topic: "검색 결과 완전성", criteria: "일부 결과에서 종료하지 않고 필요한 항목 전체 수집·반영", highlights: ["필요 항목 전체 수집·반영"], traceUrl: "https://smith.langchain.com/public/65facd3e-6c0b-4242-a24f-a3e55fd8138d/r/01a09ceb-b6e6-73c0-8b7b-bd88f63048f0?start_time=2026-09-13T22%3A38%3A08.613879Z" },
-              { name: "복합 Retrieval", topic: "검색 계획 수정·재시도", criteria: "검증 실패 시 검색 계획을 수정해 최종 근거까지 도달", highlights: ["최종 근거까지 도달"], traceUrl: "https://smith.langchain.com/public/c187e6b8-a929-4771-a541-7e892b531995/r/01a09ced-a734-77c2-bd7b-adbace131eec?start_time=2026-09-13T22%3A40%3A15.665318Z" },
-              { name: "기존 초안 수정", topic: "기존 Resource 보존형 UPDATE", criteria: "원문·발송 금지 조건을 유지하고 지정 내용만 수정", highlights: ["지정 내용만 수정"], traceUrl: "https://smith.langchain.com/public/9d2c62b8-d996-4e2e-9cd6-57fcb11d1b67/r/01a09cef-5eae-7fa1-90ea-6ec6e5077568?start_time=2026-09-13T22%3A42%3A08.172472Z" }
+              { name: "대상 없는 일정", topic: "불명확한 참조 처리", criteria: "대상을 임의로 추측하거나 조회하지 않고 사용자에게 구체화를 요청해 WAITING_CONFIRMATION 진입", highlights: ["사용자에게 구체화를 요청해 WAITING_CONFIRMATION 진입"], traceUrl: "https://smith.langchain.com/public/b7d05fe4-04e1-4dcc-8c87-cc961e7f42b1/r" },
+              { name: "선택 리소스", topic: "선택 Context 전달 안정성", criteria: "선택한 Resource를 후속 단계까지 유지해 다른 대상으로 이동하지 않고 정확히 응답", highlights: ["다른 대상으로 이동하지 않고 정확히 응답"], traceUrl: "https://smith.langchain.com/public/0ca002ce-bcaa-48ab-8667-e64c5cdf7f9f/r/01a09cea-39e2-7082-b3f2-045e306860a7?start_time=2026-09-13T22%3A36%3A31.073512Z" },
+              { name: "메일 신규 작성", topic: "복수 자료를 근거로 Gmail Draft 생성", criteria: "Tasks·Calendar 근거를 반영한 Draft Preview를 생성하고 승인 전 실제 저장·전송 금지", highlights: ["승인 전 실제 저장·전송 금지"], traceUrl: "https://smith.langchain.com/public/788deade-d1b0-4a90-9564-594bfd035fd8/r/01a09cea-c73c-7921-b9cd-455d68fdfaa8?start_time=2026-09-13T22%3A37%3A07.260078Z" },
+              { name: "다건 검색", topic: "전체 범위 검색과 Pagination 완주", criteria: "중간 결과에서 조기 종료하지 않고 Juniper 메일 제목 26건 전체 회수", highlights: ["Juniper 메일 제목 26건 전체 회수"], traceUrl: "https://smith.langchain.com/public/65facd3e-6c0b-4242-a24f-a3e55fd8138d/r/01a09ceb-b6e6-73c0-8b7b-bd88f63048f0?start_time=2026-09-13T22%3A38%3A08.613879Z" },
+              { name: "복합 Retrieval", topic: "여러 후보 근거를 비교해 최종 사실 판별", criteria: "여러 Gmail 근거 중 최신 확정 내용을 선택해 최종 출고일·담당자 도출", highlights: ["최신 확정 내용을 선택해 최종 출고일·담당자 도출"], traceUrl: "https://smith.langchain.com/public/c187e6b8-a929-4771-a541-7e892b531995/r/01a09ced-a734-77c2-bd7b-adbace131eec?start_time=2026-09-13T22%3A40%3A15.665318Z" },
+              { name: "기존 초안 수정", topic: "기존 Resource를 보존한 부분 UPDATE", criteria: "기존 제목·수신자·본문·Thread를 유지하고 지정 문장만 1회 추가, 승인 전 전송 금지", highlights: ["지정 문장만 1회 추가, 승인 전 전송 금지"], traceUrl: "https://smith.langchain.com/public/4d26d569-500b-46e9-8f66-7b17dc3c6ba9/r" }
             ],
             metricsTitle: "02. 품질 평가셋 구성 및 반복 개선",
             metricsDescription: "Smoke Test 통과 후 대표 시나리오만으로는 전체 판단 품질을 확인하기 어렵다고 보고, 총 92개 시나리오를 Validation·Stress·Holdout으로 분리해 평가 범위를 확장했습니다.",

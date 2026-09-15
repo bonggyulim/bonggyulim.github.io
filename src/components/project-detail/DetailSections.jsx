@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import { useEffect, useState } from "react";
 
 const contributionGroups = [
   { id: "build", title: "설계·구현" },
@@ -647,7 +646,7 @@ function WorkerScalingCard({ card }) {
           <p>{card.decision}</p>
         </section>
 
-        <a className="detail-worker-source-link" href={card.sourceUrl} target="_blank" rel="noopener noreferrer">실험 원본 보기</a>
+        <a className="detail-worker-source-link" href={card.sourceUrl} target="_blank" rel="noopener noreferrer">실험 원본 보기 ↗</a>
       </div>
     </article>
   );
@@ -1183,167 +1182,128 @@ export function TroubleshootingSection({ id, section }) {
   );
 }
 
+function UseCaseProcessing({ useCase }) {
+  return (
+    <div className="detail-use-case-processing">
+      <section className="detail-use-case-meta-row">
+        <strong>사용 Agent:</strong>
+        <span>{useCase.agentCount.replace(/\s/g, "")}</span>
+      </section>
+      <section className="detail-use-case-workflow">
+        <strong>처리흐름:</strong>
+        <p>{useCase.agentFlow.join(" → ")}</p>
+        {useCase.traceUrl ? (
+          <a
+            href={useCase.traceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="detail-use-case-trace-link is-icon"
+            aria-label={`${useCase.badge} Trace 열기`}
+            title="Trace 열기"
+          >
+            Trace <ExternalLinkIcon />
+          </a>
+        ) : null}
+      </section>
+    </div>
+  );
+}
+
 export function UseCaseCarouselSection({ id, section }) {
   const cases = section.cases ?? [];
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    containScroll: "trimSnaps",
-    dragThreshold: 56,
-    duration: 25,
-    loop: false,
-    skipSnaps: false
-  });
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [snapPoints, setSnapPoints] = useState([]);
-  const viewportRef = useRef(null);
-
-  const setViewportRef = useCallback((node) => {
-    viewportRef.current = node;
-    emblaRef(node);
-  }, [emblaRef]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onInit = () => setSnapPoints(emblaApi.scrollSnapList());
-    onInit();
-    onSelect();
-    emblaApi.on("reInit", onInit).on("reInit", onSelect).on("select", onSelect);
-
-    return () => {
-      emblaApi.off("reInit", onInit).off("reInit", onSelect).off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const slowDragMotion = () => {
-      const engine = emblaApi.internalEngine();
-      if (engine.dragHandler.pointerDown()) {
-        engine.scrollBody.useDuration(1.5).useFriction(0.3);
-      }
-    };
-
-    emblaApi.on("pointerDown", slowDragMotion).on("scroll", slowDragMotion);
-
-    return () => {
-      emblaApi.off("pointerDown", slowDragMotion).off("scroll", slowDragMotion);
-    };
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const outwardDragLimit = 152;
-    let startX = null;
-    let boundary = null;
-    const readClientX = (event) => event.touches?.[0]?.clientX ?? event.clientX;
-    const reset = () => {
-      startX = null;
-      boundary = null;
-    };
-    const onStart = (event) => {
-      if (!viewportRef.current?.contains(event.target)) return;
-      startX = readClientX(event);
-      boundary = !emblaApi.canScrollPrev() ? "start" : !emblaApi.canScrollNext() ? "end" : null;
-    };
-    const onMove = (event) => {
-      if (startX === null || !boundary) return;
-      const currentX = readClientX(event);
-      const isOutwardDrag = (boundary === "start" && currentX > startX) || (boundary === "end" && currentX < startX);
-      if (!isOutwardDrag || Math.abs(currentX - startX) <= outwardDragLimit) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    };
-
-    const documentNode = viewportRef.current?.ownerDocument;
-    if (!documentNode) return;
-    documentNode.addEventListener("mousedown", onStart, true);
-    documentNode.addEventListener("touchstart", onStart, true);
-    documentNode.addEventListener("mousemove", onMove, true);
-    documentNode.addEventListener("touchmove", onMove, { capture: true, passive: false });
-    documentNode.addEventListener("mouseup", reset, true);
-    documentNode.addEventListener("touchend", reset, true);
-    documentNode.addEventListener("touchcancel", reset, true);
-
-    return () => {
-      documentNode.removeEventListener("mousedown", onStart, true);
-      documentNode.removeEventListener("touchstart", onStart, true);
-      documentNode.removeEventListener("mousemove", onMove, true);
-      documentNode.removeEventListener("touchmove", onMove, true);
-      documentNode.removeEventListener("mouseup", reset, true);
-      documentNode.removeEventListener("touchend", reset, true);
-      documentNode.removeEventListener("touchcancel", reset, true);
-    };
-  }, [emblaApi]);
+  const [selectedUseCaseIndex, setSelectedUseCaseIndex] = useState(null);
+  const selectedUseCase = selectedUseCaseIndex === null ? null : cases[selectedUseCaseIndex];
 
   if (!cases.length) {
     return null;
   }
 
-  const handleKeyDown = (event) => {
-    if (!emblaApi) return;
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      emblaApi.scrollPrev();
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      emblaApi.scrollNext();
-    }
-  };
+  useEffect(() => {
+    if (!selectedUseCase) return undefined;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setSelectedUseCaseIndex(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [selectedUseCase]);
 
   return (
-    <DetailSection id={id} type={section.type} title={section.title} eyebrow={section.eyebrow}>
-      <div className="detail-use-case-carousel" role="region" aria-label="실제 업무 처리 예시">
-        <div className="detail-use-case-viewport" ref={setViewportRef} tabIndex="0" onKeyDown={handleKeyDown}>
-          <div className="detail-use-case-container">
-            {cases.map((useCase) => (
-              <article className="detail-use-case-slide" key={useCase.id} aria-label={`${useCase.badge} 사례`}>
-                <div className="detail-use-case-head">
-                  <span className="detail-use-case-badge">{useCase.badge}</span>
-                  <p className="detail-use-case-request">{useCase.request}</p>
-                </div>
-                <figure className="detail-use-case-screen">
-                  {useCase.screenshot ? (
-                    <img src={useCase.screenshot} alt={useCase.screenshotAlt ?? `${useCase.badge} 제품 화면`} />
-                  ) : (
-                    <figcaption>실제 제품 화면 추가 예정</figcaption>
-                  )}
-                </figure>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="detail-use-case-controls">
-          <div className="detail-use-case-dots" role="tablist" aria-label="업무 사례 선택">
-            {snapPoints.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                className={index === selectedIndex ? "is-active" : ""}
-                onClick={() => emblaApi?.scrollTo(index)}
-                aria-label={`${index + 1}번째 업무 사례로 이동`}
-                aria-selected={index === selectedIndex}
-                role="tab"
-              />
-            ))}
-          </div>
-        </div>
+    <DetailSection id={id} type={section.type} title={section.title} eyebrow={section.eyebrow} description={section.description}>
+      <div className="detail-use-case-gallery" role="list" aria-label="실제 업무 처리 예시">
+        {cases.map((useCase, index) => (
+          <button
+            className="detail-use-case-preview"
+            key={useCase.id}
+            type="button"
+            onClick={() => setSelectedUseCaseIndex(index)}
+            aria-haspopup="dialog"
+            aria-label={`${useCase.badge} 사례 크게 보기`}
+          >
+            <div className="detail-use-case-head">
+              <h4 className="detail-use-case-title">{useCase.badge}</h4>
+            </div>
+            <figure className="detail-use-case-screen">
+              {useCase.screenshot ? (
+                <img src={useCase.screenshot} alt="" />
+              ) : (
+                <figcaption>실제 제품 화면 추가 예정</figcaption>
+              )}
+            </figure>
+          </button>
+        ))}
       </div>
+      {selectedUseCase ? (
+        <div className="detail-use-case-modal" role="presentation" onClick={() => setSelectedUseCaseIndex(null)}>
+          <div
+            className="detail-use-case-modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selectedUseCase.badge} 사례 상세`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="detail-use-case-modal-head">
+              <div>
+                <h4 className="detail-use-case-modal-title">{selectedUseCase.badge}</h4>
+                <p className="detail-use-case-modal-subtitle">{selectedUseCase.description}</p>
+              </div>
+              <button type="button" onClick={() => setSelectedUseCaseIndex(null)} aria-label="사례 상세 닫기">닫기</button>
+            </div>
+            <div className="detail-use-case-modal-media">
+              <figure className="detail-use-case-modal-screen">
+                <img src={selectedUseCase.screenshot} alt={selectedUseCase.screenshotAlt ?? `${selectedUseCase.badge} 제품 화면`} />
+              </figure>
+              {selectedUseCaseIndex > 0 ? (
+                <button
+                  className="detail-use-case-modal-nav is-prev"
+                  type="button"
+                  aria-label={`${cases[selectedUseCaseIndex - 1].badge} 사례 보기`}
+                  onClick={() => setSelectedUseCaseIndex(selectedUseCaseIndex - 1)}
+                >
+                  <span aria-hidden="true">‹</span>
+                </button>
+              ) : null}
+              {selectedUseCaseIndex < cases.length - 1 ? (
+                <button
+                  className="detail-use-case-modal-nav is-next"
+                  type="button"
+                  aria-label={`${cases[selectedUseCaseIndex + 1].badge} 사례 보기`}
+                  onClick={() => setSelectedUseCaseIndex(selectedUseCaseIndex + 1)}
+                >
+                  <span aria-hidden="true">›</span>
+                </button>
+              ) : null}
+            </div>
+            <UseCaseProcessing useCase={selectedUseCase} />
+          </div>
+        </div>
+      ) : null}
     </DetailSection>
   );
 }
 
 export function EngineeringDecisionsSection({ id, section }) {
-  const tabs = section.tabs ?? [];
+  const tabs = (section.tabs ?? []).filter((tab) => tab.id !== "local-llm-quality");
   const [activeTabId, setActiveTabId] = useState(tabs[0]?.id ?? null);
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
 
