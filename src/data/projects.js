@@ -506,9 +506,8 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
     detailPath: "/projects/mcp-api-agent",
     status: "completed",
     statusLabel: "완료",
-    // TODO: 레이아웃 확인용 임시 영상 — 실제 시연 영상 준비되면 교체
-    videoUrl: "/assets/projects/industrial-ai.mp4",
-    videoPoster: "/assets/projects/industrial-thumbnail.png",
+    videoUrl: "/assets/projects/mcp-work-agent.mp4",
+    videoPoster: "/assets/projects/MCP-API-Work-Agent-thumbnail.png",
     image: "/assets/projects/MCP-API-Work-Agent-thumbnail.png",
     imageFit: "cover",
     summary: "MCP와 외부 API를 통해 외부 시스템 정보를 조회하고 승인된 작업만 실행·검증하는 업무 Agent",
