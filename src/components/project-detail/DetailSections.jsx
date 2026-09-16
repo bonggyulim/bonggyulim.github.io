@@ -92,7 +92,7 @@ const troubleshootingTabs = {
     title: "SQS 비동기 분석의 멱등성과 상태 정합성"
   },
   "worker-scaling-strategy": {
-    title: "CPU 추론 Worker의 적정 확장 단위 검증"
+    title: "CPU 추론 확장 전략 검증"
   },
   "thermal-model-experiments": {
     title: "Thermal 데이터 재정의와 단계별 실험"
@@ -157,40 +157,64 @@ function EmphasizedText({ text, phrases = [], emphasisClasses = {} }) {
   );
 }
 
+function ComparisonTable({ headers, rows, statuses = {} }) {
+  return (
+    <div className="detail-mcp-comparison-scroll">
+      <table>
+        <thead>
+          <tr>
+            {(headers ?? ["구성", "HTTP 요청", "Node Latency", "목록 표시", "Error", "비고"]).map((header) => <th key={header}>{header}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => {
+            const status = statuses[row[0]];
+
+            return (
+              <tr key={row[0]} className={status === "Selected" ? "is-selected" : ""}>
+                {row.map((value, index) => (
+                  <td key={`${row[0]}-${index}`}>
+                    {value}
+                    {index === 0 && status ? <span className={`detail-mcp-comparison-status is-${status.toLowerCase()}`}>{status}</span> : null}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function ComparisonSection({ tab }) {
-  if (!tab.comparisonRows?.length) {
+  if (!tab.comparisonRows?.length && !tab.comparisonStages?.length) {
     return null;
   }
 
   return (
     <section className="detail-mcp-comparison">
       <h4>{tab.comparisonTitle ?? "실험 결과"}</h4>
-      <div className="detail-mcp-comparison-scroll">
-        <table>
-          <thead>
-            <tr>
-              {(tab.comparisonHeaders ?? ["구성", "HTTP 요청", "Node Latency", "목록 표시", "Error", "비고"]).map((header) => <th key={header}>{header}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {tab.comparisonRows.map((row) => {
-              const status = tab.comparisonStatuses?.[row[0]];
-
-              return (
-                <tr key={row[0]} className={status === "Selected" ? "is-selected" : ""}>
-                  {row.map((value, index) => (
-                    <td key={`${row[0]}-${index}`}>
-                      {value}
-                      {index === 0 && status ? <span className={`detail-mcp-comparison-status is-${status.toLowerCase()}`}>{status}</span> : null}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      {tab.comparisonDescription ? (
+      {tab.comparisonIntro ? (
+        <p className="detail-mcp-comparison-intro">
+          <EmphasizedText text={tab.comparisonIntro} phrases={tab.comparisonIntroHighlights} />
+        </p>
+      ) : null}
+      {tab.comparisonStages?.length ? tab.comparisonStages.map((stage) => (
+        <div className="detail-mcp-comparison-stage" key={stage.title}>
+          <strong className="detail-mcp-comparison-subheading">{stage.title}</strong>
+          <ComparisonTable headers={tab.comparisonHeaders} rows={stage.rows} statuses={stage.statuses} />
+          {stage.description ? (
+            <p className="detail-mcp-comparison-description">
+              <EmphasizedText text={stage.description} phrases={stage.descriptionHighlights} />
+            </p>
+          ) : null}
+        </div>
+      )) : <>
+        {tab.comparisonSubheading ? <strong className="detail-mcp-comparison-subheading">{tab.comparisonSubheading}</strong> : null}
+        <ComparisonTable headers={tab.comparisonHeaders} rows={tab.comparisonRows} statuses={tab.comparisonStatuses} />
+      </>}
+      {!tab.comparisonStages?.length && tab.comparisonDescription ? (
         <p className="detail-mcp-comparison-description">
           <EmphasizedText text={tab.comparisonDescription} phrases={tab.comparisonDescriptionHighlights} />
         </p>
@@ -416,6 +440,74 @@ function FieldBlock({ label, children }) {
   );
 }
 
+function DecisionSummary({ tab }) {
+  if (tab.summary) {
+    return (
+      <section className="detail-scaling-footer detail-mcp-performance">
+        <div className="detail-scaling-footer-block">
+          <strong>{tab.summaryLabel ?? "결과"}</strong>
+          <p><EmphasizedText text={tab.summary} phrases={tab.summaryEmphasis} /></p>
+        </div>
+      </section>
+    );
+  }
+
+  if (tab.summaryMetricLines?.length) {
+    return (
+      <section className="detail-scaling-footer detail-mcp-performance">
+        <div className="detail-scaling-footer-block">
+          <strong>{tab.summaryLabel ?? "결과"}</strong>
+          <div className="detail-mcp-summary-lines">
+            {tab.summaryMetricLines.map(([label, value, note]) => (
+              <p key={label}>
+                <strong>{label}</strong>
+                <code>{value}</code>
+                {note ? <strong>{note}</strong> : null}
+              </p>
+            ))}
+          </div>
+          {tab.summaryTrailing ? (
+            <p>
+              <EmphasizedText text={tab.summaryTrailing} phrases={tab.summaryTrailingEmphasis} />
+            </p>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
+
+  if (tab.summaryLead) {
+    return (
+      <section className="detail-scaling-footer detail-mcp-performance">
+        <div className="detail-scaling-footer-block">
+          <strong>{tab.summaryLabel ?? "결과"}</strong>
+          <p className="detail-mcp-summary-lead">
+            <EmphasizedText text={tab.summaryLead} phrases={tab.summaryLeadEmphasis} />
+          </p>
+          {tab.summaryMetrics?.length ? (
+            <ul className="detail-mcp-summary-metrics">
+              {tab.summaryMetrics.map(([label, value, note]) => (
+                <li key={label}>
+                  <strong>{label}:</strong>
+                  <span>{value}</span>
+                  {note ? <em>{note}</em> : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {tab.summaryTrailing ? (
+            <p>
+              <EmphasizedText text={tab.summaryTrailing} phrases={tab.summaryTrailingEmphasis} />
+            </p>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
+
+  return null;
+}
+
 function ContextRow({ leftLabel, rightLabel, children }) {
   const [leftContent, rightContent] = children;
 
@@ -596,57 +688,22 @@ function WorkerComparisonCard({ comparison, accent = "neutral" }) {
 
 function WorkerScalingCard({ card }) {
   return (
-    <article className="detail-problem-card detail-worker-card">
-      <TripleContextRow
-        items={[
-          { label: "초기 운영 조건", content: <EmphasizedText text={card.basis} phrases={["$107의 MVP 운영 예산", "EC2 t3.large 1대·CPU Worker 1개"]} /> },
-          { label: "검증 질문", content: card.scalingNeed },
-          { label: "비교 조건", content: card.comparisonNote }
-        ]}
-      />
-      <div className="detail-problem-details detail-worker-details">
-        <div className="detail-worker-split">
-          <section className="detail-worker-section detail-worker-cost-section detail-worker-split-cost">
-            <h4>MVP 운영 예산 산정</h4>
-            <div className="detail-cost-grid">
-              <div className="detail-cost-table-wrap">
-                <table className="detail-cost-table">
-                  <thead><tr><th>항목</th><th>기준</th><th>월 예상 비용</th></tr></thead>
-                  <tbody>
-                    {card.costRows.map((row) => <tr key={row[0]}>{row.map((cell) => <td key={cell}>{cell}</td>)}</tr>)}
-                    <tr className="is-total">{card.totalCost.map((cell) => <td key={cell}>{cell}</td>)}</tr>
-                    <tr>{card.extraCost.map((cell) => <td key={cell}>{cell}</td>)}</tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <p><EmphasizedText text={card.budgetDescription} /></p>
-          </section>
-
-          <div className="detail-worker-split-bridge">
-            <p>월 운영비 기준 · EC2 t3.large 1대 구성</p>
-            <span className="detail-worker-split-bridge-arrow-down" aria-hidden="true"></span>
-            <p>YOLO26s 640 · CPU ONNX 87.2 ± 0.9ms 참고</p>
-            <span className="detail-worker-split-bridge-arrow-down" aria-hidden="true"></span>
-            <p>단일 EC2의 적정 Worker 수와 Node 분산 방식은 무엇인가?</p>
-            <span className="detail-worker-split-bridge-arrow" aria-hidden="true"></span>
-          </div>
-
-          <section className="detail-worker-section detail-worker-split-verification">
-            <h4>Worker 확장 방식 검증</h4>
-            <div className="detail-worker-comparison-stack">
-              <WorkerComparisonCard comparison={card.comparisonOne} accent="amber" />
-              <WorkerComparisonCard comparison={card.comparisonTwo} accent="teal" />
-            </div>
-          </section>
-        </div>
-
-        <section className="detail-worker-decision">
-          <h4>결정</h4>
-          <p>{card.decision}</p>
+    <article className="detail-problem-card detail-worker-card detail-mcp-decision-card">
+      <div className="detail-mcp-decision-details">
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">문제</strong>
+          <p><EmphasizedText text={card.problem} phrases={card.problemHighlights} /></p>
         </section>
 
-        <a className="detail-worker-source-link" href={card.sourceUrl} target="_blank" rel="noopener noreferrer">실험 원본 보기 ↗</a>
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">판단</strong>
+          <p><EmphasizedText text={card.decision} phrases={card.decisionHighlights} /></p>
+        </section>
+
+        <ComparisonSection tab={card} />
+        <DecisionSummary tab={card} />
+
+        <a className="detail-mcp-results-link" href={card.sourceUrl} target="_blank" rel="noopener noreferrer">실험 원본 보기 ↗</a>
       </div>
     </article>
   );
@@ -866,39 +923,42 @@ function IndustrialScalingCard({ card }) {
   });
 
   return (
-    <article className="detail-problem-card detail-thermal-card">
-      <ContextRow leftLabel={card.problemLabel ?? "문제"} rightLabel="핵심 판단">
-        <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
-        <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
-      </ContextRow>
-
-      <div className="detail-problem-details detail-thermal-details">
-        <section className="detail-thermal-section">
-          <div className="detail-thermal-merge-grid">
-            <div className="detail-thermal-merge-col">
-              <h4 className="detail-thermal-step-heading">{card.backboneFlow.title}</h4>
-              <figure className="detail-thermal-tradeoff detail-backbone-image">
-                <img src={card.backboneFlow.image} alt={card.backboneFlow.imageAlt} />
-              </figure>
-              <p>{card.backboneFlow.summary}</p>
-            </div>
-
-            <div className="detail-thermal-merge-col">
-              <h4 className="detail-thermal-step-heading">{card.stageFlow.title}</h4>
-              <ScalingFlow steps={card.stageFlow.steps} />
-              <div className="detail-scaling-criteria">
-                <span className="detail-scaling-criteria-label">평가 기준</span>
-                {card.stageFlow.criteria.map((item) => (
-                  <span key={item} className="detail-scaling-chip">{item}</span>
-                ))}
-              </div>
-              {card.stageFlow.summary ? <p className="detail-scaling-flow-summary">{card.stageFlow.summary}</p> : null}
-            </div>
-          </div>
+    <article className="detail-problem-card detail-thermal-card detail-mcp-decision-card detail-industrial-decision-card detail-industrial-scaling-card">
+      <div className="detail-mcp-decision-details">
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">문제</strong>
+          <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
         </section>
 
-        <section className="detail-thermal-section detail-thermal-augment-section">
-          <h4 className="detail-thermal-step-heading">{card.lightweightSection.title}</h4>
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">판단</strong>
+          <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
+        </section>
+
+        <div className="detail-industrial-stage-pair">
+          <section className="detail-industrial-stage">
+            <h4>{card.backboneFlow.title}</h4>
+            <figure className="detail-thermal-tradeoff detail-backbone-image">
+              <img src={card.backboneFlow.image} alt={card.backboneFlow.imageAlt} />
+            </figure>
+            <p><EmphasizedText text={card.backboneFlow.summary} phrases={card.backboneFlow.summaryEmphasis} /></p>
+          </section>
+
+          <section className="detail-industrial-stage">
+            <h4>{card.stageFlow.title}</h4>
+            <ScalingFlow steps={card.stageFlow.steps} />
+            <div className="detail-scaling-criteria">
+              <span className="detail-scaling-criteria-label">평가 기준</span>
+              {card.stageFlow.criteria.map((item) => (
+                <span key={item} className="detail-scaling-chip">{item}</span>
+              ))}
+            </div>
+            {card.stageFlow.summary ? <p className="detail-scaling-flow-summary">{card.stageFlow.summary}</p> : null}
+          </section>
+        </div>
+
+        <section className="detail-industrial-stage">
+          <h4>{card.lightweightSection.title}</h4>
           <p>{card.lightweightSection.summary}</p>
           <div className="detail-scaling-stage-grid">
             {card.lightweightSection.metrics.map((metric) => (
@@ -907,7 +967,7 @@ function IndustrialScalingCard({ card }) {
           </div>
         </section>
 
-        <section className="detail-scaling-footer">
+        <section className="detail-scaling-footer detail-mcp-performance">
           <div className="detail-scaling-footer-block">
             <strong>결과</strong>
             {resultItems.map((item, index) => (
@@ -924,23 +984,28 @@ function IndustrialScalingCard({ card }) {
 
 function IndustrialRuntimeAlignmentCard({ card }) {
   return (
-    <article className="detail-problem-card detail-thermal-card">
-      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
-        <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
-        <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
-      </ContextRow>
+    <article className="detail-problem-card detail-thermal-card detail-mcp-decision-card detail-industrial-decision-card detail-industrial-runtime-card">
+      <div className="detail-mcp-decision-details">
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">문제</strong>
+          <p><EmphasizedText text={card.problem} phrases={card.problemEmphasis} /></p>
+        </section>
 
-      <div className="detail-problem-details detail-thermal-details">
-        <section className="detail-thermal-section">
-          <h4 className="detail-thermal-step-heading">{card.runtimeAlignment.title}</h4>
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">핵심 판단</strong>
+          <p><EmphasizedText text={card.decision} phrases={card.decisionEmphasis} /></p>
+        </section>
+
+        <section className="detail-industrial-stage">
+          <h4>{card.runtimeAlignment.title}</h4>
           <figure className="detail-runtime-image">
             <img src={card.runtimeAlignment.image} alt={card.runtimeAlignment.imageAlt} />
           </figure>
           <p><EmphasizedText text={card.runtimeAlignment.summary} phrases={card.runtimeAlignment.summaryEmphasis} /></p>
         </section>
 
-        <section className="detail-thermal-section detail-runtime-criteria-section">
-          <h4 className="detail-thermal-step-heading">{card.inferenceCriteria.title}</h4>
+        <section className="detail-industrial-stage detail-runtime-criteria-section">
+          <h4>{card.inferenceCriteria.title}</h4>
           <div className="detail-runtime-criteria-grid">
             {card.inferenceCriteria.items.map((item) => (
               <div key={item.title} className="detail-runtime-criteria-item">
@@ -951,7 +1016,7 @@ function IndustrialRuntimeAlignmentCard({ card }) {
           </div>
         </section>
 
-        <section className="detail-scaling-footer">
+        <section className="detail-scaling-footer detail-mcp-performance">
           <div className="detail-scaling-footer-block">
             <strong>결과</strong>
             <p><EmphasizedText text={card.result} phrases={card.resultEmphasis} /></p>
@@ -963,105 +1028,107 @@ function IndustrialRuntimeAlignmentCard({ card }) {
 }
 
 function SqsTroubleshootingCard() {
-  const codeBlocks = [
+  const [isFlowOpen, setIsFlowOpen] = useState(false);
+  const implementationItems = [
     {
-      accent: "teal",
       title: "중복 Job 생성 차단",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/de4e810faa34021c2d3c257ddd1c6cd590f0692a/backend/src/main/resources/db/migration/V8__add_unique_active_analysis_job_per_image.sql#L1-L3",
       points: [
-        "Partial Unique Index로 활성 Job 1개만 허용",
-        "동시 요청 Race를 DB에서 차단"
+        "서비스에서 Active Job 존재 여부를 확인하고, Partial Unique Index로 동시 요청 Race까지 DB에서 차단"
       ],
       pointEmphasis: ["Partial Unique Index"]
     },
     {
-      accent: "blue",
-      title: "메시지 재전달 시 재실행 방지",
+      title: "메시지 재전달·재실행 제어",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/378b524e2dae099ba60d1f228e1d108c915b7262/ai-worker/app/infrastructure/db/analysis_job_repository.py#L54-L68",
       points: [
-        "조건부 상태 갱신으로 처리 가능한 Job만 선점",
-        "이미 선점되거나 완료된 Job은 재실행하지 않음"
+        "QUEUED → RUNNING 조건부 갱신에 성공한 Job만 처리하고, terminal 실패만 삭제 · retryable 실패는 재수신"
       ],
-      pointEmphasis: ["조건부 상태 갱신"]
+      pointEmphasis: ["QUEUED → RUNNING"]
     },
     {
-      accent: "green",
       title: "결과·Job 상태 정합성 유지",
       linkUrl: "https://github.com/solar-ai-dev/pv-fusion/blob/develop/ai-worker/app/infrastructure/db/result_repository.py#L149-L284",
       points: [
-        "결과·결함 저장 + Job 완료 변경을 단일 Transaction으로 처리",
-        "일부만 반영되는 상태 불일치 방지"
+        "Result·Defect 저장과 RUNNING → SUCCEEDED 변경을 단일 DB Transaction으로 처리하고, 상태 전이 실패 시 완료 처리하지 않음"
       ],
-      pointEmphasis: ["단일 Transaction"]
+      pointEmphasis: ["단일 DB Transaction"]
     }
   ];
 
   return (
-    <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card">
-      <ContextRow leftLabel="문제" rightLabel="핵심 판단">
-        <p><EmphasizedText text="연속·동시 요청으로 동일 이미지의 중복 Job이 생성될 수 있고, SQS 메시지 재전달로 동일 Job이 반복 실행될 수 있으며, 분석 결과와 Job 완료 상태가 서로 어긋날 수 있었습니다." phrases={["중복 Job이 생성될 수 있고", "분석 결과와 Job 완료 상태가 서로 어긋날 수 있었습니다."]} /></p>
-        <p><EmphasizedText text="생성 단계는 DB 제약, 실행 단계는 조건부 상태 갱신, 완료 단계는 단일 DB 트랜잭션으로 나눠 중복 실행과 상태 불일치를 단계별로 제어하도록 설계했습니다." phrases={["DB 제약", "조건부 상태 갱신", "단일 DB 트랜잭션"]} /></p>
-      </ContextRow>
-
-      <div className="detail-sqs-visual-grid">
-        <section className="detail-sqs-diagram-section">
-          <h4>SQS 흐름도</h4>
-          <div className="detail-sqs-diagram-link" aria-hidden="true">
-            <img className="detail-sqs-diagram" src="/assets/projects/diagram.png" alt="SQS Job 상태 안정화 다이어그램" />
-          </div>
+    <article className="detail-problem-card detail-sqs-card detail-sqs-flow-card detail-mcp-decision-card detail-sqs-vertical-card">
+      <div className="detail-mcp-decision-details">
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">문제</strong>
+          <p>
+            <EmphasizedText text="동일 이미지에 연속·동시 분석 요청이 들어오면 Active Job이 중복 생성될 수 있었고, SQS 재전달로 이미 처리 중인 Job이 다시 실행될 가능성도 있었습니다." phrases={["Active Job이 중복 생성될 수 있었고"]} />
+            <br />
+            <EmphasizedText text="또한 결과 저장과 Job 완료 상태 변경이 분리되면 분석 결과와 Job 상태가 서로 어긋날 수 있었습니다." phrases={["분석 결과와 Job 상태가 서로 어긋날 수 있었습니다."]} />
+          </p>
         </section>
 
-        <section className="detail-sqs-implementation">
-          <h4>구현 근거</h4>
-          <div className="detail-sqs-code-stack">
-            {codeBlocks.map((block) => (
-              block.linkUrl ? (
-                <a
-                  key={block.title}
-                  className={`detail-sqs-code-card-link is-${block.accent}`.trim()}
-                  href={block.linkUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <article className={`detail-sqs-code-card is-${block.accent}`.trim()}>
-                    <ExternalLinkIcon />
-                    <div className="detail-sqs-code-card-head">
-                      <strong>{block.title}</strong>
-                    </div>
-                    {block.description ? <p className="detail-sqs-code-card-description">{block.description}</p> : null}
-                    <div className="detail-sqs-code-points">
-                      <ul className="detail-card-list">
-                        {block.points.map((point) => (
-                          <li key={point}><EmphasizedText text={point} phrases={block.pointEmphasis} /></li>
-                        ))}
-                      </ul>
-                    </div>
-                  </article>
-                </a>
-              ) : (
-                <article key={block.title} className={`detail-sqs-code-card is-${block.accent}`.trim()}>
-                  <div className="detail-sqs-code-card-head">
-                    <strong>{block.title}</strong>
-                  </div>
-                  {block.description ? <p className="detail-sqs-code-card-description">{block.description}</p> : null}
-                  <div className="detail-sqs-code-points">
-                    <ul className="detail-card-list">
-                      {block.points.map((point) => (
-                        <li key={point}><EmphasizedText text={point} phrases={block.pointEmphasis} /></li>
-                      ))}
-                    </ul>
-                  </div>
-                </article>
-              )
+        <section className="detail-mcp-decision-context-block">
+          <strong className="detail-context-label">판단</strong>
+          <p>
+            <EmphasizedText text="중복 처리를 하나의 로직으로 막기보다 Job 생성 · 실행 · 완료 단계마다 정합성 경계를 분리하기로 했습니다." phrases={["Job 생성 · 실행 · 완료 단계마다 정합성 경계를 분리"]} />
+            <br />
+            <EmphasizedText text="생성은 DB 제약으로 중복을 차단하고, 실행은 조건부 상태 전이로 처리 권한을 제어하며, 완료는 결과 저장과 상태 변경을 하나의 Transaction으로 묶었습니다." phrases={["DB 제약", "조건부 상태 전이", "하나의 Transaction"]} />
+          </p>
+        </section>
+
+        <section className="detail-sqs-vertical-section detail-sqs-implementation detail-sqs-implementation-list">
+          <strong className="detail-context-label">구현</strong>
+          <div className="detail-sqs-implementation-items">
+            {implementationItems.map((item) => (
+              <article key={item.title} className="detail-sqs-implementation-item">
+                <div className="detail-sqs-implementation-item-head">
+                  <strong>{item.title}</strong>
+                  <a href={item.linkUrl} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+                </div>
+                <ul>
+                  {item.points.map((point) => (
+                    <li key={point}><EmphasizedText text={point} phrases={item.pointEmphasis} /></li>
+                  ))}
+                </ul>
+              </article>
             ))}
           </div>
         </section>
-      </div>
 
-      <section className="detail-sqs-result">
-        <h4>결과</h4>
-        <p><EmphasizedText text="DB 제약과 조건부 상태 갱신으로 분석 Job 생성·실행 경로의 멱등성을 확보하고, 분석 결과 저장과 Job 완료 상태 변경을 하나의 트랜잭션으로 처리해 실패·재처리 상황에서도 결과와 Job 상태의 정합성을 유지했습니다." phrases={["분석 Job 생성·실행 경로의 멱등성", "하나의 트랜잭션", "결과와 Job 상태의 정합성"]} /></p>
-      </section>
+        <section className="detail-sqs-vertical-section detail-scaling-footer detail-mcp-performance">
+          <div className="detail-scaling-footer-block">
+            <strong>결과</strong>
+            <p>
+              <EmphasizedText text="Active Job 중복 생성 → DB 제약으로 차단" phrases={["Active Job 중복 생성"]} />
+              <br />
+              <EmphasizedText text="SQS 재전달·중복 실행 → 조건부 상태 전이와 삭제 정책으로 제어" phrases={["SQS 재전달·중복 실행"]} />
+              <br />
+              <EmphasizedText text="Result ↔ Job 상태 불일치 → 단일 Transaction으로 방지" phrases={["Result ↔ Job 상태 불일치"]} />
+              <br />
+              <br />
+              <EmphasizedText text="Job의 생성 · 실행 · 완료 단계별로 정합성 경계를 분리해, 동시 요청과 SQS 재처리 상황에서도 분석 상태가 일관되게 수렴하도록 구성했습니다." phrases={["생성 · 실행 · 완료 단계별로 정합성 경계를 분리"]} />
+            </p>
+          </div>
+        </section>
+
+        <section className="detail-sqs-vertical-section detail-sqs-diagram-section detail-sqs-full-diagram">
+          <button
+            type="button"
+            className="detail-sqs-flow-toggle"
+            aria-expanded={isFlowOpen}
+            onClick={() => setIsFlowOpen((isOpen) => !isOpen)}
+          >
+            <span>SQS 흐름도</span>
+            <span aria-hidden="true">{isFlowOpen ? "−" : "+"}</span>
+          </button>
+          {isFlowOpen ? (
+            <div className="detail-sqs-diagram-link">
+              <img className="detail-sqs-diagram" src="/assets/projects/diagram.png" alt="SQS Job 상태 안정화 다이어그램" />
+            </div>
+          ) : null}
+        </section>
+      </div>
     </article>
   );
 }
@@ -1356,12 +1423,17 @@ export function EngineeringDecisionsSection({ id, section }) {
           aria-labelledby={`detail-tab-${activeTab.id}`}
         >
           <article className="detail-problem-card detail-sqs-flow-card detail-mcp-decision-card">
-            <ContextRow leftLabel="문제" rightLabel={activeTab.decisionLabel}>
-              <p><EmphasizedText text={activeTab.problem} phrases={activeTab.problemHighlights} /></p>
-              <p><EmphasizedText text={activeTab.decision} phrases={activeTab.decisionHighlights} /></p>
-            </ContextRow>
-
             <div className="detail-mcp-decision-details">
+              <section className="detail-mcp-decision-context-block">
+                <strong className="detail-context-label">문제</strong>
+                <p><EmphasizedText text={activeTab.problem} phrases={activeTab.problemHighlights} /></p>
+              </section>
+
+              <section className="detail-mcp-decision-context-block">
+                <strong className="detail-context-label">{activeTab.decisionLabel}</strong>
+                <p><EmphasizedText text={activeTab.decision} phrases={activeTab.decisionHighlights} /></p>
+              </section>
+
               {activeTab.validationScenarios?.length ? (
                 <section className="detail-mcp-comparison detail-mcp-validation">
                   <div className="detail-mcp-validation-head">
@@ -1498,14 +1570,7 @@ export function EngineeringDecisionsSection({ id, section }) {
                 </>
               ) : null}
 
-              {activeTab.summary ? (
-                <section className="detail-scaling-footer">
-                  <div className="detail-scaling-footer-block">
-                    <strong>{activeTab.summaryLabel ?? "결과"}</strong>
-                    <p><EmphasizedText text={activeTab.summary} phrases={activeTab.summaryEmphasis} /></p>
-                  </div>
-                </section>
-              ) : null}
+              <DecisionSummary tab={activeTab} />
 
               {activeTab.fullResultsUrl ? (
                 <a className="detail-mcp-results-link" href={activeTab.fullResultsUrl} target="_blank" rel="noopener noreferrer">

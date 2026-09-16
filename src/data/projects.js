@@ -105,19 +105,20 @@ export const projects = [
           id: "category-scaling-strategy",
           kind: "industrial_scaling",
           title: "신규 카테고리 대응 구조와 경량 모델 검증",
-          problemLabel: "운영 과제",
-          problem: "신규 카테고리마다 모델을 다시 학습하지 않고 빠르게 대응하면서, 검사 요청 증가에 대비해 판정 성능과 추론 속도·GPU 자원 사용량을 함께 고려할 구조가 필요했습니다.",
-          problemEmphasis: ["모델을 다시 학습하지 않고 빠르게 대응", "추론 속도·GPU 자원 사용량"],
-          decision: "Backbone은 유지하고 카테고리별 Memory Bank를 분리해 신규 카테고리에 대응했습니다. SPEED와 PERFORMANCE의 역할을 나누고, SPEED의 경량 대안으로 PERFORMANCE를 Teacher로 둔 Student 실험을 설계했습니다.",
-          decisionEmphasis: ["Backbone은 유지", "카테고리별 Memory Bank", "SPEED와 PERFORMANCE의 역할을 나누고", "PERFORMANCE를 Teacher로 둔 Student 실험"],
+          problemLabel: "문제",
+          problem: "신규 카테고리가 추가될 때마다 모델을 다시 학습하지 않고 빠르게 대응해야 했고, 검사 요청 증가에 대비해 추론 시간과 GPU 사용량을 줄이면서 판정 성능을 유지할 구조가 필요했습니다.",
+          problemEmphasis: ["빠르게 대응", "추론 시간과 GPU 사용량을 줄이면서 판정 성능을 유지할 구조"],
+          decision: "하나의 모델 최적화에 의존하지 않고 세 단계로 접근했습니다.\n① Backbone 재사용 + 카테고리별 Memory Bank 분리\n② SPEED / PERFORMANCE 역할 분리\n③ Teacher–Student 경량화로 확장성과 자원 효율을 함께 개선했습니다.",
+          decisionEmphasis: ["① Backbone 재사용 + 카테고리별 Memory Bank 분리", "② SPEED / PERFORMANCE 역할 분리", "③ Teacher–Student 경량화"],
           backboneFlow: {
-            title: "01. Backbone 유지 + 카테고리별 Memory Bank 분리 — 신규 카테고리 대응 구조",
+            title: "1. Backbone 재사용 + 카테고리별 Memory Bank",
             image: "/assets/projects/memorybank.svg",
             imageAlt: "모델별 Backbone과 카테고리별 Memory Bank를 이용한 신규 카테고리 대응 구조 다이어그램",
-            summary: "각 모델의 Backbone에서 정상 이미지 Feature를 추출해 카테고리별 Memory Bank로 관리하고, 검사 이미지의 Feature와 비교해 Anomaly Score와 Heatmap을 생성합니다."
+            summary: "Backbone은 재사용하고 정상 Feature만 카테고리별 Memory Bank로 분리했습니다.\n신규 카테고리는 정상 이미지로 Memory Bank만 생성해 추가하도록 구성했습니다.",
+            summaryEmphasis: ["카테고리별 Memory Bank로 분리"]
           },
           stageFlow: {
-            title: "02. 속도형·성능형 모델 역할 분리",
+            title: "2. SPEED / PERFORMANCE 역할 분리",
             steps: [
               {
                 type: "box2",
@@ -137,7 +138,7 @@ export const projects = [
             summary: "속도형 모델로 빠르게 1차 판정하고, 저신뢰·경계 구간 결과는 성능형 모델로 재검토·정밀 판정"
           },
           lightweightSection: {
-            title: "03. Teacher–Student 경량화 검증",
+            title: "3. Teacher–Student 경량화",
             summary: "기존 SPEED보다 효율적인 1차 판정 모델을 검토하기 위해 PERFORMANCE를 Teacher로 두고 Student를 학습했으며, 실제 운영 후보 평가는 기존 SPEED와 Student를 비교했습니다.",
             metrics: [
               { title: "Peak GPU Memory", beforeLabel: "SPEED", before: "89.8 MB", afterLabel: "Student", after: "84.2 MB", note: "약 6.2% 감소" },
@@ -148,9 +149,9 @@ export const projects = [
             ],
             resultItems: [
               {
-                text: "Student는 기존 SPEED 대비 이미지 1장 평균 처리 시간을 약 72.7% 단축하고 Peak GPU Memory를 약 6.2% 줄이면서 주요 판정·위치 성능을 유사한 수준으로 유지해, 빠른 1차 판정을 위한 경량 모델 후보로 선정했습니다.",
-                emphasisPrimary: ["이미지 1장 평균 처리 시간을 약 72.7% 단축", "Peak GPU Memory를 약 6.2% 줄이면서", "주요 판정·위치 성능을 유사한 수준으로 유지"],
-                emphasisSecondary: ["빠른 1차 판정을 위한 경량 모델 후보로 선정"]
+                text: "Student는 기존 SPEED 대비 평균 처리시간을 72.7% 단축하고 Peak GPU Memory를 6.2% 줄이면서, 주요 판정 성능은 유사 수준을 유지해 1차 판정 경량 후보로 선정했습니다.",
+                emphasisPrimary: ["평균 처리시간을 72.7% 단축하고 Peak GPU Memory를 6.2% 줄이면서", "주요 판정 성능은 유사 수준을 유지"],
+                emphasisSecondary: ["1차 판정 경량 후보로 선정했습니다."]
               }
             ]
           }
@@ -206,16 +207,18 @@ export const projects = [
     summary: "드론 RGB·Thermal 이미지로 태양광 패널의 이상 후보를 탐지하고, 분석 결과와 조치 이력을 관리하는 플랫폼",
     homeSummary: "드론 RGB·열화상 이미지에서 태양광 패널 이상 후보를 탐지하고 후속 조치를 지원하는 플랫폼",
     description:
-      "드론 RGB·Thermal 이미지에서 태양광 패널의 이상 후보를 탐지하고, 분석 결과와 조치 이력을 관리하는 플랫폼입니다.",
+      "드론 RGB·Thermal 이미지에서 태양광 패널의 이상 후보를 탐지하고,\nBounding Box·Heatmap 등으로 결과를 시각화해 청소·재촬영·현장 점검·교체 검토 우선순위를 제공하며 분석 결과와 조치 이력을 관리하는 플랫폼입니다.",
     descriptionEmphasis: [
       "드론 RGB·Thermal 이미지에서 태양광 패널의 이상 후보를 탐지",
+      "청소·재촬영·현장 점검·교체 검토 우선순위",
       "SQS 기반 비동기 분석",
       "ONNX Runtime CPU 추론",
       "AWS·K3s 환경"
     ],
     meta: [
       "2026.05.26 ~ 2026.07.05",
-      "2인 팀 프로젝트"
+      "2인 팀 프로젝트",
+      "월 운영비 $107.31"
     ],
     image: "/assets/projects/pv-insight-thumbnail.png",
     imageFit: "cover",
@@ -406,33 +409,44 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
           {
             id: "worker-scaling-strategy",
             kind: "worker_scaling",
-            title: "CPU 추론 Worker의 적정 확장 단위 검증",
-            basis: "월 약 $107의 MVP 운영 예산을 기준으로 EC2 t3.large 1대·CPU Worker 1개를 Baseline으로 설정했습니다.",
-            scalingNeed: "CPU 기반 추론에서 동일 Node의 Worker 증설과 Node 수평 확장 중 어떤 방식이 처리 시간 개선에 유리한지 비교했습니다.",
-            comparisonNote: "RGB·Thermal 각 100 Job을 동일 조건으로 처리하고, Worker 수와 Node 배치에 따른 처리 시간·CPU 사용률을 비교했습니다.",
-            budgetDescription: "AWS Pricing Calculator로 단일 EC2 기반 MVP 운영환경의 월 비용을 산정",
-            costRows: [
-              ["EC2 + EBS", "t3.large / gp3 100GB", "$85.04"],
-              ["RDS + Storage", "db.t4g.micro / gp3", "$20.87"],
-              ["S3", "20GB / 소규모 요청", "$0.50"],
-              ["ECR", "5GB 이미지 저장", "$0.50"],
-              ["SQS", "Standard Queue / 1M", "$0.40"]
+            title: "CPU 추론 확장 전략 검증",
+            problem: "월 약 $107 규모의 MVP 운영 예산 안에서 EC2 t3.large 기반 CPU Worker로 AI 분석 Job을 처리해야 했습니다.\n분석 요청이 한 번에 많이 들어오면 SQS 작업 큐가 쌓이면서 전체 처리 완료까지 시간이 길어지는 문제가 있었습니다.",
+            problemHighlights: ["$107 규모의 MVP 운영 예산", "SQS 작업 큐가 쌓이면서 전체 처리 완료까지 시간이 길어지는 문제"],
+            decision: "추가 인프라 비용을 바로 늘리기보다 먼저 동일 Node에서 Worker 수를 늘려 병렬 처리 효과를 확인하기로 했습니다.\nWorker 증설만으로 충분하지 않을 경우에는 EC2 Node를 추가해 Worker를 분산하는 수평 확장 방식까지 비교해, 비용 대비 효과가 높은 확장 전략을 결정하기로 했습니다.",
+            decisionHighlights: ["먼저 동일 Node에서 Worker 수를 늘려 병렬 처리 효과를 확인", "EC2 Node를 추가해 Worker를 분산하는 수평 확장 방식", "비용 대비 효과가 높은 확장 전략"],
+            comparisonTitle: "실험 — Worker 증설 후 Node 분산 비교",
+            comparisonHeaders: ["구성", "RGB 처리시간", "RGB 처리량", "Thermal 처리시간", "Thermal 처리량"],
+            comparisonStages: [
+              {
+                title: "1차 — 동일 Node에서 Worker 증설",
+                rows: [
+                  ["1 EC2 / 1 Worker", "271.40s", "0.368 jobs/s", "80.19s", "1.247 jobs/s"],
+                  ["1 EC2 / 2 Workers", "251.35s", "0.398 jobs/s", "65.43s", "1.528 jobs/s"]
+                ],
+                statuses: { "1 EC2 / 1 Worker": "Baseline" },
+                description: "같은 Node에서 Worker를 1 → 2로 늘렸을 때 RGB 처리량은 8.2% 증가하는 데 그쳤고, 평균 추론시간은 2.45s → 4.60s, Node CPU Peak는 99%까지 상승했습니다.",
+                descriptionHighlights: ["8.2% 증가", "99%"]
+              },
+              {
+                title: "2차 — Worker를 Node별로 분산",
+                rows: [
+                  ["1 EC2 / 2 Workers", "251.35s", "0.398 jobs/s", "65.43s", "1.528 jobs/s"],
+                  ["2 EC2 / 2 Workers", "127.19s", "0.786 jobs/s", "39.21s", "2.550 jobs/s"]
+                ],
+                statuses: { "2 EC2 / 2 Workers": "Selected" },
+                description: "2개 Worker를 한 Node에 두는 대신 2개 Node에 분산하자 RGB·Thermal 모두 처리시간과 처리량이 크게 개선되었습니다.",
+                descriptionHighlights: ["2개 Node에 분산하자 RGB·Thermal 모두 처리시간과 처리량이 크게 개선"]
+              }
             ],
-            totalCost: ["합계", "AWS Pricing Calculator", "$107.31 / month"],
-            extraCost: ["별도 반영", "Public IPv4 / EIP", "+$3.65"],
-            comparisonOne: {
-              title: "1 EC2 / 1 Worker → 1 EC2 / 2 Workers",
-              rgb: ["271.4s → 251.4s", "약 7.4% 단축"],
-              thermal: ["80.2s → 65.4s", "약 18.4% 단축"],
-              conclusion: "동일 Node의 CPU 경합으로 Worker 증설 효과 제한 (CPU Peak ≈99%)"
-            },
-            comparisonTwo: {
-              title: "1 EC2 / 2 Workers → 2 EC2 / 2 Workers",
-              rgb: ["251.4s → 127.2s", "약 49.4% 단축"],
-              thermal: ["65.4s → 39.2s", "약 40.1% 단축"],
-              conclusion: "Worker 수를 유지한 채 Node를 분산하자 처리 시간이 크게 감소 (CPU Peak ≈76%)"
-            },
-            decision: "동일 Node에서 Worker를 늘렸을 때는 CPU 경합으로 개선 폭이 제한적이었고, Worker를 Node별로 분산했을 때 처리 시간이 크게 줄었습니다. 이를 바탕으로 노드당 1 Worker를 유지하고 Node를 수평 확장하는 방향을 우선 확장 전략으로 결정했습니다.",
+            summaryLabel: "성과",
+            summaryMetricLines: [
+              ["RGB 처리시간", "271.4s → 127.2s", "(-53.1%)"],
+              ["RGB 처리량", "0.368 → 0.786 jobs/s", "(+113.6%)"],
+              ["Thermal 처리시간", "80.2s → 39.2s", "(-51.1%)"],
+              ["Thermal 처리량", "1.247 → 2.550 jobs/s", "(+104.5%)"]
+            ],
+            summaryTrailing: "동일 Node의 Worker 증설보다 Node를 추가해 Worker를 분산하는 방식이 CPU 추론 확장에 효과적임을 확인하고, Node 수평 확장을 우선 확장 전략으로 결정했습니다.",
+            summaryTrailingEmphasis: ["Node를 추가해 Worker를 분산하는 방식이 CPU 추론 확장에 효과적임을 확인", "Node 수평 확장을 우선 확장 전략으로 결정했습니다."],
             sourceUrl: "https://github.com/solar-ai-dev/pv-fusion/tree/develop/docs/benchmarks/worker-scaling"
           },
           {
@@ -854,14 +868,17 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             id: "provider-api-performance",
             title: "Provider API 조회 성능 개선",
             problem:
-              "Gmail 최근 20건 목록 조회가 느리게 체감돼 조회 경로를 확인했습니다.\n목록 응답만으로 필요한 Metadata를 구성할 수 없어 Thread별 Detail 조회가 추가됐고, List 1회 + Detail 20회로 HTTP 요청이 21회 발생했습니다.",
-            problemHighlights: ["List 1회 + Detail 20회로 HTTP 요청이 21회 발생"],
-            decisionLabel: "실험 설계",
+              "Gmail Thread 20건의 표시용 Metadata를 완성하려면 목록 조회 후 각 Thread의 Detail 조회가 추가로 필요했습니다.\n기존 Individual / 3W에서는 List 1회 + Detail 20회로 물리 HTTP 요청이 총 21회 발생했고, 이 구간이 목록 조회 지연의 주요 병목이었습니다.",
+            problemHighlights: ["List 1회 + Detail 20회", "21회 발생"],
+            decisionLabel: "판단",
             decision:
-              "이를 개선하기 위해 Gmail API 권장 Batch 범위에서 Batch Size × Worker 10개 조합을 비교했습니다.\n먼저 조회 결과 정합성과 오류 안정성을 확인하고, 이후 p95·HTTP 요청 수·CPU·구현 단순성을 기준으로 후보를 비교했습니다.",
-            decisionHighlights: ["Gmail API 권장 Batch 범위에서 Batch Size × Worker 10개 조합을 비교", "p95·HTTP 요청 수·CPU·구현 단순성"],
-            comparisonTitle: "Provider 후보 비교",
-            comparisonHeaders: ["구성", "HTTP 요청", "Provider p95", "Provider CPU", "Error"],
+              "Worker를 늘리면 응답 시간은 줄일 수 있지만, HTTP 요청 수와 CPU 비용은 거의 그대로 유지됐습니다.\n따라서 단순 Worker 증설보다 Batch로 HTTP fan-out 자체를 줄이는 것이 핵심이라고 판단했습니다.",
+            decisionHighlights: ["HTTP 요청 수와 CPU 비용은 거의 그대로 유지됐습니다.", "Batch로 HTTP fan-out 자체를 줄이는 것이 핵심"],
+            comparisonTitle: "실험 — Batch Size × Worker 조합 비교",
+            comparisonIntro:
+              "Batch Size × Worker 10개 조합을 각 100회 비교했습니다.\n먼저 count · order · metadata · next_page_token 정합성을 확인한 뒤 Provider p95 · 물리 HTTP 요청 수 · CPU · Error를 비교했습니다.",
+            comparisonIntroHighlights: ["Batch Size × Worker 10개 조합을 각 100회 비교", "Provider p95 · 물리 HTTP 요청 수 · CPU · Error"],
+            comparisonHeaders: ["구성", "물리 HTTP 요청", "Provider p95", "Provider CPU", "Error"],
             comparisonRows: [
               ["Individual / 3W", "21", "5.71s", "149.4ms/job", "0%"],
               ["Individual / 10W", "21", "2.90s", "143.6ms/job", "0%"],
@@ -870,11 +887,18 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
             ],
             comparisonStatuses: { "Individual / 3W": "Baseline", "Batch 20 / 1W": "Selected" },
             comparisonDescription:
-              "Worker 증설은 p95를 줄였지만 HTTP 요청 수와 CPU 사용량은 거의 유지됐습니다.\nBatch 적용 시 두 지표가 함께 감소했고, B20W1은 B5W4와 비슷한 p95에서 HTTP 요청 수와 CPU 사용량이 가장 낮았습니다.",
-            comparisonDescriptionHighlights: ["HTTP 요청 수와 CPU 사용량은 거의 유지", "B20W1은 B5W4와 비슷한 p95에서 HTTP 요청 수와 CPU 사용량이 가장 낮았습니다."],
-            summary:
-              "선정한 B20W1은 Provider 수준에서 끝내지 않고 Production READ Node와 Local API에서 다시 검증했습니다.\n동일한 조회 결과와 Metadata 정합성을 유지하면서 HTTP 요청 21회 -> 2회, Production READ Node p95 63.2% 단축, Local API p95 68.0% 단축을 확인했습니다. Error·Timeout·429는 발생하지 않았습니다.",
-            summaryEmphasis: ["Production READ Node와 Local API에서 다시 검증", "HTTP 요청 21회 -> 2회, Production READ Node p95 63.2% 단축, Local API p95 68.0% 단축"],
+              "B20/W1은 B5/W4와 유사한 p95를 유지하면서 HTTP 요청 수와 CPU 사용량이 가장 낮았고, Worker 1개로 구성도 단순해 최종 선택했습니다.",
+            comparisonDescriptionHighlights: ["B20/W1은 B5/W4와 유사한 p95를 유지하면서 HTTP 요청 수와 CPU 사용량이 가장 낮았고, Worker 1개로 구성도 단순해 최종 선택했습니다."],
+            summaryLabel: "성과",
+            summaryMetricLines: [
+              ["물리 HTTP 요청", "21회 → 2회"],
+              ["Provider CPU", "149.4 → 33.1ms/job", "(-77.8%)"],
+              ["Production READ Node p95", "5.40s → 1.99s", "(-63.2%)"],
+              ["Local API p95", "5.48s → 1.75s", "(-68.05%)"]
+            ],
+            summaryTrailing:
+              "동일한 조회 결과와 Metadata 정합성을 유지한 채 Local API와 Production READ Node에서 각각 100회 재검증했으며, Error·Timeout·403/429는 발생하지 않았습니다.",
+            summaryTrailingEmphasis: ["Error·Timeout·403/429는 발생하지 않았습니다."],
             fullResultsUrl: "https://github.com/solar-ai-dev/google-work-agent/tree/main/evaluation/results/gmail-metadata-hydration-20260914-7afac9f5"
           }
         ]
