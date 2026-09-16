@@ -149,8 +149,8 @@ export const projects = [
             ],
             resultItems: [
               {
-                text: "Student는 기존 SPEED 대비 평균 처리시간을 72.7% 단축하고 Peak GPU Memory를 6.2% 줄이면서, 주요 판정 성능은 유사 수준을 유지해 1차 판정 경량 후보로 선정했습니다.",
-                emphasisPrimary: ["평균 처리시간을 72.7% 단축하고 Peak GPU Memory를 6.2% 줄이면서", "주요 판정 성능은 유사 수준을 유지"],
+                text: "Memory Bank로 신규 카테고리 재학습 범위를 줄이고, SPEED/PERFORMANCE로 검사 비용을 분리했으며, Student는 기존 SPEED 대비 평균 처리시간 72.7% 단축·GPU Memory 6.2% 감소를 확인해 1차 판정 경량 후보로 선정했습니다.",
+                emphasisPrimary: ["Memory Bank로 신규 카테고리 재학습 범위를 줄이고", "SPEED/PERFORMANCE로 검사 비용을 분리", "평균 처리시간 72.7% 단축·GPU Memory 6.2% 감소"],
                 emphasisSecondary: ["1차 판정 경량 후보로 선정했습니다."]
               }
             ]
