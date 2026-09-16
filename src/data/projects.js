@@ -291,7 +291,7 @@ export const projects = [
             items: [
               "AWS RDS·S3·SQS·EC2·K3s 운영환경 구성",
               "Traefik·HTTPS 기반 외부 라우팅 구성",
-              "Jenkins → ECR → K3s CI/CD 파이프라인 적용",
+              "Jenkins 기반 테스트·빌드 → ECR Push → K3s Rollout 자동화",
               "운영 예산을 기준으로 서버 구성과 Worker 확장 방식 검증",
             ],
             emphasisIndex: 2
