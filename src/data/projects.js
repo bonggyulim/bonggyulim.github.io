@@ -244,7 +244,6 @@ export const projects = [
         "AWS ECR",
         "Traefik"
       ],
-    serviceUrl: "https://app.pv-insight.com/",
     githubUrl: pvRepo,
     pptUrl: "https://drive.google.com/file/d/1aGiUSR2hrWWxOQss0XEdZAJtKm6wi4x0/view?usp=sharing",
     demoUrl: "",
@@ -560,7 +559,6 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
     ],
     githubUrl: "https://github.com/solar-ai-dev/mcp-work-agent",
     actionItems: [
-      { key: "installer", label: "설치 파일" },
       { key: "github", label: "GitHub", href: "https://github.com/solar-ai-dev/mcp-work-agent" }
     ],
     highlights: [
