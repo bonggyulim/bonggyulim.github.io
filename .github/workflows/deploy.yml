@@ -32,6 +32,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_GA4_MEASUREMENT_ID: G-P3WYBWSSYQ
 
       - name: Create SPA fallback
         run: cp dist/index.html dist/404.html
