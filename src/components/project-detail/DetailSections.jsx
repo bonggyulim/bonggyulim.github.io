@@ -628,7 +628,7 @@ function WorkerScalingCard({ card }) {
             <span className="detail-worker-split-bridge-arrow-down" aria-hidden="true"></span>
             <p>YOLO26s 640 · CPU ONNX 87.2 ± 0.9ms 참고</p>
             <span className="detail-worker-split-bridge-arrow-down" aria-hidden="true"></span>
-            <p>Job 누적 시 처리 용량을 어떻게 확장할 것인가?</p>
+            <p>단일 EC2의 적정 Worker 수와 Node 분산 방식은 무엇인가?</p>
             <span className="detail-worker-split-bridge-arrow" aria-hidden="true"></span>
           </div>
 
