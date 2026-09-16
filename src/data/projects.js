@@ -58,30 +58,30 @@ export const projects = [
             id: "implementation",
             title: "핵심 기능 구현",
             items: [
-              "검사 도메인 구현",
-              "문서 관리 도메인 구현",
-              "모델·Memory Bank 적용 범위 관리 구현",
-              "FastAPI AI 서빙 연동 및 React 화면 구현"
+              "검사 요청·AI 추론·결과 저장까지 비동기 검사 도메인 구현",
+              "문서 업로드·버전·인덱싱 상태를 포함한 문서 관리 도메인 구현",
+              "모델 버전·Artifact·Memory Bank 생성 및 적용 범위 관리 구현",
+              "Spring–FastAPI AI 서빙 연동과 주요 React 서비스 화면 구현"
             ]
           },
           {
             id: "design",
             title: "설계·의사결정",
             items: [
-              "요구사항·MVP·설계 기준 정의",
-              "서버·저장소 책임과 데이터 흐름 설계",
-              "API·DB·Spring–FastAPI 계약 설계",
-              "Memory Bank 운영 구조·AI 평가 기준 설계"
+              "요구사항 분석부터 MVP 범위·서비스 정책·설계 기준 정의",
+              "Spring·FastAPI·DB·파일 저장소의 책임과 데이터 흐름 설계",
+              "API·DB 모델과 Spring–FastAPI 간 추론 요청·응답 계약 설계",
+              "카테고리별 Memory Bank 운영 구조와 AI 모델 평가·적용 기준 설계"
             ]
           },
           {
             id: "operations-deploy",
             title: "자체호스팅 배포·운영 관리",
             items: [
-              "Docker Compose·Nginx·HTTPS 운영환경",
-              "GitHub Actions 빌드·배포 자동화",
-              "Health·Resource 상태 조회",
-              "Request ID·Log·비동기 작업 추적"
+              "Docker Compose·Nginx·HTTPS 기반 자체호스팅 운영환경 구성",
+              "GitHub Actions 기반 빌드·배포 Workflow와 서비스 기동 확인 구성",
+              "FastAPI·Redis·MinIO·ChromaDB 등 주요 컴포넌트 Health·Resource 상태 조회",
+              "Request ID·운영 Log·비동기 Job 상태를 연결한 장애 추적 흐름 구성"
             ]
           }
         ]
