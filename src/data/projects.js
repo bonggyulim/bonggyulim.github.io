@@ -15,7 +15,8 @@ export const projects = [
     descriptionEmphasis: ["Memory Bank 운영", "설비 문서 RAG 챗봇"],
     meta: [
       "2026.04.17 ~ 2026.05.15",
-      "7인 팀 프로젝트"
+      "7인 팀 프로젝트",
+      "PM"
     ],
     image: "/assets/projects/industrial-thumbnail.png?v=login-screen",
     imageFit: "cover",
