@@ -78,10 +78,10 @@ export const projects = [
             id: "operations-deploy",
             title: "자체호스팅 배포·운영 관리",
             items: [
-              "Docker Compose·Nginx·HTTPS 기반 자체호스팅 운영환경 구성",
-              "GitHub Actions 기반 빌드·배포 Workflow와 서비스 기동 확인 구성",
-              "FastAPI·Redis·MinIO·ChromaDB 등 주요 컴포넌트 Health·Resource 상태 조회",
-              "Request ID·운영 Log·비동기 Job 상태를 연결한 장애 추적 흐름 구성"
+              "Docker Compose·Nginx·HTTPS 기반 자체호스팅 운영",
+              "GitHub Actions 빌드·배포 자동화 및 기동 확인",
+              "FastAPI·Redis·MinIO·ChromaDB 상태 조회",
+              "Request ID·Log·비동기 Job 기반 장애 추적"
             ]
           }
         ]
