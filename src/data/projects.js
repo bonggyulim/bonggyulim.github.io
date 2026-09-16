@@ -108,7 +108,7 @@ export const projects = [
           problemLabel: "문제",
           problem: "신규 카테고리가 추가될 때마다 모델을 다시 학습하지 않고 빠르게 대응해야 했고, 검사 요청 증가에 대비해 추론 시간과 GPU 사용량을 줄이면서 판정 성능을 유지할 구조가 필요했습니다.",
           problemEmphasis: ["빠르게 대응", "추론 시간과 GPU 사용량을 줄이면서 판정 성능을 유지할 구조"],
-          decision: "하나의 모델 최적화에 의존하지 않고 세 단계로 접근했습니다.\n① Backbone 재사용 + 카테고리별 Memory Bank 분리\n② SPEED / PERFORMANCE 역할 분리\n③ Teacher–Student 경량화로 확장성과 자원 효율을 함께 개선했습니다.",
+          decision: "① Backbone 재사용 + 카테고리별 Memory Bank 분리\n② SPEED / PERFORMANCE 역할 분리\n③ Teacher–Student 경량화",
           decisionEmphasis: ["① Backbone 재사용 + 카테고리별 Memory Bank 분리", "② SPEED / PERFORMANCE 역할 분리", "③ Teacher–Student 경량화"],
           backboneFlow: {
             title: "1. Backbone 재사용 + 카테고리별 Memory Bank",
