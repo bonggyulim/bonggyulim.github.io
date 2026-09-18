@@ -1,4 +1,6 @@
 const EXCLUSION_KEY = "exclude_analytics";
+let isInitialized = false;
+let lastTrackedPath = null;
 
 export function initializeAnalytics() {
   const url = new URL(window.location.href);
@@ -26,15 +28,22 @@ export function initializeAnalytics() {
   }
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag() {
+  window.gtag = window.gtag || function gtag() {
     window.dataLayer.push(arguments);
   };
 
   window.gtag("js", new Date());
-  window.gtag("config", measurementId);
+  window.gtag("config", measurementId, { send_page_view: false });
+  isInitialized = true;
+}
 
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
+export function trackPageView(pathname) {
+  if (!isInitialized || pathname === lastTrackedPath) return;
+
+  lastTrackedPath = pathname;
+  window.gtag("event", "page_view", {
+    page_location: window.location.href,
+    page_path: pathname,
+    page_title: document.title,
+  });
 }

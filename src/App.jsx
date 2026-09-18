@@ -1,8 +1,10 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import ProjectDetail from "./pages/ProjectDetail";
+import { trackPageView } from "./analytics";
 
 function NotFound() {
   return (
@@ -16,6 +18,12 @@ function NotFound() {
 }
 
 export default function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
+
   return (
     <div className="app-shell">
       <Header />
