@@ -1333,6 +1333,121 @@ img {
   font-weight: 700;
 }
 
+.detail-agent-role-content {
+  min-width: 0;
+}
+
+.detail-agent-role-scroll {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  width: min(520px, 100%);
+  gap: 0;
+  margin-top: 0;
+  padding: 4px 10px 4px 12px;
+  overflow: visible;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+  scrollbar-color: rgba(15, 118, 110, 0.42) transparent;
+  scrollbar-width: thin;
+}
+
+.detail-agent-role-trigger {
+  position: relative;
+  z-index: 2;
+}
+
+.detail-agent-role-trigger::before {
+  display: none;
+}
+
+.detail-agent-role-trigger-text {
+  min-width: 0;
+}
+
+.detail-agent-role-trigger-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.detail-agent-role-trigger-button:focus-visible {
+  outline: 2px solid rgba(15, 118, 110, 0.36);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.detail-agent-role-toggle {
+  display: inline-grid;
+  place-items: center;
+  align-items: center;
+  width: 18px;
+  min-height: 18px;
+  padding: 0;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.06);
+  color: var(--primary);
+  font: inherit;
+  font-size: 0;
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.detail-agent-role-trigger-button:hover .detail-agent-role-toggle {
+  color: var(--primary-strong);
+  border-color: rgba(15, 118, 110, 0.36);
+  background: rgba(15, 118, 110, 0.12);
+}
+
+.detail-agent-role-toggle::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+.detail-agent-role-detail {
+  display: grid;
+  gap: 3px;
+  padding: 8px 2px;
+}
+
+.detail-agent-role-detail + .detail-agent-role-detail {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.detail-agent-role-detail strong {
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.detail-agent-role-detail p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
 .detail-contribution-three-column-grid .detail-contribution-item {
   min-width: 0;
   padding: 24px;

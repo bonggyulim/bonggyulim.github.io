@@ -539,22 +539,65 @@ function TripleContextRow({ items }) {
 }
 
 function ContributionRoleRow({ card }) {
+  const agentDetails = card.agentDetails ?? [];
+  const [isAgentDetailsOpen, setIsAgentDetailsOpen] = useState(false);
+  const items = (
+    <ul>
+      {(card.items ?? []).map((item, index) => {
+        const text = typeof item === "string" ? item : item.text;
+        const highlights = typeof item === "string" ? [] : item.highlights;
+        const isEmphasized = card.emphasizeAll || index === card.emphasisIndex;
+        const isAgentDetailsTrigger = agentDetails.length && index === 0;
+
+        return (
+          <li
+            key={text}
+            className={`${isEmphasized ? "is-emphasized" : ""}${isAgentDetailsTrigger ? " detail-agent-role-trigger" : ""}`}
+          >
+            {isAgentDetailsTrigger ? (
+              <>
+                <button
+                  type="button"
+                  className="detail-agent-role-trigger-button"
+                  aria-expanded={isAgentDetailsOpen}
+                  aria-controls={`agent-details-${card.id ?? card.title}`}
+                  onClick={() => setIsAgentDetailsOpen((isOpen) => !isOpen)}
+                >
+                  <span className="detail-agent-role-trigger-text">
+                    {isEmphasized ? <strong>{text}</strong> : <EmphasizedText text={text} phrases={highlights} />}
+                  </span>
+                  <span className="detail-agent-role-toggle" aria-hidden="true" />
+                </button>
+                {isAgentDetailsOpen ? (
+                  <div id={`agent-details-${card.id ?? card.title}`} className="detail-agent-role-scroll">
+                    {agentDetails.map((agent) => (
+                      <article className="detail-agent-role-detail" key={agent.title}>
+                        <strong>{agent.title}</strong>
+                        <p>{agent.description}</p>
+                      </article>
+                    ))}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <span className="detail-agent-role-trigger-text">
+                {isEmphasized ? <strong>{text}</strong> : <EmphasizedText text={text} phrases={highlights} />}
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+
   return (
     <article className="detail-contribution-role-row">
       <h3>{card.title}</h3>
-      <ul>
-        {(card.items ?? []).map((item, index) => {
-          const text = typeof item === "string" ? item : item.text;
-          const highlights = typeof item === "string" ? [] : item.highlights;
-          const isEmphasized = card.emphasizeAll || index === card.emphasisIndex;
-
-          return (
-            <li key={text} className={isEmphasized ? "is-emphasized" : ""}>
-              {isEmphasized ? <strong>{text}</strong> : <EmphasizedText text={text} phrases={highlights} />}
-            </li>
-          );
-        })}
-      </ul>
+      {agentDetails.length ? (
+        <div className="detail-agent-role-content">
+          {items}
+        </div>
+      ) : items}
     </article>
   );
 }

@@ -589,6 +589,32 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
               {
                 text: "외부 조회·사용자 응답에 따라 재분기할 수 있도록 DAG가 아닌 State 기반 순환형 흐름으로 구성"
               }
+            ],
+            agentDetails: [
+              {
+                title: "요청 분석 Agent",
+                description: "사용자 요청을 업무 단위로 분해하고 목표·대상·조건·제약을 State에 구조화"
+              },
+              {
+                title: "도구 선택 Agent",
+                description: "업무별 사용할 도구와 데이터를 결정"
+              },
+              {
+                title: "컨텍스트 탐색 Agent",
+                description: "구조화 Query로 Retrieval을 수행하고 필요한 근거만 선별"
+              },
+              {
+                title: "업무 분석 Agent",
+                description: "요청과 Context를 분석해 사실·관계·시간 조건·정보 부족·충돌 여부를 판단"
+              },
+              {
+                title: "Planning Agent",
+                description: "분석 결과를 바탕으로 답변을 만들거나, 실제 실행할 작업과 필요한 값을 계획"
+              },
+              {
+                title: "검토 Agent",
+                description: "만든 계획이 사용자 요청과 근거에 맞는지 다시 확인하고, 문제가 있으면 검색·계획·사용자 확인 단계로 되돌림"
+              }
             ]
           },
           {
