@@ -545,12 +545,9 @@ DB 제약(Partial Unique Index)으로 동시 요청의 경쟁 조건 차단
       "LangGraph",
       "LangSmith",
       "MCP",
-      "Pydantic",
-      "SQLAlchemy",
       "SQLite",
       "OAuth 2.0",
-      "Gemini API",
-      "Ollama"
+      "Ollama(Qwen3.5 9B)"
     ],
     connectors: [
       "Gmail API",
